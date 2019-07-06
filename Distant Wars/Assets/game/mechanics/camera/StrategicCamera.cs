@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
 [ExecuteInEditMode]
@@ -7,7 +8,8 @@ public class StrategicCamera : MonoBehaviour
     public float MaxOrthographicSize = 4000;
     public float MinOrthographicSize = 100;
     public float ZoomSensitivity = 10;
-    public float PanSensitivity = 10;
+    [FormerlySerializedAs("PanSensitivity")] public float MousePanSensitivity = 10;
+    public float ArrowsPanSensitivity = 10;
     public float LerpStrength = 0.2f;
 
     public float TargetSize;
@@ -53,10 +55,31 @@ public class StrategicCamera : MonoBehaviour
         
         if (Input.GetMouseButton((int) MouseButton.MiddleMouse))
         {
-            var /* position delta */ dp = PanSensitivity * MouseEx.PositionDelta * Time.deltaTime * TargetSize;
+            var /* position delta */ dp = MousePanSensitivity * MouseEx.PositionDelta * Time.deltaTime * Mathf.Sqrt(TargetSize);
             var /* new position */ np = TargetPosition - dp;
-            TargetPosition = ClampPosition(np);    
+            TargetPosition = ClampPosition(np);
         }
+
+        var uk = Input.GetKey(KeyCode.UpArrow);
+        var dk = Input.GetKey(KeyCode.DownArrow); 
+        var lk = Input.GetKey(KeyCode.LeftArrow);
+        var rk = Input.GetKey(KeyCode.RightArrow);
+        if (uk || dk || lk || rk)
+        {
+            var dp = Vector2.zero;
+            dp += uk ? Vector2.up    : Vector2.zero;
+            dp += dk ? Vector2.down  : Vector2.zero;
+            dp += lk ? Vector2.left  : Vector2.zero;
+            dp += rk ? Vector2.right : Vector2.zero;
+
+            dp *= ArrowsPanSensitivity;
+            dp *= Time.deltaTime;
+            dp *= Mathf.Sqrt(TargetSize);
+
+            var /* new position */ np = TargetPosition + dp;
+            TargetPosition = ClampPosition(np);
+        }
+        
 
         // apply target position
         {
@@ -86,8 +109,8 @@ public class StrategicCamera : MonoBehaviour
         var os = TargetSize;
         var ms = MaxOrthographicSize;
         var ar = camera.aspect;
-        var minx = -ms + os * ar;
-        var maxx =  ms - os * ar;
+        var minx = -ms * ar + os * ar;
+        var maxx =  ms * ar - os * ar;
         return new Vector3
         (
             minx < maxx ? Mathf.Clamp(p.x, minx, maxx) : 0,

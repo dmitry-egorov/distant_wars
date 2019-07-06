@@ -89,8 +89,8 @@
             float height_at(float2 uv)
             {
                 //float v = simple_texture_fetch(uv);
-                float v = precise_texture_fetch(uv);
-                return saturate( v / _HeightRange);
+                float h = precise_texture_fetch(uv);
+                return saturate(h / _HeightRange);
             }
             
             float is_land(float2 uv)
@@ -153,7 +153,6 @@
                 float3 /* shallow sea color */ ssc = _ShallowSeaColor;
                 float  /* sea level */          sl = _SeaLevel;
                 float  /* color gamma */        cg = _ColorGamma;
-                
                 
                 float  /* height */         h = height_at(uv);
                 float  /* is land */       il = is_land(uv);
