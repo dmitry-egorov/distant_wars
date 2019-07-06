@@ -12,7 +12,9 @@ public class Map : MonoBehaviour
     [Range(0, 1)] public float SeaLevel;
     [Range(0, 0.01f)] public float SeaBlend;
     [Range(0, 1)] public float LinesIntensity;
+    [Range(0, 1)] public float LinesSecondaryIntensity;
     [Range(0, 100)] public float LinesBands;
+    [Range(0,  10)] public float LinesSecondaryBands;
     [Range(0, 0.05f)] public float LineWidth;
     [Range(0, 1)] public float LineStrength;
     [Range(0, 1)] public float ShadowRange;
@@ -28,7 +30,9 @@ public class Map : MonoBehaviour
     static readonly int _seaLevel = Shader.PropertyToID("_SeaLevel");
     static readonly int _seaBlend = Shader.PropertyToID("_SeaBlend");
     static readonly int _linesIntensity = Shader.PropertyToID("_LinesIntensity");
+    static readonly int _linesSecondaryIntensity = Shader.PropertyToID("_LinesSecondaryIntensity");
     static readonly int _linesBands = Shader.PropertyToID("_LinesBands");
+    static readonly int _linesSecondaryBands = Shader.PropertyToID("_LinesSecondaryBands");
     static readonly int _lineWidth = Shader.PropertyToID("_LineWidth");
     static readonly int _lineStrength = Shader.PropertyToID("_LineStrength");
     static readonly int _shadowRange = Shader.PropertyToID("_ShadowRange");
@@ -74,7 +78,9 @@ public class Map : MonoBehaviour
         material.SetFloat(_seaLevel, SeaLevel);
         material.SetFloat(_seaBlend, SeaBlend);
         material.SetFloat(_linesIntensity, LinesIntensity);
+        material.SetFloat(_linesSecondaryIntensity, LinesSecondaryIntensity);
         material.SetFloat(_linesBands, LinesBands);
+        material.SetFloat(_linesSecondaryBands, LinesSecondaryBands);
         material.SetFloat(_lineWidth, LineWidth);
         material.SetFloat(_lineStrength, LineStrength);
         material.SetFloat(_shadowRange, ShadowRange);

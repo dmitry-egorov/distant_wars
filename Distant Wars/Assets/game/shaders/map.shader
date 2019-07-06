@@ -12,7 +12,9 @@
         _SeaLevel ("Sea Level", Range(0, 1)) = 0.01
         _SeaBlend ("Sea Blend", Range(0, 0.01)) = 0.005
         _LinesIntensity ("Lines Intensity", Range (0,1)) = 0.5
+        _LinesSecondaryIntensity ("Lines Secondary Intensity", Range (0,1)) = 0.2
         _LinesBands ("Lines Bands", Range (0,100)) = 10
+        _LinesSecondaryBands ("Lines Secondary Bands", Range (0,10)) = 5
         _LineWidth ("Line Width", Range (0,0.05)) = 1
         _LineStrength ("Line Strength", Range (0,2)) = 1
         _ShadowRange ("Shadow Range", Range(0, 1)) = 0.001
@@ -55,20 +57,53 @@
             float _SeaLevel;
             float _SeaBlend;
             float _LinesIntensity;
+            float _LinesSecondaryIntensity;
             float _LinesBands;
+            float _LinesSecondaryBands;
             float _LineWidth;
             float _LineStrength;
             float _ShadowRange;
             float _ShadowIntensity;
             
-            float adjust_height(float h)
-            {
-                return saturate(h / _HeightRange);
-            }
-            
             float height_at(float2 uv)
             {
-                return adjust_height(tex2D(_MainTex, uv));
+                return saturate(tex2D(_MainTex, uv) / _HeightRange);
+            }
+            
+            float line_color
+            (
+                float /* height */ h, 
+                float /* line bands */ lb, 
+                float /* line intensity*/ li, 
+                float /* line width */ lw
+            )
+            {
+                float /* sea level */       sl = _SeaLevel;
+                float /* height fraction */ hf = (frac((h - sl) * lb + 0.5) - 0.5) / lb;
+                float /* line color */      lc = 1 - li * smoothstep(0, abs(hf), lw);
+                
+                return lc;
+            }
+            
+            float line_color(float2 uv)
+            {
+                float /* texture width */         tw = _MainTex_TexelSize.z;
+                float /* lines strength */        ls = _LineStrength;
+                float /* lines width */           lw = _LineWidth;
+                float /* height */                 h = height_at(uv); // NOTE: assuming this would be optimized
+                float /* uv derivative */        duv = fwidth(uv) * tw * 10; // magic number
+                float /* height derivative */     dh = fwidth(h) * tw;
+                float /* adjusted line width */  alw = lw * dh / pow(duv, ls);
+                
+                float /* main lines bands */     mlb = _LinesBands;
+                float /* main lines intensity */ mli = _LinesIntensity;
+                float /* main line color */      mlc = line_color(h, mlb, mli, alw);
+                
+                float /* sec lines bands */      slb = _LinesBands * _LinesSecondaryBands;
+                float /* sec lines intensity */  sli = _LinesIntensity * _LinesSecondaryIntensity;
+                float /* sec line color */       slc = line_color(h, slb, sli, alw);
+                
+                return mlc * slc;
             }
 
             v2f vert (appdata v)
@@ -84,21 +119,20 @@
                 float tx = _MainTex_TexelSize.x;
                 float ty = _MainTex_TexelSize.y;
                 
-                float duv = fwidth(i.uv) * 10000;
-                float /* height */ h = height_at(i.uv);
-                float /* top left height */ htl = height_at(i.uv + float2(-tx, +ty));
-                float /* bottom right height */ hbr = height_at(i.uv + float2(+tx, -ty));
-                 
-                float  /* height derivative */ dh = fwidth(h) * _MainTex_TexelSize.z;
-                float  /* height fraction */   hf = frac((h - _SeaLevel) * _LinesBands);
-                float  /* line width */        lw = _LineWidth * dh / pow(duv, _LineStrength);
-                float  /* line color */        lc = 1 - _LinesIntensity * (smoothstep(0, hf, lw) + smoothstep(0, 1-hf, lw));
                 
-                float4 /* land color */    ldc = lerp(_BottomLandColor, _TopLandColor, pow(saturate((h - _SeaLevel) / (1 - _SeaLevel)), _ColorGamma));
+                float /* line color */ lc = line_color(i.uv); 
+                
+                float  /* height */         h = height_at(i.uv);
+                float  /* is land */       il = smoothstep(_SeaLevel - _SeaBlend, _SeaLevel + _SeaBlend, h);
+                float4 /* land color */   ldc = lerp(_BottomLandColor, _TopLandColor, pow(saturate((h - _SeaLevel) / (1 - _SeaLevel)), _ColorGamma));
                 float4 /* sea color */     sc = lerp(_DeepSeaColor, _SeaColor, saturate(h / _SeaLevel));
-                float4 /* terrain color */ tc = lerp(sc, ldc, smoothstep(_SeaLevel - _SeaBlend, _SeaLevel + _SeaBlend, h));
+                float4 /* terrain color */ tc = lerp(sc, ldc, il);
                 
-                float  /* shadow */ sh = 1 - _ShadowIntensity * step(hbr, htl); 
+                float /* top left height */     htl = height_at(i.uv + float2(-tx, +ty));
+                float /* bottom right height */ hbr = height_at(i.uv + float2(+tx, -ty));
+                float /* shadow */               sh = 1 - _ShadowIntensity * step(hbr, htl);
+                
+                lc = lerp(0.5 * (lc + 1), lc, il); // brighter lines under the sea 
                 
                 return tc * lc * sh;
             }
