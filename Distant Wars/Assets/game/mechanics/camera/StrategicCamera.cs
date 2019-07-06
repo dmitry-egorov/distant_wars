@@ -5,18 +5,9 @@ using UnityEngine.UIElements;
 public class StrategicCamera : MonoBehaviour
 {
     public float MaxOrthographicSize = 4000;
-    public float MaxZoomLevel = 15;
-    public float MinZoomLevel = 1;
+    public float MinOrthographicSize = 100;
     public float ZoomSensitivity = 10;
-    public float PanSensitivity = 10;
-    [Range(0, 1)] public float LerpStrength = 0.2f;
     
-    
-    public float TargetZoomLevel = 10;
-    public float CurrentZoomLevel = 10;
-    public Vector2 TargetPosition;
-    public Vector2 CurrentPosition;
-
     // Update is called once per frame
     void Update()
     {
@@ -27,46 +18,41 @@ public class StrategicCamera : MonoBehaviour
                 return;
             camera_transform = camera.transform;
         }
-
-        // adjust target zoom level
+        
+        var /* zoom delta */ dz = ZoomSensitivity * Input.mouseScrollDelta.y * Time.deltaTime;
+        var /* zoom target */ zt = camera.ScreenToWorldPoint(Input.mousePosition);
+        var /* current size */ os = camera.orthographicSize;
+        
+        // Zoom camera
         {
-            TargetZoomLevel += ZoomSensitivity * Input.mouseScrollDelta.y * Time.deltaTime;
-            TargetZoomLevel = ClampZoomLevel(TargetZoomLevel);
-        }
-
-        // adjust current zoom level
-        {
-            CurrentZoomLevel = Mathf.Lerp(CurrentZoomLevel, TargetZoomLevel, LerpStrength);
-            CurrentZoomLevel = ClampZoomLevel(CurrentZoomLevel);
+            var ns = ClampOrthographicSize(os - dz);
+            dz = os - ns;    
+            camera.orthographicSize = ns;
         }
         
-        var zoom_exp = 1f / Mathf.Exp(CurrentZoomLevel);
-        
-        // pan camera
-        if (Input.GetMouseButton((int) MouseButton.MiddleMouse))
+        // Move camera
         {
-            TargetPosition += -PanSensitivity * zoom_exp * MouseEx.PositionDelta * Time.deltaTime;
-        }
-
-        // adjust camera's position
-        {
-            CurrentPosition = Vector2.Lerp(CurrentPosition, TargetPosition, LerpStrength);
-        }
-
-        // set camera's position
-        {
-            var ct = camera_transform;
-            ct.position = new Vector3(CurrentPosition.x, CurrentPosition.y, ct.position.z);
-        }
-        
-        // set camera orthographic size
-        {
-            camera.orthographicSize = MaxOrthographicSize * zoom_exp;
+            var p = camera_transform.position;
+            var m = dz / os;
+            var np = p + (zt - p) * m;
+            camera_transform.position = ClampPosition(np);    
         }
     }
 
-    private float ClampZoomLevel(float /* zoom level*/ zl) => Mathf.Clamp(zl, MinZoomLevel, MaxZoomLevel);
+    float ClampOrthographicSize(float /* zoom level */ zl) => Mathf.Clamp(zl, MinOrthographicSize, MaxOrthographicSize);
+    
+    Vector3 ClampPosition(Vector3 /* position */ p)
+    {
+        var os = camera.orthographicSize;
+        var ms = MaxOrthographicSize;
+        return new Vector3
+        (
+            Mathf.Clamp(p.x, -ms + os, ms - os),
+            Mathf.Clamp(p.y, -ms + os, ms - os),
+            p.z
+        );
+    }
 
-    private new Camera camera;
-    private Transform camera_transform;
+    new Camera camera;
+    Transform camera_transform;
 }

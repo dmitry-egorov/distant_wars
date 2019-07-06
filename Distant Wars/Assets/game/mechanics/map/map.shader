@@ -96,7 +96,7 @@
             float is_land(float2 uv)
             {
                 float /* height */ h = height_at(uv);
-                return smoothstep(_SeaLevel - _SeaBlend, _SeaLevel + _SeaBlend, h);
+                return sstep(_SeaLevel, h, _SeaBlend);
             }
             
             float line_color
@@ -140,19 +140,19 @@
                 float /* line color */ lc = mlc * slc;
                 
                 float /* is land */ il = is_land(uv);
-                lc = lerp(0.5 * (lc + 1), lc, il); // brighter lines under the sea
+                lc = lerp(0.5 * (lc + 1), lc, il); // dimmer lines under the sea
                 
                 return lc;
             }
             
             float3 terrain_color(float2 uv)
             {
-                float3 tlc = _TopLandColor;
-                float3 blc = _BottomLandColor;
-                float3 dsc = _DeepSeaColor;
-                float3 ssc = _ShallowSeaColor;
-                float sl = _SeaLevel;
-                float cg = _ColorGamma;
+                float3 /* top land color */    tlc = _TopLandColor;
+                float3 /* bottom land color */ blc = _BottomLandColor;
+                float3 /* deep sea color */    dsc = _DeepSeaColor;
+                float3 /* shallow sea color */ ssc = _ShallowSeaColor;
+                float  /* sea level */          sl = _SeaLevel;
+                float  /* color gamma */        cg = _ColorGamma;
                 
                 
                 float  /* height */         h = height_at(uv);
@@ -189,9 +189,9 @@
             {
                 float2 uv = i.uv;
                 
-                float /* line color */ lc = line_color(uv);
+                float  /* line color */    lc = line_color(uv);
                 float3 /* terrain color */ tc = terrain_color(uv);
-                float /* shadow */ sh = shadow(uv); 
+                float  /* shadow */        sh = shadow(uv); 
                 
                 return float4(tc * lc * sh, 1);
             }

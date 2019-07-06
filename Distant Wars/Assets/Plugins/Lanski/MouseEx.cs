@@ -2,8 +2,8 @@ using UnityEngine;
 
 public static class MouseEx
 {
-    public static Vector2 Position() => Input.mousePosition.xy();
-    
+    public static Vector2 Position => Input.mousePosition.xy();
+
     public static Vector2 PositionDelta
     {
         get
@@ -30,7 +30,7 @@ public static class MouseEx
             if (lf != cf)
             {
                 last_frame = cf;
-                var /* new position */ np = Position();
+                var /* new position */ np = Position;
                 last_position = lf == cf - 1 ? current_position.Value : np;
                 current_position = np;
             }
