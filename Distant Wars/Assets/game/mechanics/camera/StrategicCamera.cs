@@ -7,79 +7,98 @@ public class StrategicCamera : MonoBehaviour
 {
     public float MaxOrthographicSize = 4000;
     public float MinOrthographicSize = 100;
+    [Range(0, 1)] public float LerpStrength = 0.2f;
     public float ZoomSensitivity = 10;
-    [FormerlySerializedAs("PanSensitivity")] public float MousePanSensitivity = 10;
+    [Range(0, 1)] public float ZoomOvershootX = 0.2f;
+    [Range(0, 1)] public float ZoomOvershootY = 0.2f;
+    public float MousePanSensitivity = 10;
     public float ArrowsPanSensitivity = 10;
-    public float LerpStrength = 0.2f;
 
     public float TargetSize;
     public float CurrentSize;
     public Vector2 TargetPosition;
     public Vector2 CurrentPosition;
     
-    // Update is called once per frame
     void Update()
     {
-        if (camera == null)
+        // initialize camera (first entry only)
         {
-            camera = GetComponent<Camera>();
             if (camera == null)
-                return;
-            camera_transform = camera.transform;
-        }
-
-        var /* zoom sensitivity */ zs = ZoomSensitivity;
-        var /* scroll delta */ ds = Input.mouseScrollDelta.y;
-
-        if (ds != 0f)
-        {
-            var /* zoom delta */   dz = ds * zs * TargetSize * Time.deltaTime;
-            var /* zoom target */  zt = camera.ScreenToWorldPoint(Input.mousePosition).xy();
-            var /* current size */ cs = TargetSize;
-        
-            // Zoom camera
             {
-                var ns = ClampOrthographicSize(cs - dz);
-                TargetSize = ns;
-                dz = cs - ns;    
+                camera = GetComponent<Camera>();
+                if (camera == null)
+                    return; // <!!!!----
+                camera_transform = camera.transform;
             }
+        }
+
+        var /* delta time */ dt = Time.deltaTime;
         
-            // Move camera
+        // zoom to mouse position on scroll
+        {
+            var /* scroll delta */ ds = Input.mouseScrollDelta.y;
+            if (ds != 0f)
             {
-                var p = TargetPosition;
-                var m = dz / cs;
-                var np = p + (zt - p) * m;
-                TargetPosition = ClampPosition(np);    
-            }            
+                var /* zoom sensitivity */ zs = ZoomSensitivity;
+                var /* size */              s = TargetSize;
+                var /* zoom delta */       dz = zs * s * ds * dt;
+        
+                // zoom camera
+                {
+                    var ns = clamp_size(s - dz);
+                    TargetSize = ns;
+                    dz = s - ns;    
+                }
+        
+                // move camera
+                {
+                    var /* zoom target */     zt = camera.ScreenToWorldPoint(Input.mousePosition).xy();
+                    var /* position */         p = TargetPosition;
+                    var /* offset */           o = new Vector2(1f + ZoomOvershootX, 1f + ZoomOvershootY);
+                    var /* position delta */  dp = o * (dz / s);
+                    var /* new position */    np = p + (zt - p) * dp;
+                    TargetPosition = clamp_position(np);    
+                }            
+            }
         }
         
-        if (Input.GetMouseButton((int) MouseButton.MiddleMouse))
+        // pan with middle mouse button
         {
-            var /* position delta */ dp = MousePanSensitivity * MouseEx.PositionDelta * Time.deltaTime * Mathf.Sqrt(TargetSize);
-            var /* new position */ np = TargetPosition - dp;
-            TargetPosition = ClampPosition(np);
+            if (Input.GetMouseButton((int) MouseButton.MiddleMouse))
+            {
+                var /* mouse position delta */ mdp = MouseEx.PositionDelta;
+                var /* pan sensitivity */       ps = MousePanSensitivity;
+                var /* size */                   s = TargetSize;
+                var /* position */               p = TargetPosition;
+                var /* position delta */        dp = ps * mdp * dt * Mathf.Sqrt(s);
+                var /* new position */          np = p - dp;
+                TargetPosition = clamp_position(np);
+            }
         }
 
-        var uk = Input.GetKey(KeyCode.UpArrow);
-        var dk = Input.GetKey(KeyCode.DownArrow); 
-        var lk = Input.GetKey(KeyCode.LeftArrow);
-        var rk = Input.GetKey(KeyCode.RightArrow);
-        if (uk || dk || lk || rk)
+        // pan with arrow keys
         {
-            var dp = Vector2.zero;
-            dp += uk ? Vector2.up    : Vector2.zero;
-            dp += dk ? Vector2.down  : Vector2.zero;
-            dp += lk ? Vector2.left  : Vector2.zero;
-            dp += rk ? Vector2.right : Vector2.zero;
+            var uk = Input.GetKey(KeyCode.UpArrow);
+            var dk = Input.GetKey(KeyCode.DownArrow); 
+            var lk = Input.GetKey(KeyCode.LeftArrow);
+            var rk = Input.GetKey(KeyCode.RightArrow);
+            if (uk || dk || lk || rk)
+            {
+                var dp = Vector2.zero;
+                dp += uk ? Vector2.up    : Vector2.zero;
+                dp += dk ? Vector2.down  : Vector2.zero;
+                dp += lk ? Vector2.left  : Vector2.zero;
+                dp += rk ? Vector2.right : Vector2.zero;
 
-            dp *= ArrowsPanSensitivity;
-            dp *= Time.deltaTime;
-            dp *= Mathf.Sqrt(TargetSize);
+                dp *= ArrowsPanSensitivity;
+                dp *= dt;
+                dp *= Mathf.Sqrt(TargetSize);
 
-            var /* new position */ np = TargetPosition + dp;
-            TargetPosition = ClampPosition(np);
+                var /* current position */ cp = TargetPosition;
+                var /* new position */     np = cp + dp;
+                TargetPosition = clamp_position(np);
+            }
         }
-        
 
         // apply target position
         {
@@ -98,23 +117,23 @@ public class StrategicCamera : MonoBehaviour
 
         // apply size
         {
-            camera.orthographicSize = ClampOrthographicSize(CurrentSize);
+            camera.orthographicSize = clamp_size(CurrentSize);
         }
     }
 
-    float ClampOrthographicSize(float /* zoom level */ zl) => Mathf.Clamp(zl, MinOrthographicSize, MaxOrthographicSize);
+    float clamp_size(float /* zoom level */ zl) => Mathf.Clamp(zl, MinOrthographicSize, MaxOrthographicSize);
     
-    Vector2 ClampPosition(Vector2 /* position */ p)
+    Vector2 clamp_position(Vector2 /* position */ p)
     {
-        var os = TargetSize;
-        var ms = MaxOrthographicSize;
-        var ar = camera.aspect;
-        var minx = -ms * ar + os * ar;
-        var maxx =  ms * ar - os * ar;
+        var /* current size */ cs = TargetSize;
+        var /* max size */     ms = MaxOrthographicSize;
+        var /* aspect ratio */ ar = camera.aspect;
+        var minx = -ms * ar + cs * ar;
+        var maxx =  ms * ar - cs * ar;
         return new Vector3
         (
             minx < maxx ? Mathf.Clamp(p.x, minx, maxx) : 0,
-            Mathf.Clamp(p.y, -ms + os, ms - os)
+            Mathf.Clamp(p.y, -ms + cs, ms - cs)
         );
     }
 
