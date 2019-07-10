@@ -13,9 +13,6 @@ public class handle_right_click : MassiveMechanic
         var /* selected units*/ su = lp.SelectedUnits;
         var /* target */         t = lp.WorldMousePosition;
 
-        foreach (var u in su)
-        {
-            u.issue_move_order(t);
-        }
+        foreach (var u in su) u.issue_move_order(t);
     }
 }

@@ -29,14 +29,16 @@ public class handle_camera_movement: MassiveMechanic
         
                 // move camera
                 {
+                    var /* local player */       lp = LocalPlayer.Instance;
+                    
                     var /* aspect ratio (w/h) */ ar = sc.Camera.aspect;
-                    var /* zoom target */        zt = sc.Camera.ScreenToWorldPoint(((Vector2) Input.mousePosition).xy0()).xy();
+                    var /* zoom target */        zt = lp.WorldMousePosition;
                     var /* position */            p = sc.TargetPosition;
                     var /* offset */              o = new Vector2(1f + sc.ZoomOvershoot / ar, 1f + sc.ZoomOvershoot );
                     var /* position delta */     dp = o * (dz / s);
                     var /* new position */       np = p + (zt - p) * dp;
                     sc.TargetPosition = clamp_position(np);    
-                }            
+                }
             }
         }
         

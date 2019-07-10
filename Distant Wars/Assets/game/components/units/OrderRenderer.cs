@@ -24,7 +24,7 @@ public class OrderRenderer : MonoBehaviour
 
     void show_move_order_point(Vector2 t)
     {
-        transform.position = t.xy(Units.Instance.OrdersZ);
+        transform.position = t.xy(UnitsRegistry.Instance.OrdersZ);
         
         mesh_renderer.enabled = true;
     }
@@ -33,11 +33,11 @@ public class OrderRenderer : MonoBehaviour
     {
         var sc = StrategicCamera.Instance;
         
-        var z = Units.Instance.OrdersZ;
+        var z = UnitsRegistry.Instance.OrdersZ;
         line_renderer.SetPosition(0, p.xy(z));
         line_renderer.SetPosition(1, t.xy(z));
 
-        var w = Units.Instance.OrderLineWidth * sc.SizeProportion;
+        var w = UnitsRegistry.Instance.OrderLineWidth * sc.SizeProportion;
         line_renderer.startWidth = w;
         line_renderer.endWidth = w;
 

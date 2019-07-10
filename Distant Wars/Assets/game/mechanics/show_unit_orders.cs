@@ -4,25 +4,22 @@ public class show_unit_orders: MassiveMechanic
 {
     public void _()
     {
-        var lp = LocalPlayer.Instance;
+        var /* local player */ lp = LocalPlayer.Instance;
 
         if (lp.SelectionChanged)
         {
-            var psu = PreviouslySelectedUnits;
+            var /* previously selected units */ psu = PreviouslySelectedUnits;
 
             foreach (var u in psu) u.hide_order_graphic();
             psu.Clear();
 
-            foreach (var su in lp.SelectedUnits)
-            {
-                su.show_order_graphic();
+            foreach (var /* selected unit */ su in lp.SelectedUnits) 
                 psu.Add(su);
-            }
         }
 
-        foreach (var u in Unit.All)
+        foreach (var u in lp.SelectedUnits)
         {
-            u.update_order_graphic();
+            u.show_order_graphic();
         }
     }
     

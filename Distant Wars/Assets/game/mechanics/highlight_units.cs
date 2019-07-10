@@ -9,8 +9,6 @@ public class highlight_units : MassiveMechanic
         
         var /* local player */ lp = LocalPlayer.Instance;
         
-        var id = lp.IsDragging;
-        var bu = lp.UnitsUnderTheCursorBox;
 
         var /* previously highlighted units */ phu = PreviouslyHighlightedUnits;
 
@@ -20,19 +18,20 @@ public class highlight_units : MassiveMechanic
             phu.Clear();
         }
 
-        // highlight selected units
-        foreach (var unit in lp.SelectedUnits)
+        // highlight units in the cursor box
+        var /* units under the cursor box */ bu = lp.UnitsUnderTheCursorBox;
+        foreach (var /* unit */ u in bu)
         {
-            unit.apply_highlighted_material();
-            phu.Add(unit);
+            u.apply_highlighted_material();
+            phu.Add(u);
         }
 
-        // highlight units in the selection box
-        if (id)
-        foreach (var unit in bu)
+        // highlight selected units
+        var /* selected units */ su = lp.SelectedUnits;
+        foreach (var /* unit */ u in su)
         {
-            unit.apply_highlighted_material();
-            phu.Add(unit);
+            u.apply_selected_material();
+            phu.Add(u);
         }
     }
     

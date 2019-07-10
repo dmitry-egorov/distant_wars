@@ -5,13 +5,15 @@ public class prepare_units_scale : MassiveMechanic
     public void _()
     {
         var /* strategic camera */ sc = StrategicCamera.Instance;
-        var /* size */             sp = sc.SizeProportion;
-        var /* units size */       us = sc.UnitsSize;
-        var /* min unit size */  mins = sc.MinUnitsSize;
-        var /* scale */             s = Mathf.Max(mins, us * sp);
-        var /* screen space multiplier */ m = sc.ScreenSpaceMultiplier;
-        var /* pixel perfect scale */   pps = (s * m).Floor() / m;
+        var /* units' registry */  ur = UnitsRegistry.Instance;
+        
+        
+        var      /* unit's screen size */   us = ur.UnitScreenSize * Screen.height / 1080 * 16; // order of operations is important for rounding
+        var /* screen space multiplier */    s2w = sc.ScreenToWorldSpaceMultiplier;
+        var              /* world size */   ws = us * s2w;
+        var         /* min unit's size */ mins = ur.MinWorldSize;
+        var           /* adjusted size */    s = Mathf.Max(mins, ws);
 
-        Units.Instance.Scale = pps;
+        UnitsRegistry.Instance.WorldScale = s;
     }
 }

@@ -15,41 +15,31 @@ public class find_units_under_the_cursor : MassiveMechanic
             
         if (fd || id)
             return;
-        
-        if (Game.Instance.ManualPhysics)
-        {
-            var /* mouse position */ mp = lp.WorldMousePosition;
-            var    /* boxed units */ bu = lp.UnitsUnderTheCursorBox;
-            var   /* closest unit */ cu = default(Unit);
-            var /* sqr distance to the closest unit */ sqcd = float.MaxValue;
-            foreach (var /* unit */ u in Unit.All)
-            {
-                var /* sqr distance to the unit */ sqd = (u.Position - mp).sqrMagnitude;
-                if (sqd < sqcd)
-                {
-                    cu = u;
-                    sqcd = sqd;
-                }
-            }
 
-            var     /* units' manager */ um = Units.Instance;
-            var       /* units' scale */ us = um.Scale.x;
-            var /* selection distance */ sd = um.SelectionDistance;
-            if (cu != null && sqcd < (sd * us).sqr())
+        var /* units' repository */ ur = UnitsRegistry.Instance;
+        var  /* strategic camera */ sc = StrategicCamera.Instance;
+        var      /* multiplier */  w2s = sc.WorldToScreenSpaceMultiplier;
+        var      /* multiplier */ w2so = sc.WorldToScreenSpaceOffset;
+        var    /* mouse position */ mp = lp.ScreenMousePosition;
+        var       /* boxed units */ bu = lp.UnitsUnderTheCursorBox;
+        var      /* closest unit */ cu = default(Unit);
+        var /* sqr distance to the closest unit */ sqcd = float.MaxValue;
+        foreach (var /* unit */ u in ur.All)
+        {
+            var     /* world space unit position */  wp = u.Position;
+            var    /* screen space unit position */  sp = wp * w2s + w2so;
+            var      /* sqr distance to the unit */ sqd = (sp - mp).sqrMagnitude;
+            if (sqd < sqcd)
             {
-                bu.Add(cu);
+                cu = u;
+                sqcd = sqd;
             }
         }
-        else
-        {
-            var /* mouse position */ mp = lp.WorldMousePosition;
-            var /* boxed units */    bu = lp.UnitsUnderTheCursorBox;
 
-            var collider = Physics2D.OverlapPoint(mp);
-            if (collider.TryGetComponent<Unit>(out var /* unit */ u)) 
-            {
-                bu.Add(u);
-            }
-        }
+        var /* units' screen size */ us = ur.WorldScale * w2s;
+        var /* selection distance */ sd = ur.ScreenSelectionDistance;
+        var /* adjusted selection distance */ asd = sd * us / 2f;
+        if (cu != null && sqcd < asd.sqr()) 
+            bu.Add(cu);
     }
 }

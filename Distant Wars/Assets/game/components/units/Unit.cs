@@ -1,15 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
 
-[ExecuteInEditMode]
 [RequireComponent(typeof(SpriteRenderer))]
-public class Unit : MassiveBehaviour<Unit>
+public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
 {
     public float Speed;
-    
     public Faction Faction;
     public Vector2 Position;
-    
     public Vector2? MoveTarget;  
 
     public void issue_move_order(Vector2 /* target */ t) => MoveTarget = t;
@@ -35,23 +32,37 @@ public class Unit : MassiveBehaviour<Unit>
         }
     }
 
-    public void hide_order_graphic() => order_graphic_is_visible = false;
-    public void show_order_graphic() => order_graphic_is_visible = true;
-    
-    public void update_order_graphic()
+    public void show_order_graphic()
     {
-        if (order_graphic_is_visible && MoveTarget.TryGetValue(out var t))
+        if (MoveTarget.TryGetValue(out var t))
         {
             order_renderer.show_move_order(Position, t);
         }
-        else
-        {
-            order_renderer.hide();
-        }
+    }
+
+    public void hide_order_graphic()
+    {
+        order_renderer.hide();
     }
 
     void Start()
     {
+        // find components
+        {
+            Assert.IsNotNull(sprite_renderer = GetComponent<SpriteRenderer>());
+            Assert.IsNotNull(order_renderer = GetComponentInChildren<OrderRenderer>());
+        }
+
+        // apply faction material
+        {
+            sprite_renderer.sharedMaterial = Faction != null ? Faction.DefaultSpriteMaterial : null;
+        }
+
+        // initialize order renderer
+        {
+            order_renderer.init();
+        }
+        
         if (!Application.isPlaying) return;
         
         // assert data is set
@@ -59,32 +70,16 @@ public class Unit : MassiveBehaviour<Unit>
             Assert.IsNotNull(Faction);
         }
         
-        // find components
-        {
-            Assert.IsNotNull(sprite_renderer = GetComponent<SpriteRenderer>());
-            Assert.IsNotNull(order_renderer = GetComponentInChildren<OrderRenderer>());
-        }
-        
         // apply transform to position
         {
             Position = transform.position.xy();
         }
-
-        // apply faction material
-        {
-            sprite_renderer.sharedMaterial = Faction.DefaultSpriteMateral;
-        }
-
-        // initialize order renderer
-        {
-            order_renderer.init();
-        }
     }
 
-    public void apply_default_material() => sprite_renderer.sharedMaterial = Faction.DefaultSpriteMateral;
+    public void apply_default_material() => sprite_renderer.sharedMaterial = Faction.DefaultSpriteMaterial;
     public void apply_highlighted_material() => sprite_renderer.sharedMaterial = Faction.HighlightedSpriteMaterial;
+    public void apply_selected_material() => sprite_renderer.sharedMaterial = Faction.SelectedSpriteMaterial;
 
     OrderRenderer order_renderer;
     SpriteRenderer sprite_renderer;
-    bool order_graphic_is_visible;
 }

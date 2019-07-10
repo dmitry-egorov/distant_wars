@@ -4,7 +4,7 @@
     {
         _MainTex ("Texture", 2D) = "white" {}
         _Color ("Color", Color) = (1, 0, 0, 1)
-        [Toggle(WHITE_ICON)] _WhiteIcon ("White Icon", Float) = 0
+        [KeywordEnum(Default, Highlighted, Selected)] _Mode ("Mode", Float) = 0
     }
     SubShader
     {
@@ -17,7 +17,7 @@
             #pragma vertex vert
             #pragma fragment frag
             
-            #pragma shader_feature WHITE_ICON
+            #pragma multi_compile_local DEFAULT HIGHLIGHTED SELECTED
 
             #include "UnityCG.cginc"
 
@@ -48,14 +48,23 @@
             fixed4 frag (v2f i) : SV_Target
             {
                 fixed col = tex2D(_MainTex, i.uv);
-                if (col > 0.9)
+                if (col > 0.75)
                     discard;
-                #ifdef WHITE_ICON
-                    float4 icon_color = float4(1,1,1,1);
-                #else
+                    
+                #ifdef DEFAULT
                     float4 icon_color = float4(0,0,0,1);
+                    float4 border_color = float4(0,0,0,1);
                 #endif
-                return step(col, 0.4) * icon_color + step(0.4, col) * _Color;
+                #ifdef HIGHLIGHTED
+                    float4 icon_color = float4(1,1,1,1);
+                    float4 border_color = float4(0,0,0,1);
+                #endif
+                #ifdef SELECTED
+                    float4 icon_color = float4(1,1,1,1);
+                    float4 border_color = float4(1,1,1,1);
+                #endif
+                
+                return step(col, 0.25) * icon_color + step(col, 0.5) * border_color + step(0.5, col) * _Color;
             }
             ENDCG
         }

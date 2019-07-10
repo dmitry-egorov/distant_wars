@@ -1,19 +1,17 @@
-using UnityEngine;
+using Plugins.Lanski;
 
 internal class prepare_camera_transformations: MassiveMechanic
 {
     public void _()
     {
         var sc = StrategicCamera.Instance;
-        var c = sc.Camera;
         
         var /* camera size */ ss = sc.Size;
-        var /* screen size */ scs = new Vector2(Screen.width, Screen.height);
-        var vss = new Vector2(2 * ss * c.aspect, 2 * ss);
-        var m = scs / vss;
-        var o = new Vector2(0.5f, 0.5f) * scs - sc.Position * m;
+        var /* screen size */ scs = 0.5f * ScreenEx.Size.v2f();
+        var m = scs.y / ss;
+        var o = scs - sc.Position * m;
 
-        sc.ScreenSpaceMultiplier = m;
-        sc.ScreenSpaceOffset = o;
+        sc.WorldToScreenSpaceMultiplier = m;
+        sc.WorldToScreenSpaceOffset = o;
     }
 }
