@@ -26,7 +26,7 @@ public class apply_unit_transforms: MassiveMechanic
 
                 var ut = u.transform;
                 ut.localScale = scv;
-                ut.position = snp.xy(z);
+                ut.position = snp.xy(z + u.BaseZOffset + u.StyleZOffset);
             }
         }
         else

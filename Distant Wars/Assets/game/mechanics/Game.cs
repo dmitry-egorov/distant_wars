@@ -7,7 +7,12 @@ public class Game: RequiredSingleton<Game>
 {
     void Update()
     {
-        _<disable_debug_text>();
+        // debug
+        {
+            _<pause_on_p>();
+            _<disable_debug_text>();            
+        }
+        
         _<cleanup_units>();
         _<reset_selection_changed>();
         _<clear_units_in_the_selection_box>();

@@ -5,16 +5,15 @@ public class highlight_units : MassiveMechanic
 {
     public void _()
     {
-        if (!Application.isPlaying) return;
-        
         var /* local player */ lp = LocalPlayer.Instance;
-        
 
         var /* previously highlighted units */ phu = PreviouslyHighlightedUnits;
 
         // clear previously highlighted units
         {
-            foreach (var unit in phu) unit.apply_default_material();
+            foreach (var unit in phu) 
+                unit.set_default_style();
+            
             phu.Clear();
         }
 
@@ -22,15 +21,17 @@ public class highlight_units : MassiveMechanic
         var /* units under the cursor box */ bu = lp.UnitsUnderTheCursorBox;
         foreach (var /* unit */ u in bu)
         {
-            u.apply_highlighted_material();
+            u.make_highlighted_style();
             phu.Add(u);
         }
+        
+        if (!Application.isPlaying) return;
 
         // highlight selected units
         var /* selected units */ su = lp.SelectedUnits;
         foreach (var /* unit */ u in su)
         {
-            u.apply_selected_material();
+            u.set_selected_style();
             phu.Add(u);
         }
     }

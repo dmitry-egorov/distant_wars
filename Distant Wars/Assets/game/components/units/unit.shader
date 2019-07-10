@@ -52,19 +52,24 @@
                     discard;
                     
                 #ifdef DEFAULT
+                    float d = 0;
                     float4 icon_color = float4(0,0,0,1);
                     float4 border_color = float4(0,0,0,1);
                 #endif
                 #ifdef HIGHLIGHTED
-                    float4 icon_color = float4(1,1,1,1);
-                    float4 border_color = float4(0,0,0,1);
+                    float d = 0.5;
+                    float4 icon_color = float4(0,0,0,1);
+                    float4 border_color = float4(1,1,1,1);
                 #endif
                 #ifdef SELECTED
+                    float d = 1;
                     float4 icon_color = float4(1,1,1,1);
                     float4 border_color = float4(1,1,1,1);
                 #endif
-                
-                return step(col, 0.25) * icon_color + step(col, 0.5) * border_color + step(0.5, col) * _Color;
+                //return float4(d,d,d,1);
+                return step(col, 0.25) * icon_color 
+                     + (step(col, 0.5) - step(col, 0.25)) * border_color 
+                     + (step(col, 0.75) - step(col, 0.5)) * _Color;
             }
             ENDCG
         }

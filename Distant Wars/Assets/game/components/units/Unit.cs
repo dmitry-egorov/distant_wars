@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Serialization;
 
 [RequireComponent(typeof(SpriteRenderer))]
 public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
@@ -7,7 +8,9 @@ public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
     public float Speed;
     public Faction Faction;
     public Vector2 Position;
-    public Vector2? MoveTarget;  
+    public Vector2? MoveTarget;
+    public float BaseZOffset;
+    [FormerlySerializedAs("ZOffset")] public float StyleZOffset;
 
     public void issue_move_order(Vector2 /* target */ t) => MoveTarget = t;
 
@@ -76,9 +79,23 @@ public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
         }
     }
 
-    public void apply_default_material() => sprite_renderer.sharedMaterial = Faction.DefaultSpriteMaterial;
-    public void apply_highlighted_material() => sprite_renderer.sharedMaterial = Faction.HighlightedSpriteMaterial;
-    public void apply_selected_material() => sprite_renderer.sharedMaterial = Faction.SelectedSpriteMaterial;
+    public void set_default_style()
+    {
+        StyleZOffset = 0;
+        sprite_renderer.sharedMaterial = Faction.DefaultSpriteMaterial;
+    }
+
+    public void make_highlighted_style()
+    {
+        StyleZOffset = -1;
+        sprite_renderer.sharedMaterial = Faction.HighlightedSpriteMaterial;
+    }
+
+    public void set_selected_style()
+    {
+        StyleZOffset = -2;
+        sprite_renderer.sharedMaterial = Faction.SelectedSpriteMaterial;
+    }
 
     OrderRenderer order_renderer;
     SpriteRenderer sprite_renderer;
