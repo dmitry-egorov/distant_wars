@@ -98,7 +98,7 @@ PlayerSettings:
   xboxEnableHeadOrientation: 0
   xboxEnableGuest: 0
   xboxEnablePIXSampling: 0
-  metalFramebufferOnly: 0
+  metalFramebufferOnly: 1
   xboxOneResolution: 0
   xboxOneSResolution: 0
   xboxOneXResolution: 3
@@ -516,7 +516,8 @@ PlayerSettings:
   webGLWasmStreaming: 0
   scriptingDefineSymbols: {}
   platformArchitecture: {}
-  scriptingBackend: {}
+  scriptingBackend:
+    Standalone: 0
   il2cppCompilerConfiguration: {}
   managedStrippingLevel: {}
   incrementalIl2cppBuild: {}
