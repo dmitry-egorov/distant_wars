@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class handle_right_click : MassiveMechanic
+public class issue_move_orders : MassiveMechanic
 {
     public void _()
     {
@@ -12,10 +12,10 @@ public class handle_right_click : MassiveMechanic
         if (!lp.RightMouseButtonIsDown) 
             return;
 
-        var /* selected units*/ su = lp.SelectedUnits;
-        var /* target */         t = lp.WorldMousePosition;
+        var /* selected units */ su = lp.SelectedUnits;
+        var         /* target */  t = lp.WorldMousePosition;
 
-        foreach (var u in su) 
-            u.issue_move_order(t);
+        foreach (var u in su)
+            u.MoveTarget = t;
     }
 }

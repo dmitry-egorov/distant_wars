@@ -3,11 +3,9 @@ using UnityEngine;
 public class UnitsRegistry: MassiveRegistry<UnitsRegistry, Unit>
 {
     [Header("Settings")] 
-    public int UnitScreenSize = 32;
+    public int UnitScreenSize = 2;
     public float MinWorldSize = 1f;
     public float ScreenSelectionDistance = 1f;
-    public float Z = 50f;
-    public bool SingleMesh;
     public Texture Texture;
     public Color Color;
 

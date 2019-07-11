@@ -51,7 +51,7 @@ public class Game: RequiredSingleton<Game>
         
         _<select_units>();
         _<set_units_style>();
-        _<handle_right_click>();
+        _<issue_move_orders>();
 
         // simulation
         {

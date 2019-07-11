@@ -63,7 +63,7 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
-                fixed col = tex2D(_MainTex, i.uv);
+                fixed col = tex2Dlod(_MainTex, float4(i.uv, 0, 0));
                 
                 if (col > 0.75)
                     discard;
