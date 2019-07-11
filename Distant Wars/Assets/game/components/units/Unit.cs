@@ -12,4 +12,11 @@ public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
     public Vector2? MoveTarget;
     public bool IsHighlighted;
     public bool IsSelected;
+
+    public void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        
+        Gizmos.DrawIcon(Position,"U", false);
+    }
 }

@@ -17,9 +17,9 @@ public class StrategicCamera : RequiredSingleton<StrategicCamera>
     public float Size;
     public Vector2 TargetPosition;
     public Vector2 Position;
-    public float WorldToScreenSpaceMultiplier;
-    public float ScreenToWorldSpaceMultiplier => 1 / WorldToScreenSpaceMultiplier;
-    public Vector2 WorldToScreenSpaceOffset;
+    public float WorldToScreenMultiplier;
+    public float ScreenToWorldSpaceMultiplier => 1 / WorldToScreenMultiplier;
+    public Vector2 WorldToScreenOffset;
 
     public Camera Camera => camera == null ? camera = FindObjectOfType<Camera>() : camera;
     

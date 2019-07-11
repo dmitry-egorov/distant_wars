@@ -10,10 +10,10 @@ public class set_units_style : MassiveMechanic
         foreach (var /* unit */ u in lp.PreviousUnitsInTheCursorBox) 
             u.IsHighlighted = false;
 
-        foreach (var /* unit */ u in lp.UnitsInTheCursorBox) 
+        foreach (var /* unit */ u in lp.UnitsInTheCursorBox)
             u.IsHighlighted = true;
 
-        foreach (var u in lp.PreviouslySelectedUnits) 
+        foreach (var u in lp.PreviouslySelectedUnits)
             u.IsSelected = false;
 
         foreach (var /* unit */ u in lp.SelectedUnits) 

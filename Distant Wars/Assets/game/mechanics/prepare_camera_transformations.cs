@@ -11,7 +11,7 @@ internal class prepare_camera_transformations: MassiveMechanic
         var m = scs.y / ss;
         var o = scs - sc.Position * m;
 
-        sc.WorldToScreenSpaceMultiplier = m;
-        sc.WorldToScreenSpaceOffset = o;
+        sc.WorldToScreenMultiplier = m;
+        sc.WorldToScreenOffset = o;
     }
 }

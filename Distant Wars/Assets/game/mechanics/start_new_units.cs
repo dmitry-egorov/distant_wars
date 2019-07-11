@@ -1,4 +1,3 @@
-using Plugins.Lanski.Behaviours;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -6,10 +5,8 @@ internal class start_new_units : MassiveMechanic
 {
     public void _()
     {
-        var /* units registry */
-            ur = UnitsRegistry.Instance;
-        var /* new units */
-            nu = ur.NewObjects;
+        var /* units registry */ ur = UnitsRegistry.Instance;
+        var      /* new units */ nu = ur.NewObjects;
         if (Application.isPlaying)
         {
             foreach (var u in nu)

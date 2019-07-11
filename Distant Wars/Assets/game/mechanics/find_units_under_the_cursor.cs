@@ -5,8 +5,6 @@ public class find_units_under_the_cursor : MassiveMechanic
 {
     public void _()
     {
-        if (!Application.isPlaying) return;
-        
         var /* units' repository */ ur = UnitsRegistry.Instance;
         var      /* local player */ lp = LocalPlayer.Instance;
 
@@ -18,6 +16,8 @@ public class find_units_under_the_cursor : MassiveMechanic
 
         var /* cursor is a box */ ib = lp.IsDragging || lp.FinishedDragging;
 
+        var us = ur.Units;
+        
         if (ib)
         {
             var /* cursor box */ cb = lp.WorldCursorBox;
@@ -30,7 +30,7 @@ public class find_units_under_the_cursor : MassiveMechanic
             var miny = Mathf.Min(min.y, max.y);
             var maxy = Mathf.Max(min.y, max.y);
 
-            foreach (var u in ur.Units)
+            foreach (var /* unit */ u in us)
             {
                 var p = u.Position;
                 var px = p.x;
@@ -47,17 +47,17 @@ public class find_units_under_the_cursor : MassiveMechanic
         }
         else
         {
-            var  /* strategic camera */ sc = StrategicCamera.Instance;
-            var      /* multiplier */  w2s = sc.WorldToScreenSpaceMultiplier;
-            var      /* multiplier */ w2so = sc.WorldToScreenSpaceOffset;
-            var    /* mouse position */ mp = lp.ScreenMousePosition;
-            var      /* closest unit */ cu = default(Unit);
+            var  /* strategic camera */   sc = StrategicCamera.Instance;
+            var        /* multiplier */  w2s = sc.WorldToScreenMultiplier;
+            var            /* offset */ w2so = sc.WorldToScreenOffset;
+            var    /* mouse position */   mp = lp.ScreenMousePosition;
+            var      /* closest unit */   cu = default(Unit);
             var /* sqr distance to the closest unit */ sqcd = float.MaxValue;
-            foreach (var /* unit */ u in ur.Units)
+            foreach (var /* unit */ u in us)
             {
-                var     /* world space unit position */  wp = u.Position;
-                var    /* screen space unit position */  sp = wp * w2s + w2so;
-                var      /* sqr distance to the unit */ sqd = (sp - mp).sqrMagnitude;
+                var  /* world space unit position */  wp = u.Position;
+                var /* screen space unit position */  sp = wp * w2s + w2so;
+                var   /* sqr distance to the unit */ sqd = (sp - mp).sqrMagnitude;
                 if (sqd < sqcd)
                 {
                     cu = u;
@@ -65,10 +65,10 @@ public class find_units_under_the_cursor : MassiveMechanic
                 }
             }
 
-            var /* units' screen size */ us = ur.WorldScale * w2s;
-            var /* selection distance */ sd = ur.ScreenSelectionDistance;
-            var /* adjusted selection distance */ asd = sd * us / 2f;
-            if (cu != null && sqcd < asd.sqr()) 
+            var /* units' screen size */ uss = ur.WorldScale * w2s;
+            var /* selection distance */  sd = ur.ScreenSelectionDistance;
+            var /* adjusted selection distance */ asd = sd * uss / 2f;
+            if (cu != null && sqcd < asd.sqr())
                 bu.Add(cu);
         }
     }

@@ -34,21 +34,19 @@ public class Game: RequiredSingleton<Game>
         _<set_position_from_transform_in_editor>();
 
         _<prepare_mouse_clicking>();
-        
         _<prepare_screen_mouse_position>();
         _<prepare_camera_transformations>();
         _<prepare_world_mouse_position>();
         _<handle_camera_movement>(); // Note: camera has moved, so the transformation and mouse position needs to be recalculated
         _<prepare_camera_transformations>();
         _<prepare_world_mouse_position>();
+        _<prepare_units_scale>();
         
         _<prepare_mouse_dragging>();
-        _<prepare_units_scale>();
-
         _<set_cursor_is_a_box>();
+
         _<find_units_under_the_cursor>();
-        _<find_units_in_the_cursor_box>();
-        
+
         _<select_units>();
         _<set_units_style>();
         _<issue_move_orders>();
