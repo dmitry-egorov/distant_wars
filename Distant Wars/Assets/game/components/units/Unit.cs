@@ -10,8 +10,6 @@ public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
     [Header("State")]
     public Vector2 Position;
     public Vector2? MoveTarget;
-    
-    [Header("Auto")]
     public bool IsHighlighted;
     public bool IsSelected;
 }
