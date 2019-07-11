@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Profiling;
 
@@ -10,6 +11,11 @@ public static class Massive
         try
         {
             Registry<T>.Instance._();
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+            MassiveDebug.Display(e.ToString());
         }
         finally
         {

@@ -4,7 +4,6 @@
     {
         _MainTex ("Texture", 2D) = "white" {}
         _Color ("Color", Color) = (1, 0, 0, 1)
-        [KeywordEnum(Default, Highlighted, Selected)] _Mode ("Mode", Float) = 0
     }
     SubShader
     {
@@ -74,4 +73,5 @@
             ENDCG
         }
     }
+    CustomEditor "UnitShaderEditor"
 }

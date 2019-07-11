@@ -23,25 +23,13 @@ public class LocalPlayer : RequiredSingleton<LocalPlayer>
     public Vector2 ScreenDragStartPosition;
     public Vector2 WorldDragStartPosition;
     
+    public bool CursorIsABox;
     public Rect ScreenCursorBox;
     public Rect WorldCursorBox;
-    
-    public bool SelectionChanged => selection_changed;
-    
+
     // Units under the cursor or the cursor box
-    public List<Unit> UnitsUnderTheCursorBox;
+    public List<Unit> UnitsInTheCursorBox;
+    public List<Unit> PreviousUnitsInTheCursorBox;
     public List<Unit> SelectedUnits;
-
-    public void reset_selection_changed() => selection_changed = false;
-
-    public void select_units(List<Unit> bu)
-    {
-        selection_changed = true;
-        
-        var /* selected units */ su = SelectedUnits;
-        su.Clear();
-        foreach (var u in bu) su.Add(u);
-    }
-    
-    bool selection_changed;
+    public List<Unit> PreviouslySelectedUnits;
 }

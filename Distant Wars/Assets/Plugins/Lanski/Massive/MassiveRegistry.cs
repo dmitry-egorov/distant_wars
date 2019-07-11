@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Plugins.Lanski;
 using UnityEngine;
@@ -6,12 +7,13 @@ public abstract class MassiveRegistry<TM, T> : RequiredSingleton<TM>
     where TM : MassiveRegistry<TM, T> 
     where T: MassiveBehaviour<TM, T>
 {
-    public List<T> All => objects ?? (objects = new List<T>());
+    public List<T> Units => objects ?? (objects = new List<T>());
+    public List<T> NewObjects => new_objects ?? (new_objects = new List<T>());
 
     public void clean_up()
     {
         var i = 0;
-        var list = All;
+        var list = Units;
         while(i < list.Count)
         {
             if (list[i] == null)
@@ -29,8 +31,10 @@ public abstract class MassiveRegistry<TM, T> : RequiredSingleton<TM>
 
     internal void register(T b)
     {
-        All.Add(b);
+        Units.Add(b);
+        NewObjects.Add(b);
     }
 
     static List<T> objects;
+    static List<T> new_objects;
 }

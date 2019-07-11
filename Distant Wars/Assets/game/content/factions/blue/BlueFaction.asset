@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e2692d8da254968859c2958b1e1a793, type: 3}
   m_Name: BlueFaction
   m_EditorClassIdentifier: 
-  DefaultSpriteMateral: {fileID: 2100000, guid: 06da4c7f8681b4d4ab58191d420f42f2,
+  DefaultSpriteMaterial: {fileID: 2100000, guid: 06da4c7f8681b4d4ab58191d420f42f2,
     type: 2}
-  SelectedSpriteMaterial: {fileID: 2100000, guid: 1f61bced836c84fbc826dd0fbee31f30,
+  HighlightedSpriteMaterial: {fileID: 2100000, guid: eff9cb1a4b2224fa580a2b326b4b8e79,
+    type: 2}
+  SelectedSpriteMaterial: {fileID: 2100000, guid: e14d1f68d3aec422596a71bf49d4b76f,
     type: 2}

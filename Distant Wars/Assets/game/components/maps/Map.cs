@@ -7,6 +7,7 @@ public class Map : RequiredSingleton<Map>
     public TextAsset HeightMap;
     public int Width = 1025;
     public int Height = 1025;
+    public float Scale = 8000;
     
     [Header("Visual")]
     public Color TopLandColor;

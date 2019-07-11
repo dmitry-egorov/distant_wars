@@ -1,6 +1,5 @@
 ﻿using Plugins.Lanski;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class StrategicCamera : RequiredSingleton<StrategicCamera>
 {
@@ -32,5 +31,4 @@ public class StrategicCamera : RequiredSingleton<StrategicCamera>
     }
     
     new Camera camera;
-
 }
