@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
+﻿using UnityEditor;
 
 [CustomEditor(typeof(Map))]
 public class MapEditor : Editor
@@ -12,7 +9,7 @@ public class MapEditor : Editor
         DrawDefaultInspector();
         if (EditorGUI.EndChangeCheck())
         {
-            ((Map)target).UpdateMaterialParameters();
+            ((Map)target).Reload();
             serializedObject.Update();
         }
     }

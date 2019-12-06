@@ -7,7 +7,7 @@ public class set_units_style : MassiveMechanic
     {
         var /* local player */ lp = LocalPlayer.Instance;
 
-        foreach (var /* unit */ u in lp.PreviousUnitsInTheCursorBox) 
+        foreach (var /* unit */ u in lp.PreviousUnitsInTheCursorBox)
             u.IsHighlighted = false;
 
         foreach (var /* unit */ u in lp.UnitsInTheCursorBox)

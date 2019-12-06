@@ -6,15 +6,13 @@ public class UnitsRegistry: MassiveRegistry<UnitsRegistry, Unit>
     public int UnitScreenSize = 2;
     public float MinWorldSize = 1f;
     public float ScreenSelectionDistance = 1f;
-    public Texture Texture;
-    public Color Color;
-
+    public MeshRenderer SpritesRenderer;
+    public MeshRenderer VisionRenderer;
 
     [Header("State")]
     public float WorldScale;
 
     [Header("Auto")] 
-    public Mesh Mesh;
-    public Material Material;
-    public MeshRenderer MeshRenderer;
+    public Mesh SpritesMesh;
+    public Mesh VisionMesh;
 }

@@ -1,0 +1,24 @@
+- auto squads: select part of a squad and give it a command to create a new squad
+- right-click on a squad to merge selected units with it
+- squads auto resupply
+- drag on movement path line to create new point (delay the single click if clicking on a line)
+- third rare resource for tech
+- zerg-like faction with a queen
+- tsunami from sea explosions
+- terain destruction
+- water simulation
+- melting sand
+- forest fire
+- waporising lakes
+- fog
+- unit overheating
+- hero pilots with passive and active perks
+- underground units? or underground level
+- vision by unit clusters (omptimization)
+
+- session multiplayer
+- players arrive at the sight early, acid fog covers the map (planning phase)
+- fog disperces, but then slowly covers the map again
+- players fight for artifacts
+
+Hyper-Massive Encounters

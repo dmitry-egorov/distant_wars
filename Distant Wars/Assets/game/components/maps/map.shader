@@ -2,27 +2,33 @@
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
-        _TopLandColor ("Top Land Color", Color) = (1,1,1,1)
-        _BottomLandColor ("Bottom Land Color", Color) = (1,1,1,1)
-        _ShallowSeaColor ("Sea Color", Color) = (1,1,1,1)
-        _DeepSeaColor ("Deep Sea Color", Color) = (1,1,1,1)
-        _ShoreHighColor ("Shore High Color", Color) = (1,1,1,1)
-        _ShoreLowColor ("Shore Low Color", Color) = (1,1,1,1)
-        _LandColorGamma ("Land Color Gamma", Range(0, 2)) = 1
-        _ShoreColorGamma ("Shore Color Gamma", Range(0, 2)) = 1
-        _HeightRange ("Height Range", Range(0, 1)) = 1
-        _SeaLevel ("Sea Level", Range(0, 1)) = 0.01
-        _ShoreWidth ("Sea Level", Range(0, 1)) = 1
-        _ShoreBlend ("Shore Blend", Range(0, 0.01)) = 0.005
-        _SeaBlend ("Sea Blend", Range(0, 0.01)) = 0.005
-        _LinesIntensity ("Lines Intensity", Range (0,1)) = 0.5
+        _MainTex                 ("Map Texture", 2D) = "white" {}
+        _VisionTex               ("Vision Texture", 2D) = "white" {}
+        _DiscoveryTex            ("Discovery Texture", 2D) = "white" {}
+        _TopLandColor            ("Top Land Color", Color) = (1,1,1,1)
+        _BottomLandColor         ("Bottom Land Color", Color) = (1,1,1,1)
+        _ShallowSeaColor         ("Sea Color", Color) = (1,1,1,1)
+        _DeepSeaColor            ("Deep Sea Color", Color) = (1,1,1,1)
+        _ShoreHighColor          ("Shore High Color", Color) = (1,1,1,1)
+        _ShoreLowColor           ("Shore Low Color", Color) = (1,1,1,1)
+        _SeaColorGamma           ("Sea Color Gamma", Range(0, 8)) = 1
+        _LandColorGamma          ("Land Color Gamma", Range(0, 2)) = 1
+        _ShoreColorGamma         ("Shore Color Gamma", Range(0, 2)) = 1
+        _HeightRange             ("Height Range", Range(0, 1)) = 1
+        _SeaLevel                ("Sea Level", Range(0, 1)) = 0.01
+        _ShoreWidth              ("Sea Level", Range(0, 1)) = 1
+        _ShoreBlend              ("Shore Blend", Range(0, 0.01)) = 0.005
+        _SeaBlend                ("Sea Blend", Range(0, 0.01)) = 0.005
+        _LinesIntensity          ("Lines Intensity", Range (0,1)) = 0.5
         _LinesSecondaryIntensity ("Lines Secondary Intensity", Range (0,1)) = 0.2
-        _LinesBands ("Lines Bands", Range (0,100)) = 10
-        _LinesSecondaryBands ("Lines Secondary Bands", Range (0,10)) = 5
-        _LineWidth ("Line Width", Range (0,10)) = 1
-        _LineStrength ("Line Strength", Range (0,2)) = 1
-        _ShadowIntensity ("Shadow Intensity", Range(0, 1)) = 0.5
+        _LinesBands              ("Lines Bands", Range (0,100)) = 10
+        _LinesSecondaryBands     ("Lines Secondary Bands", Range (0,10)) = 5
+        _LineWidth               ("Line Width", Range (0,10)) = 1
+        _LineStrength            ("Line Strength", Range (0,2)) = 1
+        _ShadowIntensity         ("Shadow Intensity", Range(0, 1)) = 0.5
+        _VisionBrightness        ("Vision Brightness", Range(0, 1)) = 0.5
+        _VisionSaturation        ("Vision Saturation", Range(0, 1)) = 0.1
+        _VisionSharpness         ("Vision Sharpness", Range(0, 16)) = 8
     }
     SubShader
     {
@@ -52,12 +58,19 @@
             sampler2D _MainTex;
             float4 _MainTex_ST;
             float4 _MainTex_TexelSize;
+            sampler2D _VisionTex;
+            float4 _VisionTex_ST;
+            float4 _VisionTex_TexelSize;
+            sampler2D _DiscoveryTex;
+            float4 _DiscoveryTex_ST;
+            float4 _DiscoveryTex_TexelSize;
             float4 _TopLandColor;
             float4 _BottomLandColor;
             float4 _ShallowSeaColor;
             float4 _DeepSeaColor;
             float4 _ShoreLowColor;
             float4 _ShoreHighColor;
+            float _SeaColorGamma;
             float _LandColorGamma;
             float _ShoreColorGamma;
             float _HeightRange;
@@ -72,10 +85,14 @@
             float _LineWidth;
             float _LineStrength;
             float _ShadowIntensity;
+            float _VisionBrightness;
+            float _VisionSaturation;
+            float _VisionSharpness;
             
-            float sqr(float v) { return v * v; }
-            float sstep(float min, float max, float width) { return smoothstep(min - width, min + width, max); }
-            float remap01(float v, float min, float max) { return (v - min) / (max - min); }
+            /* square value */                        float sqr(float v) { return v * v; }
+            /* smooth step within [min,max] */        float sstep(float min, float max, float width) { return smoothstep(min - width, min + width, max); }
+            /* remap value from [min,max] to [0,1] */ float remap01(float v, float min, float max) { return (v - min) / (max - min); }
+            /* saturate or clamp to [0,1] */          float sat(float v) { return saturate(v); }
             
             float border(float2 uv)
             {
@@ -83,38 +100,50 @@
                 return step(ts.x, uv.x) * step(ts.x, 1 - uv.x) * step(ts.y, uv.y) * step(ts.y, 1 - uv.y);  
             }
             
-            float simple_texture_fetch(float2 uv) { return tex2D(_MainTex, uv); }
-            
-            float precise_texture_fetch(float2 uv)
+            float filtered_texture_fetch(float2 uv, sampler2D tex, float2 res)
             {
                 //Note: from Inigo Quilez at https://www.iquilezles.org/www/articles/hwinterpolation/hwinterpolation.htm
-                float2 res = _MainTex_TexelSize.zw;
-            
                 float2 st = uv*res - 0.5;
             
                 float2 iuv = floor(st);
                 float2 fuv = frac(st);
             
-                float a = tex2D(_MainTex, (iuv+float2(0.5,0.5))/res);
-                float b = tex2D(_MainTex, (iuv+float2(1.5,0.5))/res);
-                float c = tex2D(_MainTex, (iuv+float2(0.5,1.5))/res);
-                float d = tex2D(_MainTex, (iuv+float2(1.5,1.5))/res);
+                float a = tex2D(tex, (iuv+float2(0.5,0.5))/res);
+                float b = tex2D(tex, (iuv+float2(1.5,0.5))/res);
+                float c = tex2D(tex, (iuv+float2(0.5,1.5))/res);
+                float d = tex2D(tex, (iuv+float2(1.5,1.5))/res);
             
                 return lerp(lerp(a, b, fuv.x), lerp(c, d, fuv.x), fuv.y);
+            }
+
+            float filtered_main_texture_fetch(float2 uv)
+            {
+                return filtered_texture_fetch(uv, _MainTex, _MainTex_TexelSize.zw);
+            }
+
+            float filtered_vision_texture_fetch(float2 uv)
+            {
+                return filtered_texture_fetch(uv, _VisionTex, _VisionTex_TexelSize.zw);
+            }
+
+            float filtered_discovery_texture_fetch(float2 uv)
+            {
+                return filtered_texture_fetch(uv, _DiscoveryTex, _DiscoveryTex_TexelSize.zw);
             }
             
             float height_at(float2 uv)
             {
-                //float v = simple_texture_fetch(uv);
-                float h = precise_texture_fetch(uv);
-                return saturate(h / _HeightRange);
+                float h = filtered_main_texture_fetch(uv);
+                
+                return /* height */ saturate(h / _HeightRange);
             }
             
             float shore_level()
             {
                 float  /* sea level */   sl = _SeaLevel;
                 float  /* lines bands */ bs = _LinesBands;
-                return sl + _ShoreWidth / bs;
+                
+                return /* shore level */ sl + _ShoreWidth / bs;
             }
             
             float is_shore(float2 uv)
@@ -125,7 +154,7 @@
                 float /* height */        h = height_at(uv);
                 float /* shore level */ shl = shore_level();
                 
-                return sstep(sl, h, sb) - sstep(shl, h, shb);
+                return /* is shore */ sstep(sl, h, sb) - sstep(shl, h, shb);
             }
             
             float is_land(float2 uv)
@@ -133,7 +162,7 @@
                 float /* height */ h = height_at(uv);
                 float /* shore level */ shl = shore_level();
                 
-                return sstep(shl, h, _ShoreBlend);
+                return /* is land */ sstep(shl, h, _ShoreBlend);
             }
             
             float topo_line
@@ -145,9 +174,8 @@
             )
             {
                 float /* height fraction */ hf = (frac(h * lb + 0.5) - 0.5) / lb;
-                float /* line color */ lc = 1 - li * smoothstep(0, abs(hf), lw);
                 
-                return lc;
+                return /* topo line color */ 1 - li * smoothstep(0, abs(hf), lw);
             }
             
             float topo_line(float2 uv)
@@ -177,9 +205,9 @@
                 float /* line color */ lc = mlc * slc;
                 
                 float /* is land */ il = is_land(uv);
-                lc = lerp(0.5 * (lc + 1), lc, il); // dimmer lines under the sea
                 
-                return lc;
+                // dimmer lines under the sea
+                return /* topo line color */ lerp(0.5 * (lc + 1), lc, il);
             }
             
             float3 terrain(float2 uv)
@@ -191,35 +219,65 @@
                 float3 /* shore high color */ shhc = _ShoreHighColor;
                 float3 /* shore low color */  shlc = _ShoreLowColor;
                 float  /* sea level */          sl = _SeaLevel;
+                float  /* sea level */         scg = _SeaColorGamma;
                 float  /* land gamma */         lg = _LandColorGamma;
                 float  /* shore gamma */       shg = _ShoreColorGamma;
                 float  /* lines bands */        bs = _LinesBands;
                 
-                
                 float  /* shore level */  shl = shore_level();
                 float  /* height */         h = height_at(uv);
-                float3 /* sea color */     sc = lerp(dsc, ssc, saturate(remap01(h, 0, sl)));
-                float3 /* shore color */  shc = lerp(shlc, shhc, pow(saturate(remap01(h, sl, shl)), shg));   
-                float3 /* land color */   ldc = lerp(blc, tlc, pow(saturate(remap01(h, shl, 1)), lg));
+                float3 /* sea color */     sc = lerp( dsc,  ssc, pow(sat(remap01(h,   0,  sl)), scg));
+                float3 /* shore color */  shc = lerp(shlc, shhc, pow(sat(remap01(h,  sl, shl)), shg));   
+                float3 /* land color */   ldc = lerp( blc,  tlc, pow(sat(remap01(h, shl,   1)),  lg));
                 
                 float  /* is shore */     ish = is_shore(uv);
                 float  /* is land */       il = is_land(uv);
-                float3 /* terrain color */ tc = lerp(lerp(sc, shc, ish), ldc, il);
                 
-                return tc;
+                return /* terrain color */ lerp(lerp(sc, shc, ish), ldc, il);
             }
             
             float shadow(float2 uv)
             {
-                float tx = _MainTex_TexelSize.x;
-                float ty = _MainTex_TexelSize.y;
+                float2 ts = _MainTex_TexelSize.xy;
+                float  tx = ts.x;
+                float  ty = ts.y;
                 
                 float /* shadow's intensity */   si = _ShadowIntensity;
                 float /* top left height */     htl = height_at(uv + float2(-tx, +ty));
                 float /* bottom right height */ hbr = height_at(uv + float2(+tx, -ty));
-                float /* shadow */               sh = 1 - si * sstep(hbr, htl, 0.001);
                 
-                return sh;
+                return /* shadow color */ 1 - si * sstep(hbr, htl, 0.001);
+            }
+            
+            float grid(float2 uv)
+            {
+                float2  ts = _MainTex_TexelSize.xy;
+                float   tx = ts.x;
+                float   ty = ts.y;
+                float    w = 0.05;
+                float2 suv = frac(uv / ts);
+                //float /* shadow's intensity */   si = _ShadowIntensity;
+                return /* grid color */ 
+                1 - 
+                (
+                      step(0.5 - w, suv.x) 
+                    * step(suv.x, 0.5 + w)
+                    * step(0.5 - w, suv.y) 
+                    * step(suv.y, 0.5 + w)
+                );
+            }
+
+            float3 vision(float /* discovery */ d, float /* vision */ v, float3 /* map color */ mc)
+            {
+                float  brt = _VisionBrightness;
+                float  sat = _VisionSaturation;
+                float shrp = 8;//_VisionSharpness;
+
+                float /* color intensity */ ci = dot(float3(0.222, 0.707, 0.071), mc);
+                float3 fgc = brt * lerp(float3(ci, ci, ci), mc, sat);
+                float3 bgd = float3(0,0,0);
+
+                return lerp(bgd, lerp(fgc,  mc, pow(v, shrp)), pow(d, shrp));
             }
 
             v2f vert (appdata v)
@@ -233,12 +291,22 @@
             float4 frag (v2f i) : SV_Target
             {
                 float2 uv = i.uv;
-                float  /* border */        bc = border(uv);
-                float  /* line color */    lc = topo_line(uv);
-                float3 /* terrain color */ tc = terrain(uv);
-                float  /* shadow */        sh = shadow(uv); 
+                float /* vision */ v = filtered_vision_texture_fetch(uv).x;
+                float /* vision */ d = filtered_discovery_texture_fetch(uv).x;
                 
-                return float4(bc * tc * lc * sh, 1);
+                if (d == 0.0) discard;
+
+                float3 /* map color */ mc = 1
+                    * border(uv)
+                    * topo_line(uv)
+                    * terrain(uv)
+                    * shadow(uv)
+                    //* grid(uv)
+                ;
+
+                float3 fc = vision(d, v, mc);
+                
+                return float4(fc, 1);
             }
             ENDCG
         }

@@ -21,12 +21,13 @@ public class StrategicCamera : RequiredSingleton<StrategicCamera>
     public float ScreenToWorldSpaceMultiplier => 1 / WorldToScreenMultiplier;
     public Vector2 WorldToScreenOffset;
 
-    public Camera Camera => camera == null ? camera = FindObjectOfType<Camera>() : camera;
+    public Camera Camera => camera == null ? camera = Camera.main : camera;
     
     public float SizeProportion => Size / MaxOrthographicSize;
 
     void Awake()
     {
+        
         Camera.eventMask = 0;
     }
     

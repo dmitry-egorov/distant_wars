@@ -16,5 +16,10 @@ namespace Plugins.Lanski
             item = l[index];
             return true;
         }
+
+        public static void ReserveMemoryFor<T>(this List<T> l, int count)
+        {
+            if (l.Capacity < count) l.Capacity = count;
+        }
     }
 }

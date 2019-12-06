@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
-using UnityEngine.Serialization;
 
 public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
 {
     [Header("Settings")]
-    [FormerlySerializedAs("Speed")] public float BaseSpeed;
+    public float BaseSpeed;
+    public float VisionRange;
     public Faction Faction;
 
     [Header("State")]

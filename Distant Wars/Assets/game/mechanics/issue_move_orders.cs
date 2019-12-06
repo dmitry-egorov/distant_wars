@@ -4,7 +4,7 @@ public class issue_move_orders : MassiveMechanic
 {
     public void _()
     {
-        if (!Application.isPlaying) 
+        if (!Application.isPlaying)
             return;
 
         var /* local player */  lp = LocalPlayer.Instance;

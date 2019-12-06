@@ -1,0 +1,13 @@
+- buildings
+  - factory
+  - metal gatherer
+  - energy gatherer
+- hide enemy units
+- screen space visibility
+
++ terrain movement speed modifier
+
+
+oc nc
+
+nc > 0.5 ? nc : max(oc, nc)

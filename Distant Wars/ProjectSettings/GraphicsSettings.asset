@@ -35,7 +35,7 @@ GraphicsSettings:
   - {fileID: 16001, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: 17000, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: 4800000, guid: ae0a5080718b74d6db4a84ada2966784, type: 3}
-  - {fileID: 4800000, guid: 6387461ae60624c4290f67af601d1051, type: 3}
+  - {fileID: 4800000, guid: 88892021ada564922b598ce328a3a839, type: 3}
   - {fileID: 4800000, guid: 21593896b368c4841bc25d839b5a024d, type: 3}
   - {fileID: 16002, guid: 0000000000000000f000000000000000, type: 0}
   m_PreloadedShaders: []
@@ -113,3 +113,4 @@ GraphicsSettings:
   m_AlbedoSwatchInfos: []
   m_LightsUseLinearIntensity: 0
   m_LightsUseColorTemperature: 0
+  m_LogWhenShaderIsCompiled: 0
