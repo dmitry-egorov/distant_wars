@@ -9,6 +9,8 @@
         ZWrite Off
         ZTest Off
         ZClip False
+        Blend One One
+        BlendOp Max
 
 
         Pass

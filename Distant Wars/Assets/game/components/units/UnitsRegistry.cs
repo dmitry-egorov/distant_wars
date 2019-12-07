@@ -13,9 +13,10 @@ public class UnitsRegistry: MassiveRegistry<UnitsRegistry, Unit>
 
     [Header("State")]
     public float WorldScale;
-    public List<Unit> OwnUnits;
+    public List<Unit> Units;
+    public List<Unit> VisionUnits;
     public List<Unit> OtherUnits;
-    public List<Unit> OtherVisibleUnits;
+    public List<Unit> VisibleOtherUnits;
 
     [Header("Auto")] 
     public Mesh SpritesMesh;

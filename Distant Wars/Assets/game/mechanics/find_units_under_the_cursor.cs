@@ -6,9 +6,8 @@ public class find_units_under_the_cursor : MassiveMechanic
     public void _()
     {
         var /* units' repository */ ur = UnitsRegistry.Instance;
-        var      /* local player */ lp = LocalPlayer.Instance;
-
-        var /* units in the box */ bu = lp.PreviousUnitsInTheCursorBox;
+        var /* local player      */ lp = LocalPlayer.Instance;
+        var /* units in the box  */ bu = lp.PreviousUnitsInTheCursorBox;
         bu.Clear();
         
         lp.PreviousUnitsInTheCursorBox = lp.UnitsInTheCursorBox;
@@ -16,7 +15,12 @@ public class find_units_under_the_cursor : MassiveMechanic
 
         var /* cursor is a box */ ib = lp.IsDragging || lp.FinishedDragging;
 
-        var us = ur.OwnUnits;
+        var vus = ur.VisionUnits;
+        var ous = ur.VisibleOtherUnits;
+
+        var vuc = vus.Count;
+        var ouc = ous.Count;
+        var tuc = vuc + ouc;
         
         if (ib)
         {
@@ -30,17 +34,18 @@ public class find_units_under_the_cursor : MassiveMechanic
             var miny = Mathf.Min(min.y, max.y);
             var maxy = Mathf.Max(min.y, max.y);
 
-            foreach (var /* unit */ u in us)
+            for (int i = 0; i < tuc; i++)
             {
+                var /* unit */ u = i < vuc ? vus[i] : ous[i - vuc];
                 var p = u.Position;
                 var px = p.x;
                 var py = p.y;
                 var /* is within the box */ wb =
-                        px >= minx
-                        && px <= maxx
-                        && py >= miny
-                        && py <= maxy
-                    ;
+                    px >= minx
+                    && px <= maxx
+                    && py >= miny
+                    && py <= maxy
+                ;
                 if (wb)
                     bu.Add(u);
             }
@@ -54,8 +59,10 @@ public class find_units_under_the_cursor : MassiveMechanic
 
             var      /* closest unit */   cu = default(Unit);
             var /* sqr distance to the closest unit */ sqcd = float.MaxValue;
-            foreach (var /* unit */ u in us)
+
+            for (int i = 0; i < tuc; i++)
             {
+                var /* unit */ u = i < vuc ? vus[i] : ous[i - vuc];
                 var  /* world space unit position */  wp = u.Position;
                 var /* screen space unit position */  sp = wp * w2s + w2so;
                 var   /* sqr distance to the unit */ sqd = (sp - mp).sqrMagnitude;

@@ -1,9 +1,15 @@
-- faction colors
+- firing and destruction
+  - attacking
+  - bullet firing
+  - hp and destruction
+  - blinking when attacked
+- radar
 - buildings
   - factory
   - metal gatherer
   - energy gatherer
 
++ faction colors
 + hide enemy units
 + screen space visibility
 + terrain movement speed modifier

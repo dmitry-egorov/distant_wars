@@ -3,19 +3,19 @@ using Plugins.Lanski;
 
 // find visible units other than the player's
 //TODO: spacial storage for other units
-internal class find_other_visible_units : MassiveMechanic
+internal class update_visible_enemy_units : MassiveMechanic
 {
     public void _()
     {
         var ur = UnitsRegistry.Instance;
-        var ovu = ur.OtherVisibleUnits;
+        var ovu = ur.VisibleOtherUnits;
 
         foreach(var vu in ovu)
             vu.IsVisible = false;
 
         ovu.Clear();
 
-        foreach(var /* own unit */ owu in ur.OwnUnits)
+        foreach(var /* own unit */ owu in ur.VisionUnits)
         {
             var /* own position */ owp = owu.Position;
             var /* own vision range squared*/ vr2 = owu.VisionRange.sqr();

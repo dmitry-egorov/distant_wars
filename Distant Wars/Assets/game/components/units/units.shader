@@ -3,7 +3,6 @@
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _Color ("Color", Color) = (1, 0, 0, 1)
     }
     SubShader
     {
@@ -26,14 +25,14 @@
             struct v2f
             {
                 float2 uv : TEXCOORD0;
-                float2 flags: TEXCOORD1;// x - is highlighted, y - is selected
+                float4 flags: TEXCOORD1;// x - is highlighted, y - is selected, z - color index
                 float4 vertex : SV_POSITION;
             };
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
-            float4 _Color;
             float _UnitsSize;
+            float4 _FactionColors[16];
 
             v2f vert (appdata d)
             {
@@ -45,6 +44,7 @@
                 
                 o.flags.x = ih ? 1.0 : 0.0;
                 o.flags.y = is ? 1.0 : 0.0;
+                o.flags.z = floor(fmod(flags, 256) / 16);
                 
                 float /* offset x */ ox = fmod(flags,  8) >= 4 ? 0.5 : -0.5;
                 float /* offset y */ oy = fmod(flags, 16) >= 8 ? 0.5 : -0.5;
@@ -74,10 +74,16 @@
                 float is = i.flags.y;
                 float4 ic = lerp(float4(0,0,0,1), float4(1,1,1,1), is);
                 float4 bc = lerp(float4(0,0,0,1), float4(1,1,1,1), saturate(ih + is));
+                float4 fc = _FactionColors[i.flags.z];
+
+                //return i.flags.z;
+                //return float4(1,1,1,1);
+                //return _FactionColors[1];
+
                 
                 return step(col, 0.25) * ic 
                      + (step(col, 0.5 ) - step(col, 0.25)) * bc
-                     + (step(col, 0.75) - step(col, 0.5 )) * _Color
+                     + (step(col, 0.75) - step(col, 0.5 )) * fc
                  ;
             }
             ENDCG

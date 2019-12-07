@@ -19,6 +19,7 @@ public class Game: RequiredSingleton<Game>
             _<initialize_map>();
             _<initialize_local_player>();
             _<initialize_units_registry>();
+            _<initialize_bullets_manager>();
             _<initialize_selection_box>();
             _<initialize_order_point>();
 
@@ -51,18 +52,22 @@ public class Game: RequiredSingleton<Game>
         _<find_units_under_the_cursor>();
 
         _<select_units>();
-        _<set_units_style>();
-        _<issue_move_orders>();
+        _<issue_unit_orders>();
 
         // simulation
         {
+            _<update_attack_cooldowns>();
             _<execute_unit_orders>();
+
+            _<update_bullets>();
         }
 
-        _<find_other_visible_units>();
-        
+        _<update_visible_enemy_units>();
+        _<update_units_style>();
+
         _<render_order_point>();
         _<render_units>();
+        _<render_bullets>();
         _<render_selection_box>();
 
         // debug
@@ -72,7 +77,12 @@ public class Game: RequiredSingleton<Game>
 
         _<resize_discovery_texture>();
         _<resize_vision_texture>();
+
+        time += Time.deltaTime;
+        DebugText.set_text("time", time.ToString());
     }
 
     [NonSerialized]bool initialized;
+
+    static float time;
 }

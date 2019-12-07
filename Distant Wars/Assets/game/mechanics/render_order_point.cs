@@ -9,7 +9,7 @@ public class render_order_point : MassiveMechanic
             return;
         
         var /* local player */ lp = LocalPlayer.Instance;
-        var  /* order point */ op = OrderPoint.Instance;
+        var /* order point  */ op = OrderPoint.Instance;
         var /* order mesh renderer */ omr = op.MeshRenderer;
         var /* order line renderer */ olr = op.LineRenderer;
 
@@ -19,7 +19,7 @@ public class render_order_point : MassiveMechanic
         (
             !lp.CursorIsABox 
             && bu.TryGetFirstItem(out var /* unit */ u) 
-            && u.MoveTarget.TryGetValue(out var /* target */ t)
+            && u.MoveTarget.try_get(out var /* target */ t)
         )
         {
             var /* orders z */ z = op.Z;

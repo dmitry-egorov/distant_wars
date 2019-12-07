@@ -5,7 +5,7 @@ internal class initialize_units_registry : MassiveMechanic
 {
     public void _()
     {
-        var /* units registry */  ur = UnitsRegistry.Instance;
+        var /* units registry */ ur = UnitsRegistry.Instance;
         var map = Map.Instance;
 
         {
@@ -39,5 +39,9 @@ internal class initialize_units_registry : MassiveMechanic
 
             ur.VisionMesh = vmesh;
         }
+
+        ur.Units.Clear();
+        ur.VisionUnits.Clear();
+        ur.OtherUnits.Clear();
     }
 }
