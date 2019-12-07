@@ -1,124 +1,54 @@
 ﻿using Plugins.Lanski;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Map", menuName = "DW/MapAsset", order = 1)]
-public class MapAsset : ScriptableObject
+public class Map : RequiredSingleton<Map>
 {
-    [Header("Common")]
+    [Header("Settings")]
     public TextAsset HeightMap;
     public int Width = 1025;
     public int Height = 1025;
     public float Scale = 8000;
-    
-    [Header("Visual")]
-    public Color TopLandColor;
-    public Color BottomLandColor;
-    public Color ShallowSeaColor;
-    public Color DeepSeaColor;
-    public Color ShoreHighColor;
-    public Color ShoreLowColor;
-    [Range(0, 2)]     public float LandColorGamma;
-    [Range(0, 2)]     public float ShoreColorGamma;
-    [Range(0, 8)]     public float SeaColorGamma;
-    [Range(0, 1)]     public float HeightRange;
-    [Range(0, 1)]     public float SeaLevel;
-    [Range(0, 1)]     public float ShoreWidth;
-    [Range(0, 0.01f)] public float ShoreBlend;
-    [Range(0, 0.01f)] public float SeaBlend;
-    [Range(0, 1)]     public float LinesIntensity;
-    [Range(0, 1)]     public float LinesSecondaryIntensity;
-    [Range(0, 100)]   public float LinesBands;
-    [Range(0, 10)]    public float LinesSecondaryBands;
-    [Range(0, 10)]    public float LineWidth;
-    [Range(0, 1)]     public float LineStrength;
-    [Range(0, 1)]     public float ShadowIntensity;
-    [Range(0, 1)]     public float VisionBrightness;
-    [Range(0, 1)]     public float VisionSaturation;
-    [Range(0, 16)]    public float VisionSharpness;
+    public Camera VisionCamera;
+    public Camera DiscoveryCamera;
+    public int DiscoveryTextureSize;
 
-    public void OnValidate() 
-    {
-        Map.Instance.Reload();
-    }
-}
-
-public class Map : RequiredSingleton<Map>
-{
+    [Header("State")]
+    public Texture2D map_texture;
     public RenderTexture VisionTexture;
     public RenderTexture DiscoveryTexture;
-    public MapAsset MapAsset;
 
-    public float Scale => scale;
-
-    public void Reload()
+    public void reload()
     {
-        var ma = MapAsset;
-        var renderer = GetComponent<Renderer>();
-        var material = renderer.sharedMaterial;
-        if (material == null)
+        if (map_texture == null)
         {
-            material = renderer.sharedMaterial = new Material(Shader.Find("DW/Map"));
-            material.name = "Height Map";
-        }
-
-        var texture = material.GetTexture(_mainTex) as Texture2D;
-        if (ma.HeightMap != null)
-        {
-            if (texture == null)
+            map_texture = new Texture2D(Width, Height, TextureFormat.R16, false, true)
             {
-                texture = new Texture2D(ma.Width, ma.Height, TextureFormat.R16, false, true)
-                {
-                    name = "Height Map"
-                };
-            }
-
-            texture.LoadRawTextureData(map_data);
-            texture.filterMode = FilterMode.Point;
+                name = "Height Map"
+            };
         }
-        else
+
+        if (HeightMap != null)
         {
-            texture = null;
+            map_texture.LoadRawTextureData(HeightMap.bytes);
         }
 
-        material.SetTexture(_mainTex, texture);
-        material.SetTexture(_visionTex, VisionTexture);
-        material.SetTexture(_discoveryTex, DiscoveryTexture);
-        material.SetColor(_topLandColor, ma.TopLandColor);
-        material.SetColor(_bottomLandColor, ma.BottomLandColor);
-        material.SetColor(_shallowSeaColor, ma.ShallowSeaColor);
-        material.SetColor(_deepSeaColor, ma.DeepSeaColor);
-        material.SetColor(_shoreHighColor, ma.ShoreHighColor);
-        material.SetColor(_shoreLowColor, ma.ShoreLowColor);
-        material.SetFloat(_seaColorGamma, ma.SeaColorGamma);
-        material.SetFloat(_landColorGamma, ma.LandColorGamma);
-        material.SetFloat(_shoreColorGamma, ma.ShoreColorGamma);
-        material.SetFloat(_heightRange, ma.HeightRange);
-        material.SetFloat(_seaLevel, ma.SeaLevel);
-        material.SetFloat(_shoreWidth, ma.ShoreWidth);
-        material.SetFloat(_shoreBlend, ma.ShoreBlend);
-        material.SetFloat(_seaBlend, ma.SeaBlend);
-        material.SetFloat(_linesIntensity, ma.LinesIntensity);
-        material.SetFloat(_linesSecondaryIntensity, ma.LinesSecondaryIntensity);
-        material.SetFloat(_linesBands, ma.LinesBands);
-        material.SetFloat(_linesSecondaryBands, ma.LinesSecondaryBands);
-        material.SetFloat(_lineWidth, ma.LineWidth);
-        material.SetFloat(_lineStrength, ma.LineStrength);
-        material.SetFloat(_shadowIntensity, ma.ShadowIntensity);
-        material.SetFloat(_visionBrightness, ma.VisionBrightness);
-        material.SetFloat(_visionSaturation, ma.VisionSaturation);
-        material.SetFloat(_visionSharpness, ma.VisionSharpness);
+        map_texture.filterMode = FilterMode.Point;
+        map_texture.anisoLevel = 0;
+        map_texture.Apply();
+
+        Shader.SetGlobalTexture(_mapTex, map_texture);
     }
 
     public void initialize()
     {
-        var ma = MapAsset;
+        reload();
 
-        transform.localScale = ma.Scale.v3();
-        map_data = ma.HeightMap.bytes;
-        cell_size = ma.Scale / ma.Width;
-        width = ma.Width;
-        height = ma.Height;
-        scale = ma.Scale;
+        transform.localScale = Scale.v3();
+        map_data = HeightMap.bytes;
+        cell_size = Scale / Width;
+        width = Width;
+        height = Height;
+        scale = Scale;
     }
 
     public float slope(Vector2 position, Vector2 direction) => slope2(position, direction.normalized);
@@ -168,9 +98,7 @@ public class Map : RequiredSingleton<Map>
     private int height;
     private float scale;
 
-    static readonly int _mainTex                 = Shader.PropertyToID("_MainTex");
-    static readonly int _visionTex               = Shader.PropertyToID("_VisionTex");
-    static readonly int _discoveryTex            = Shader.PropertyToID("_DiscoveryTex");
+    static readonly int _mapTex                  = Shader.PropertyToID("_MapTex");
     static readonly int _topLandColor            = Shader.PropertyToID("_TopLandColor");
     static readonly int _bottomLandColor         = Shader.PropertyToID("_BottomLandColor");
     static readonly int _shallowSeaColor         = Shader.PropertyToID("_ShallowSeaColor");
@@ -195,4 +123,5 @@ public class Map : RequiredSingleton<Map>
     static readonly int _visionBrightness        = Shader.PropertyToID("_VisionBrightness"); 
     static readonly int _visionSaturation        = Shader.PropertyToID("_VisionSaturation");
     static readonly int _visionSharpness         = Shader.PropertyToID("_VisionSharpness");
+
 }

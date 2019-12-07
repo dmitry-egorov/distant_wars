@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Assertions;
 
-internal class start_new_units : MassiveMechanic
+internal class init_new_units : MassiveMechanic
 {
     public void _()
     {
@@ -22,6 +22,17 @@ internal class start_new_units : MassiveMechanic
                 // apply transform to position
                 {
                     u.Position = u.transform.position.xy();
+                }
+
+                if (u.Faction == LocalPlayer.Instance.Faction)
+                {
+                    u.IsVisible = true;
+                    ur.OwnUnits.Add(u);
+                }
+                else
+                {
+                    u.IsVisible = false;
+                    ur.OtherUnits.Add(u);
                 }
             }
         }

@@ -47,7 +47,7 @@
             {
                 float dx = i.uv.x;
                 float dy = i.uv.y;
-                float w = 0.004;
+                float w = fwidth(dx) * 2;
                 float v = sstep(dx*dx + dy*dy, 0.5*0.5 - w, w);
                 if (v == 0) discard;
                 return float4(v,v,v,1);

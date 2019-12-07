@@ -6,6 +6,7 @@ public class LocalPlayer : RequiredSingleton<LocalPlayer>
 {
     [Header("Settings")]
     public float CursorBoxMinDistance;
+    public Faction Faction;
 
     [Header("State")] 
     public Vector2 ScreenMousePosition;

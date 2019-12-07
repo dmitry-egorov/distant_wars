@@ -2,9 +2,6 @@
 {
     Properties
     {
-        _MainTex                 ("Map Texture", 2D) = "white" {}
-        _VisionTex               ("Vision Texture", 2D) = "white" {}
-        _DiscoveryTex            ("Discovery Texture", 2D) = "white" {}
         _TopLandColor            ("Top Land Color", Color) = (1,1,1,1)
         _BottomLandColor         ("Bottom Land Color", Color) = (1,1,1,1)
         _ShallowSeaColor         ("Sea Color", Color) = (1,1,1,1)
@@ -51,13 +48,14 @@
 
             struct v2f
             {
-                float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
+                float2 uv : TEXCOORD0;
+                float2 screenPos : TEXCOORD1;
             };
 
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
-            float4 _MainTex_TexelSize;
+            sampler2D _MapTex;
+            float4 _MapTex_ST;
+            float4 _MapTex_TexelSize;
             sampler2D _VisionTex;
             float4 _VisionTex_ST;
             float4 _VisionTex_TexelSize;
@@ -96,7 +94,7 @@
             
             float border(float2 uv)
             {
-                float2 ts = _MainTex_TexelSize.xy;
+                float2 ts = _MapTex_TexelSize.xy;
                 return step(ts.x, uv.x) * step(ts.x, 1 - uv.x) * step(ts.y, uv.y) * step(ts.y, 1 - uv.y);  
             }
             
@@ -118,7 +116,7 @@
 
             float filtered_main_texture_fetch(float2 uv)
             {
-                return filtered_texture_fetch(uv, _MainTex, _MainTex_TexelSize.zw);
+                return filtered_texture_fetch(uv, _MapTex, _MapTex_TexelSize.zw);
             }
 
             float filtered_vision_texture_fetch(float2 uv)
@@ -180,9 +178,9 @@
             
             float topo_line(float2 uv)
             {
-                float /* texel width */       tx = _MainTex_TexelSize.x;
-                float /* texel heigth */      ty = _MainTex_TexelSize.y;
-                float /* texture width */     tw = _MainTex_TexelSize.z;
+                float /* texel width */       tx = _MapTex_TexelSize.x;
+                float /* texel heigth */      ty = _MapTex_TexelSize.y;
+                float /* texture width */     tw = _MapTex_TexelSize.z;
                 float /* lines strength */    ls = _LineStrength;
                 float /* lines width */       lw = 0.3 * _LineWidth;
                 float /* height */             h = height_at(uv);
@@ -238,7 +236,7 @@
             
             float shadow(float2 uv)
             {
-                float2 ts = _MainTex_TexelSize.xy;
+                float2 ts = _MapTex_TexelSize.xy;
                 float  tx = ts.x;
                 float  ty = ts.y;
                 
@@ -251,7 +249,7 @@
             
             float grid(float2 uv)
             {
-                float2  ts = _MainTex_TexelSize.xy;
+                float2  ts = _MapTex_TexelSize.xy;
                 float   tx = ts.x;
                 float   ty = ts.y;
                 float    w = 0.05;
@@ -277,21 +275,22 @@
                 float3 fgc = brt * lerp(float3(ci, ci, ci), mc, sat);
                 float3 bgd = float3(0,0,0);
 
-                return lerp(bgd, lerp(fgc,  mc, pow(v, shrp)), pow(d, shrp));
+                return lerp(bgd, lerp(fgc,  mc, pow(v, shrp)), pow(max(d, v), shrp));
             }
 
             v2f vert (appdata v)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+                o.uv = TRANSFORM_TEX(v.uv, _MapTex);
+                o.screenPos = ComputeScreenPos(o.vertex);
                 return o;
             }
 
             float4 frag (v2f i) : SV_Target
             {
                 float2 uv = i.uv;
-                float /* vision */ v = filtered_vision_texture_fetch(uv).x;
+                float /* vision */ v = tex2D(_VisionTex, i.screenPos).x;
                 float /* vision */ d = filtered_discovery_texture_fetch(uv).x;
                 
                 if (d == 0.0) discard;

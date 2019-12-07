@@ -10,7 +10,6 @@ internal class initialize_units_registry : MassiveMechanic
 
         {
             var /* mesh renderer  */ sr = ur.SpritesRenderer;
-            var /* material       */ sm = sr.sharedMaterial;
 
             var smf = sr.RequireComponent<MeshFilter>();
             var smesh = smf.sharedMesh;
@@ -25,14 +24,15 @@ internal class initialize_units_registry : MassiveMechanic
         }
 
         {
-            var /* mesh renderer  */ vr = ur.VisionRenderer;
-            var /* material       */ vm = vr.sharedMaterial;
-        
+            var vr = ur.VisionRenderer;
+            var dr = ur.DiscoveryRenderer;
+
             var vmf = vr.RequireComponent<MeshFilter>();
+            var dmf = dr.RequireComponent<MeshFilter>();
             var vmesh = vmf.sharedMesh;
 
-            if (vmesh == null) 
-                vmesh = vmf.sharedMesh = new Mesh {name = "vision quads"};
+            if (vmesh == null)
+                vmesh = dmf.sharedMesh = vmf.sharedMesh = new Mesh {name = "vision quads"};
         
             vmesh.bounds = new Bounds(Vector3.zero, new Vector3(map.Scale, map.Scale, 1));
             vmesh.MarkDynamic();

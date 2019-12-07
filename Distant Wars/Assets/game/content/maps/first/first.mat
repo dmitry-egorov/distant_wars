@@ -1,0 +1,109 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: first
+  m_Shader: {fileID: 4800000, guid: ae0a5080718b74d6db4a84ada2966784, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailAlbedoMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailNormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DiscoveryTex:
+        m_Texture: {fileID: 8400000, guid: e9fbd77cd287343b988f943ef2cdf6a6, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ParallaxMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _VisionTex:
+        m_Texture: {fileID: 8400000, guid: bf39dc5a0c2d0449e8c5b1f7db3d8d40, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _BumpScale: 1
+    - _Cutoff: 0.5
+    - _DetailNormalMapScale: 1
+    - _DstBlend: 0
+    - _GlossMapScale: 1
+    - _Glossiness: 0.5
+    - _GlossyReflections: 1
+    - _HeightRange: 1
+    - _LandColorGamma: 0.57
+    - _LineStrength: 0.12
+    - _LineWidth: 0.8
+    - _LinesBands: 48.6
+    - _LinesIntensity: 0.371
+    - _LinesSecondaryBands: 5
+    - _LinesSecondaryIntensity: 0.486
+    - _Metallic: 0
+    - _Mode: 0
+    - _OcclusionStrength: 1
+    - _Parallax: 0.02
+    - _SeaBlend: 0
+    - _SeaColorGamma: 2.35
+    - _SeaLevel: 0.116
+    - _ShadowIntensity: 0.077
+    - _ShoreBlend: 0
+    - _ShoreColorGamma: 0.4
+    - _ShoreWidth: 1
+    - _SmoothnessTextureChannel: 0
+    - _SpecularHighlights: 1
+    - _SrcBlend: 1
+    - _UVSec: 0
+    - _VisionBrightness: 0.45
+    - _VisionSaturation: 0.35
+    - _VisionSharpness: 3.9
+    - _ZWrite: 1
+    m_Colors:
+    - _BottomLandColor: {r: 0.6431373, g: 0.48624796, b: 0.3646588, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _DeepSeaColor: {r: 0.2603239, g: 0.3452196, b: 0.4716981, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _ShallowSeaColor: {r: 0.36332095, g: 0.58501977, b: 0.65699995, a: 1}
+    - _ShoreHighColor: {r: 0.85490197, g: 0.8496213, b: 0.7254902, a: 1}
+    - _ShoreLowColor: {r: 0.9529411, g: 0.9478753, b: 0.85490197, a: 1}
+    - _TopLandColor: {r: 1, g: 0.988, b: 0.92, a: 1}

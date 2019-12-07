@@ -10,6 +10,8 @@ public class handle_camera_movement: MassiveMechanic
         var sc = StrategicCamera.Instance;
         
         var /* delta time */ dt = Time.deltaTime;
+        var res = Camera.main.pixelRect;
+        var ar = res.width / res.height;
         
         // zoom to mouse position on scroll
         {
@@ -31,13 +33,12 @@ public class handle_camera_movement: MassiveMechanic
                 {
                     var /* local player */       lp = LocalPlayer.Instance;
                     
-                    var /* aspect ratio (w/h) */ ar = sc.Camera.aspect;
                     var /* zoom target */        zt = lp.WorldMousePosition;
                     var /* position */            p = sc.TargetPosition;
                     var /* offset */              o = new Vector2(1f + sc.ZoomOvershoot / ar, 1f + sc.ZoomOvershoot );
                     var /* position delta */     dp = o * (dz / s);
                     var /* new position */       np = p + (zt - p) * dp;
-                    sc.TargetPosition = clamp_position(np);    
+                    sc.TargetPosition = clamp_position(np, ar);
                 }
             }
         }
@@ -52,7 +53,7 @@ public class handle_camera_movement: MassiveMechanic
                 var /* position */         p = sc.TargetPosition;
                 var /* position delta */  dp = md * (ps * Sqrt(s) * dt);
                 var /* new position */    np = p - dp;
-                sc.TargetPosition = clamp_position(np);
+                sc.TargetPosition = clamp_position(np, ar);
             }
         }
 
@@ -76,7 +77,7 @@ public class handle_camera_movement: MassiveMechanic
 
                 var /* position delta */ dp = kd * (ps * Sqrt(s) * dt);
                 var /* new position */   np = p + dp;
-                sc.TargetPosition = clamp_position(np);
+                sc.TargetPosition = clamp_position(np, ar);
             }
         }
 
@@ -96,15 +97,24 @@ public class handle_camera_movement: MassiveMechanic
             sc.Size = Lerp(sc.Size, sc.TargetSize, sc.LerpStrength);
         }
 
-        // apply position
+        // apply to cameras
         {
-            var t = sc.transform;
-            t.position = sc.Position.xy(t.position.z);
-        }
+            var s = clamp_size(sc.Size);
+            var p = sc.Position;
 
-        // apply size
-        {
-            sc.Camera.orthographicSize = clamp_size(sc.Size);
+            foreach(var c in sc.Cameras)
+            {
+                // apply position
+                {
+                    var t = c.transform;
+                    t.position = p.xy(t.position.z);
+                }
+
+                // apply size
+                {
+                    c.orthographicSize = s;
+                }
+            }
         }
     }
     
@@ -115,12 +125,11 @@ public class handle_camera_movement: MassiveMechanic
     }
 
 
-    Vector2 clamp_position(Vector2 /* position */ p)
+    Vector2 clamp_position(Vector2 /* position */ p, float /* aspect ration (w/h)*/ ar)
     {
         var sc = StrategicCamera.Instance;
         var /* current size */ cs = sc.TargetSize;
         var /* max size */     ms = sc.MaxOrthographicSize;
-        var /* aspect ratio */ ar = sc.Camera.aspect;
         var minx = -ms * ar + cs * ar;
         var maxx =  ms * ar - cs * ar;
         return new Vector3

@@ -21,7 +21,7 @@ public class Game: RequiredSingleton<Game>
             _<initialize_units_registry>();
             _<initialize_selection_box>();
             _<initialize_order_point>();
-            
+
             _<prepare_camera_transformations>();//Note: camera movement requires transformations from the previous frame
             
             initialized = true;
@@ -34,7 +34,7 @@ public class Game: RequiredSingleton<Game>
         }
 
         _<cleanup_units>();
-        _<start_new_units>();
+        _<init_new_units>();
         _<set_position_from_transform_in_editor>();
 
         _<prepare_mouse_clicking>();
@@ -58,6 +58,8 @@ public class Game: RequiredSingleton<Game>
         {
             _<execute_unit_orders>();
         }
+
+        _<find_other_visible_units>();
         
         _<render_order_point>();
         _<render_units>();
@@ -67,6 +69,9 @@ public class Game: RequiredSingleton<Game>
         {
             _<debug_show_mouse_text>();
         }
+
+        _<resize_discovery_texture>();
+        _<resize_vision_texture>();
     }
 
     [NonSerialized]bool initialized;

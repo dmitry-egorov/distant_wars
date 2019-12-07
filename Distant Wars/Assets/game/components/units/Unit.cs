@@ -12,6 +12,8 @@ public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
     public Vector2? MoveTarget;
     public bool IsHighlighted;
     public bool IsSelected;
+    public bool IsVisible;
+
 
     public void OnDrawGizmos()
     {

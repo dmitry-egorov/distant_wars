@@ -47,10 +47,11 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
-                float dx = i.uv.x;
-                float dy = i.uv.y;
-                float w = 0.004;
-                float v = sstep(dx*dx + dy*dy, 0.5*0.5 - w, w);
+                float x = i.uv.x;
+                float y = i.uv.y;
+
+                float w = fwidth(x) * 3;
+                float v = sstep(x*x + y*y, 0.5*0.5 - w, w);
                 if (v == 0) discard;
                 return float4(v,v,v,1);
             }

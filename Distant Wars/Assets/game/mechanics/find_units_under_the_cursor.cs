@@ -16,7 +16,7 @@ public class find_units_under_the_cursor : MassiveMechanic
 
         var /* cursor is a box */ ib = lp.IsDragging || lp.FinishedDragging;
 
-        var us = ur.Units;
+        var us = ur.OwnUnits;
         
         if (ib)
         {
@@ -51,6 +51,7 @@ public class find_units_under_the_cursor : MassiveMechanic
             var        /* multiplier */  w2s = sc.WorldToScreenMultiplier;
             var            /* offset */ w2so = sc.WorldToScreenOffset;
             var    /* mouse position */   mp = lp.ScreenMousePosition;
+
             var      /* closest unit */   cu = default(Unit);
             var /* sqr distance to the closest unit */ sqcd = float.MaxValue;
             foreach (var /* unit */ u in us)

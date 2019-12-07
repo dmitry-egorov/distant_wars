@@ -4,6 +4,7 @@ using UnityEngine;
 public class StrategicCamera : RequiredSingleton<StrategicCamera>
 {
     [Header("Settings")]
+    public Camera[] Cameras;
     public float MaxOrthographicSize = 4000;
     public float MinOrthographicSize = 100;
     [Range(0, 1)] public float LerpStrength = 0.2f;
@@ -21,15 +22,14 @@ public class StrategicCamera : RequiredSingleton<StrategicCamera>
     public float ScreenToWorldSpaceMultiplier => 1 / WorldToScreenMultiplier;
     public Vector2 WorldToScreenOffset;
 
-    public Camera Camera => camera == null ? camera = Camera.main : camera;
-    
     public float SizeProportion => Size / MaxOrthographicSize;
 
     void Awake()
     {
-        
-        Camera.eventMask = 0;
+        foreach(var c in Cameras)
+        {
+            c.eventMask = 0;
+        }
     }
     
-    new Camera camera;
 }

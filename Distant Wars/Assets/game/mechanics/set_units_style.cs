@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using UnityEngine;
-
 public class set_units_style : MassiveMechanic
 {
     public void _()

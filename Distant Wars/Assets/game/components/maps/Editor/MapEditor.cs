@@ -9,7 +9,7 @@ public class MapEditor : Editor
         DrawDefaultInspector();
         if (EditorGUI.EndChangeCheck())
         {
-            ((Map)target).Reload();
+            ((Map)target).reload();
             serializedObject.Update();
         }
     }
