@@ -9,10 +9,8 @@ internal class update_attack_cooldowns : MassiveMechanic
         var dt = Time.deltaTime;
         foreach(var u in us)
         {
-            if (u.AttackCooldownCountdown > 0)
-            {
-                u.AttackCooldownCountdown -= dt;
-            }
+            var cd = u.AttackCountdown;
+            u.AttackCountdown = cd > 0 ? cd - dt : 0;
         }
     }
 }

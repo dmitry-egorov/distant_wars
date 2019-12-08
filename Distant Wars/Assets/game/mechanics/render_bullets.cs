@@ -12,15 +12,15 @@ public class render_bullets : MassiveMechanic
 
     public void _()
     {
-        const float /*bullet size */ bs = 2f;
-        var /* units' registry */  bm = BulletsManager.Instance;
+        /* bullet size     */ const float bs = 2f;
+        /* units' registry */ var pm = ProjectilesManager.Instance;
 
         // generate sprites
-        var /* sprites mesh */ sm = bm.SpritesMesh;
+        var sm = pm.SpritesMesh;
         var sv = sprite_vertices;
         var st = sprite_triangles;
 
-        var /* positions     */ ps = bm.Positions;
+        var /* positions     */ ps = pm.Positions;
         var /* sprites count */ sc = ps.Count;
 
         sv.Clear();
@@ -31,14 +31,14 @@ public class render_bullets : MassiveMechanic
 
         for (var i = 0; i < sc; i++)
         {
-            var /* unit */ p = ps[i];
+            var /* position */ p = ps[i].xy();
             
             for (var j = 0; j < 4; j++)
             {
                 sv.Add((p + bs * (j % 2 - 0.5f) * Vector2.right + bs * (j / 2 - 0.5f) * Vector2.down).xy(j));
             }
 
-            //TODO: since the quads are not changing, we should only generate additional them when capacity is increasing.
+            //TODO: since the quads are not changing, we should only generate them when capacity is increasing.
             RenderHelper.add_quad(st, i);
         }
 

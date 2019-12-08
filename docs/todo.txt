@@ -1,15 +1,27 @@
 - firing and destruction
-  - attacking
-  - bullet firing
+  + attacking
+  + bullet firing
+  + ray intersect collision
+  + fire while moving
+  + intersect terrain
   - hp and destruction
   - blinking when attacked
+  - scale independent bullet sprite
 - radar
 - buildings
   - factory
   - metal gatherer
   - energy gatherer
+- auto attack (separate order)
+- unity math, jobs, arrays?
 
 + faction colors
 + hide enemy units
 + screen space visibility
 + terrain movement speed modifier
+
+
+
+order : attack | move | guard | hold
+
+last_attack_target

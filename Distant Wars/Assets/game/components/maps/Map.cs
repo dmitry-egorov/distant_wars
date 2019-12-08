@@ -8,9 +8,11 @@ public class Map : RequiredSingleton<Map>
     public int Width = 1025;
     public int Height = 1025;
     public float Scale = 8000;
+    public float ZScale = 4000;
     public Camera VisionCamera;
     public Camera DiscoveryCamera;
     public int DiscoveryTextureSize;
+    public MeshRenderer MapRenderer;
 
     [Header("State")]
     public Texture2D map_texture;
@@ -43,12 +45,13 @@ public class Map : RequiredSingleton<Map>
     {
         reload();
 
-        transform.localScale = Scale.v3();
+        MapRenderer.transform.localScale = Scale.v3();
         map_data = HeightMap.bytes;
         cell_size = Scale / Width;
         width = Width;
         height = Height;
-        scale = Scale;
+        size = Scale;
+        ushort_z_scale = ZScale / (float)ushort.MaxValue;
     }
 
     public float slope(Vector2 position, Vector2 direction) => slope2(position, direction.normalized);
@@ -61,16 +64,18 @@ public class Map : RequiredSingleton<Map>
         var coord = coord_of(p);
         var offset = new Vector2Int(Mathf.RoundToInt(nd.x), Mathf.RoundToInt(nd.y));
         var ocoord = coord + offset;
-        var h = height_at(coord);
-        var ho = height_at(ocoord);
+        var h = z(coord);
+        var ho = z(ocoord);
 
         return (ho - h) / cell_size;
     }
 
-    public float height_at(Vector2 position)
+    public Vector3 xyz(Vector2 xy) => xy.xy(z(xy));
+
+    public float z(Vector2 position)
     {
         var coord = coord_of(position);
-        return height_at(coord);
+        return z(coord);
     }
 
     public Vector2Int coord_of(Vector2 position)
@@ -79,24 +84,25 @@ public class Map : RequiredSingleton<Map>
         return new Vector2Int(width / 2 + Mathf.RoundToInt(p.x / cell_size), height / 2 + Mathf.RoundToInt(p.y / cell_size));
     }
 
-    public float height_at(Vector2Int coord)
+    public float z(Vector2Int coord) => z(coord.x, coord.y);
+
+    public float z(int x, int y)
     {
-        var x = coord.x;
-        var y = coord.y;
         var w = width;
         var h = height;
 
         if (x < 0 || x >= width || y < 0 || y >= height) return 0;
         
         var i = 2 * (w * y + x);
-        return ((map_data[i]) + (map_data[i + 1] << 8)) / (float)ushort.MaxValue;
+        return ((map_data[i]) + (map_data[i + 1] << 8)) * ushort_z_scale;
     }
 
     private byte[] map_data;
     private float cell_size;
     private int width;
     private int height;
-    private float scale;
+    private float size;
+    private float ushort_z_scale;
 
     static readonly int _mapTex                  = Shader.PropertyToID("_MapTex");
     static readonly int _topLandColor            = Shader.PropertyToID("_TopLandColor");
@@ -123,5 +129,4 @@ public class Map : RequiredSingleton<Map>
     static readonly int _visionBrightness        = Shader.PropertyToID("_VisionBrightness"); 
     static readonly int _visionSaturation        = Shader.PropertyToID("_VisionSaturation");
     static readonly int _visionSharpness         = Shader.PropertyToID("_VisionSharpness");
-
 }

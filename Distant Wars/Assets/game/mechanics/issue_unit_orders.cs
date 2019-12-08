@@ -2,12 +2,13 @@
 
 public class issue_unit_orders : MassiveMechanic
 {
+
     public void _()
     {
         if (!Application.isPlaying)
             return;
 
-        var /* local player */  lp = LocalPlayer.Instance;
+        var /* local player */ lp = LocalPlayer.Instance;
 
         if (!lp.RightMouseButtonIsDown) 
             return;
@@ -21,26 +22,16 @@ public class issue_unit_orders : MassiveMechanic
             // FEAT: attack multiple units
             // 7.12.19
 
-            var /* other unit */ ou = ucb[0]; 
+            var /* target unit */ tu = ucb[0]; 
 
             //TODO: friend/foe/neutral distinction
-            if (ou.Faction != lp.Faction)
+            if (tu.Faction != lp.Faction)
             {
-                foreach (var u in su)
-                {
-                    u.MoveTarget = default;
-                    u.GuardTarget = default;
-                    u.AttackTarget = ou;
-                }
+                foreach (var u in su) u.IssuedOrder = Unit.Order.attack(tu);
             }
             else
             {
-                foreach (var u in su)
-                {
-                    u.MoveTarget = default;
-                    u.AttackTarget = default;
-                    u.GuardTarget = ou;
-                }
+                foreach (var u in su) u.IssuedOrder = Unit.Order.guard(tu);
             }
             
             return;
@@ -48,14 +39,10 @@ public class issue_unit_orders : MassiveMechanic
 
         // issue move order
         {
-            var /* target position */ t = lp.WorldMousePosition;
+            var /* target position */ tp = lp.WorldMousePosition;
 
             foreach (var u in su)
-            {
-                u.AttackTarget = default;
-                u.GuardTarget = default;
-                u.MoveTarget = t;
-            }
+                u.IssuedOrder = Unit.Order.move(tp);
         }
     }
 }

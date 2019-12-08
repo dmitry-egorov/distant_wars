@@ -1,5 +1,9 @@
+using UnityEngine;
+
 public static class NullableExtensions
 {
+    public static bool _<T>(this T r) => true;
+
     public static bool try_get<T>(this T? n, out T v)
         where T: struct
     {
@@ -14,7 +18,7 @@ public static class NullableExtensions
     }
 
     public static bool try_get<T>(this T n, out T v)
-        where T: class
+        where T: Object
     {
         if (n != null)
         {

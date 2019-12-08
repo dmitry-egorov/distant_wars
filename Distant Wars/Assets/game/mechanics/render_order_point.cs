@@ -19,17 +19,17 @@ public class render_order_point : MassiveMechanic
         (
             !lp.CursorIsABox 
             && bu.TryGetFirstItem(out var /* unit */ u) 
-            && u.MoveTarget.try_get(out var /* target */ t)
+            && u.IssuedOrder.is_move(out var /* move order */ tp)
         )
         {
-            var /* orders z */ z = op.Z;
-            var /* size */ s = op.PointSize;
-            var /* units registry */ ur = UnitsRegistry.Instance;
-            var us = ur.WorldScale;
+            /* orders z          */ var z  = op.Z;
+            /* size              */ var s  = op.PointSize;
+            /* units registry    */ var ur = UnitsRegistry.Instance;
+            /* units world scale */ var us = ur.WorldScale;
 
             // render point
             {
-                omr.transform.position = t.xy(z);
+                omr.transform.position = tp.xy(z);
                 omr.transform.localScale = (s * us).v3();
                 omr.enabled = true;                
             }
@@ -40,7 +40,7 @@ public class render_order_point : MassiveMechanic
                 var /* line width */ w = op.LineWidth * sc.SizeProportion;
 
                 olr.SetPosition(0, u.Position.xy(z));
-                olr.SetPosition(1, t.xy(z));
+                olr.SetPosition(1, tp.xy(z));
 
                 olr.startWidth = w;
                 olr.endWidth = w;

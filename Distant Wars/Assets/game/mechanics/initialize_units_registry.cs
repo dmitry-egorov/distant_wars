@@ -5,7 +5,7 @@ internal class initialize_units_registry : MassiveMechanic
 {
     public void _()
     {
-        var /* units registry */ ur = UnitsRegistry.Instance;
+        /* units registry */ var ur = UnitsRegistry.Instance;
         var map = Map.Instance;
 
         {
