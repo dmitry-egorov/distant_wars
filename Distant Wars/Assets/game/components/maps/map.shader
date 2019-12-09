@@ -30,7 +30,9 @@
     SubShader
     {
         Tags { "RenderType"="Opaque" }
-        LOD 100
+        ZWrite Off
+        ZTest Off
+        ZClip False
 
         Pass
         {
@@ -290,8 +292,9 @@
             float4 frag (v2f i) : SV_Target
             {
                 float2 uv = i.uv;
-                float /* vision */ v = tex2D(_VisionTex, i.screenPos).x;
-                float /* vision */ d = filtered_discovery_texture_fetch(uv).x;
+                ///* vision    */ float v = tex2D(_VisionTex, i.screenPos).x;
+                /* vision    */ float v = filtered_vision_texture_fetch(uv).x;
+                /* discovery */ float d = filtered_discovery_texture_fetch(uv).x;
                 
                 if (d == 0.0) discard;
 

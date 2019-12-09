@@ -1,7 +1,8 @@
 ﻿using Plugins.Lanski;
+using Plugins.Lanski.Space;
 using UnityEngine;
 
-public class StrategicCamera : RequiredSingleton<StrategicCamera>
+public partial class StrategicCamera : RequiredSingleton<StrategicCamera>
 {
     [Header("Settings")]
     public Camera[] Cameras;
@@ -18,18 +19,10 @@ public class StrategicCamera : RequiredSingleton<StrategicCamera>
     public float Size;
     public Vector2 TargetPosition;
     public Vector2 Position;
-    public float WorldToScreenMultiplier;
-    public float ScreenToWorldSpaceMultiplier => 1 / WorldToScreenMultiplier;
-    public Vector2 WorldToScreenOffset;
+    public UniformSpaceTransform2 WorldToScreenTransform;
+    public UniformSpaceTransform2 ScreenToWorldTransform;
+    public Vector2 ScreenResolution;
+    public FRect WorldScreen;
 
     public float SizeProportion => Size / MaxOrthographicSize;
-
-    void Awake()
-    {
-        foreach(var c in Cameras)
-        {
-            c.eventMask = 0;
-        }
-    }
-    
 }

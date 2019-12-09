@@ -11,6 +11,7 @@ public class Map : RequiredSingleton<Map>
     public float ZScale = 4000;
     public Camera VisionCamera;
     public Camera DiscoveryCamera;
+    public int VisionTextureSize;
     public int DiscoveryTextureSize;
     public MeshRenderer MapRenderer;
 

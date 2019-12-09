@@ -6,10 +6,8 @@ public class render_units: MassiveMechanic
 {
     public render_units()
     {
-        vision_vertices = new List<Vector3>(0);
         sprite_vertices = new List<Vector3>(0);
         sprite_triangles = new List<int>(0);
-        vision_triangles = new List<int>(0);
         faction_colors = new Vector4[MaxNumberOfFactionColors];
     }
     
@@ -52,45 +50,13 @@ public class render_units: MassiveMechanic
                     sv.Add(p.xy(fl));
                 }
 
-                //TODO: since the quads are not changing, we should only generate additional them when capacity is increasing.
+                //PERF: since the quads are not changing, we should only generate additional them when capacity is increasing.
                 RenderHelper.add_quad(st, i);
             }
 
             sm.Clear();
             sm.SetVertices(sv);
             sm.SetTriangles(st, 0, false);
-        }
-
-        // generate vision
-        {
-            var /* vision mesh */ vm = ur.VisionMesh;
-            var vv = vision_vertices;
-            var vt = vision_triangles;
-
-            var /* visions count */ vc = ouc;
-            vv.Clear();
-            vt.Clear();
-            vv.ReserveMemoryFor(vc * 4);
-            vt.ReserveMemoryFor(vc * 6);
-
-            for (var i = 0; i < vc; i++)
-            {
-                var /* unit        */  u = ous[i];
-                var /* vision size */ vs = u.VisionRange * 2.0f;
-
-                for (var j = 0; j < 4; j++)
-                {
-                    var p = u.Position;
-                    vv.Add((p + vs * (j % 2 - 0.5f) * Vector2.right + vs * (j / 2 - 0.5f) * Vector2.down).xy(j));
-                }
-
-                //TODO: since the quads are not changing, we should only generate additional them when capacity is increasing.
-                RenderHelper.add_quad(vt, i);
-            }
-            
-            vm.Clear();
-            vm.SetVertices(vv);
-            vm.SetTriangles(vt, 0, false);
         }
 
         // generate faction colors
@@ -118,9 +84,7 @@ public class render_units: MassiveMechanic
     }
 
     readonly List<Vector3> sprite_vertices;
-    readonly List<Vector3> vision_vertices;
     readonly List<int> sprite_triangles;
-    readonly List<int> vision_triangles;
     readonly Vector4[] faction_colors;
     
     const int MaxNumberOfFactionColors = 16;

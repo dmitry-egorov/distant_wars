@@ -1,3 +1,4 @@
+using Plugins.Lanski;
 using UnityEngine;
 
 public class select_units : MassiveMechanic
@@ -6,17 +7,16 @@ public class select_units : MassiveMechanic
     {
         if (!Application.isPlaying) return;
         
-        var /* local player */ lp = LocalPlayer.Instance;
-
+        var /* local player            */ lp = LocalPlayer.Instance;
         var /* left mouse button is up */ mu = lp.LeftMouseButtonIsDown;
-        var       /* finished dragging */ fd = lp.FinishedDragging;
+        var /* finished dragging       */ fd = lp.FinishedDragging;
 
         if (mu || fd)
         {
             var us = lp.UnitsInTheCursorBox;
             
             //swap arrays of selected units
-            var /* selected units */ su = lp.PreviouslySelectedUnits;
+            /* selected units */ var su = lp.PreviouslySelectedUnits;
             su.Clear();
             
             lp.PreviouslySelectedUnits = lp.SelectedUnits;
@@ -25,5 +25,8 @@ public class select_units : MassiveMechanic
             foreach (var u in us) 
                 su.Add(u);
         }
+
+        lp.PreviouslySelectedUnits.clean_up_expired_objects();
+        lp.SelectedUnits.clean_up_expired_objects();
     }
 }

@@ -22,8 +22,12 @@ public class Game: RequiredSingleton<Game>
             _<initialize_bullets_manager>();
             _<initialize_selection_box>();
             _<initialize_order_point>();
+            _<initialize_camera>();
 
-            _<prepare_camera_transformations>();//Note: camera movement requires transformations from the previous frame
+            //Note: camera movement requires transformations from the previous frame, that's why the call is duplicated in the initialisation
+            _<prepare_camera_transformations>();
+            
+            _<cleanup_units>();
             
             initialized = true;
         }
@@ -34,7 +38,6 @@ public class Game: RequiredSingleton<Game>
             _<disable_debug_text>();
         }
 
-        _<cleanup_units>();
         _<init_new_units>();
         _<set_position_from_transform_in_editor>();
 
@@ -54,19 +57,30 @@ public class Game: RequiredSingleton<Game>
         _<select_units>();
         _<issue_unit_orders>();
 
+        #if UNITY_EDITOR
+            _<select_units_in_inspector>();
+        #endif
+
         // simulation
+        if (Application.isPlaying)
         {
-            _<update_attack_cooldowns>();
-            _<execute_unit_orders>();
+            _<cleanup_unit_orders>();
+            _<handle_unit_movement>();
+            _<update_units_space_grid>();
+            _<handle_unit_attacking>();
 
             _<update_bullets>();
+
+            _<destroy_dead_units>();
+            _<cleanup_units>();
         }
 
-        _<update_visible_enemy_units>();
+        _<update_visible_other_units>();
         _<update_units_style>();
 
         _<render_order_point>();
         _<render_units>();
+        _<render_vision>();
         _<render_bullets>();
         _<render_selection_box>();
 
@@ -77,7 +91,7 @@ public class Game: RequiredSingleton<Game>
 
         _<resize_discovery_texture>();
         _<resize_vision_texture>();
-
+        
         time += Time.deltaTime;
         DebugText.set_text("time", time.ToString());
     }

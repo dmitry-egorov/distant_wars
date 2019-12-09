@@ -1,20 +1,22 @@
 - firing and destruction
   + attacking
   + bullet firing
+  + hp
   + ray intersect collision
   + fire while moving
   + intersect terrain
-  - hp and destruction
+  + destruction
   - blinking when attacked
   - scale independent bullet sprite
-- radar
+- radar 
 - buildings
   - factory
   - metal gatherer
   - energy gatherer
-- auto attack (separate order)
 - unity math, jobs, arrays?
+- how to preserve discovered texture??
 
++ space grid
 + faction colors
 + hide enemy units
 + screen space visibility

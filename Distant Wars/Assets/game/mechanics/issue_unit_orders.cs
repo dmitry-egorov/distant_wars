@@ -1,13 +1,8 @@
-﻿using UnityEngine;
-
-public class issue_unit_orders : MassiveMechanic
+﻿public class issue_unit_orders : MassiveMechanic
 {
 
     public void _()
     {
-        if (!Application.isPlaying)
-            return;
-
         var /* local player */ lp = LocalPlayer.Instance;
 
         if (!lp.RightMouseButtonIsDown) 
@@ -24,7 +19,7 @@ public class issue_unit_orders : MassiveMechanic
 
             var /* target unit */ tu = ucb[0]; 
 
-            //TODO: friend/foe/neutral distinction
+            //FEAT: friend/foe/neutral distinction
             if (tu.Faction != lp.Faction)
             {
                 foreach (var u in su) u.IssuedOrder = Unit.Order.attack(tu);

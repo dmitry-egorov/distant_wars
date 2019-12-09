@@ -36,7 +36,7 @@ namespace Plugins.Lanski
             return list.Count - 1;
         }
 
-        public static int clean_up_dead_objects<T>(this List<T> list)
+        public static int clean_up_expired_objects<T>(this List<T> list)
             where T: Object
         {
             var count = 0;
@@ -45,9 +45,7 @@ namespace Plugins.Lanski
             {
                 if (list[i] == null)
                 {
-                    var last_index = list.Count - 1;
-                    list[i] = list[last_index];
-                    list.RemoveAt(last_index);
+                    list.replace_with_last(i);
                     count++;
                 }
                 else

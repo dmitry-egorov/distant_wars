@@ -52,20 +52,19 @@ public class find_units_under_the_cursor : MassiveMechanic
         }
         else
         {
-            var  /* strategic camera */   sc = StrategicCamera.Instance;
-            var        /* multiplier */  w2s = sc.WorldToScreenMultiplier;
-            var            /* offset */ w2so = sc.WorldToScreenOffset;
-            var    /* mouse position */   mp = lp.ScreenMousePosition;
+            /* strategic camera */ var sc   = StrategicCamera.Instance;
+            /* multiplier       */ var w2st = sc.WorldToScreenTransform;
+            /* mouse position   */ var mp   = lp.ScreenMousePosition;
 
-            var      /* closest unit */   cu = default(Unit);
+            var /* closest unit */ cu = default(Unit);
             var /* sqr distance to the closest unit */ sqcd = float.MaxValue;
 
             for (int i = 0; i < tuc; i++)
             {
-                var /* unit */ u = i < vuc ? vus[i] : ous[i - vuc];
-                var  /* world space unit position */  wp = u.Position;
-                var /* screen space unit position */  sp = wp * w2s + w2so;
-                var   /* sqr distance to the unit */ sqd = (sp - mp).sqrMagnitude;
+                /* unit */ var u = i < vuc ? vus[i] : ous[i - vuc];
+                /* world space unit position  */ var  wp = u.Position;
+                /* screen space unit position */ var  sp = w2st.apply_to_point(wp);
+                /* sqr distance to the unit   */ var sqd = (sp - mp).sqrMagnitude;
                 if (sqd < sqcd)
                 {
                     cu = u;
@@ -73,7 +72,7 @@ public class find_units_under_the_cursor : MassiveMechanic
                 }
             }
 
-            var /* units' screen size */ uss = ur.WorldScale * w2s;
+            var /* units' screen size */ uss = w2st.apply_to_scalar(ur.WorldScale);
             var /* selection distance */  sd = ur.ScreenSelectionDistance;
             var /* adjusted selection distance */ asd = sd * uss / 2f;
             if (cu != null && sqcd < asd.sqr())

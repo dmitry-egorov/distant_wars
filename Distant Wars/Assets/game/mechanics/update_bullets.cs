@@ -13,11 +13,12 @@ internal class update_bullets : MassiveMechanic
         var dms = pm.Damages;
 
         // update position
-        /* delta time     */ var dt = Time.deltaTime;
-        /* map            */ var  m = Map.Instance;
-        /* units registry */ var ur = UnitsRegistry.Instance;
-        /* units          */ var us = ur.Units;
-        /* count          */ var  c = pps.Count;
+        /* delta time     */ var dt  = Time.deltaTime;
+        /* map            */ var  m  = Map.Instance;
+        /* units registry */ var ur  = UnitsRegistry.Instance;
+        /* units          */ var us  = ur.Units;
+        /* units          */ var usg = ur.SpaceGrid;
+        /* count          */ var   c = pps.Count;
 
         for (int i = 0; i < c;)
         {
@@ -29,11 +30,14 @@ internal class update_bullets : MassiveMechanic
 
             // check collision with units
             {
-                //TODO: use spatial structure
-                foreach (var u in us)
+                var cell = usg.get_cell_of(pp);
+                var ps = cell.positions;
+                var gus = cell.elements;
+                for(var j = 0; j < ps.Count; j++)
                 {
-                    /* unit's position 2d */ var up2 = u.Position;
+                    /* unit's position 2d */ var up2 = ps[j];
                     /* unit's position 3d */ var up3 = m.xyz(up2);
+                    /* unit               */ var   u = gus[j];
                     /* hit radius         */ var  hr = u.HitRadius;
 
                     hit = rays.try_intersect_sphere(pp, dr, up3, hr, out var t) && t >= 0 && t < po;
@@ -42,7 +46,7 @@ internal class update_bullets : MassiveMechanic
                         u.HitPoints -= dms[i];
                         break;
                     }
-                }
+                } 
             }
 
             //check collision with the terrain
@@ -72,7 +76,7 @@ internal class update_bullets : MassiveMechanic
                 {
                     if (first)
                         first = false;
-                    else if (hit = npp.z <= m.z(x0, y0)) //TODO: calculate proper z?
+                    else if (hit = npp.z <= m.z(x0, y0)) //TODO: calculate z by interpolation?
                         break;
 
                     if (x0 == x1 && y0 == y1) break;
@@ -108,10 +112,5 @@ internal class update_bullets : MassiveMechanic
                 i++;
             }
         }
-    }
-
-    void try_intersect_terrain(Map m, Vector2Int p0, Vector2Int p1)
-    {
-        
     }
 }

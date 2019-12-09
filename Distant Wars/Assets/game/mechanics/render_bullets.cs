@@ -38,7 +38,7 @@ public class render_bullets : MassiveMechanic
                 sv.Add((p + bs * (j % 2 - 0.5f) * Vector2.right + bs * (j / 2 - 0.5f) * Vector2.down).xy(j));
             }
 
-            //TODO: since the quads are not changing, we should only generate them when capacity is increasing.
+            //PERF: since the quads are not changing, we should only generate them when capacity is increasing.
             RenderHelper.add_quad(st, i);
         }
 

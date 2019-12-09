@@ -6,8 +6,7 @@ internal class prepare_world_mouse_position : MassiveMechanic
         var /* strategic camera */ sc = StrategicCamera.Instance;
 
         var /* mouse position */ p = lp.ScreenMousePosition;
-        var /* multiplier */ m = sc.WorldToScreenMultiplier;
-        var     /* offset */ o = sc.WorldToScreenOffset;
-        lp.WorldMousePosition = (p - o) / m;
+        var /* multiplier     */ t = sc.ScreenToWorldTransform;
+        lp.WorldMousePosition = t.apply_to_point(p);
     }
 }
