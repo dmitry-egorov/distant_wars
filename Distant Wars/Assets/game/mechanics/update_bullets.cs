@@ -31,14 +31,14 @@ internal class update_bullets : MassiveMechanic
             // check collision with units
             {
                 var cell = usg.get_cell_of(pp);
-                var ps = cell.positions;
-                var gus = cell.elements;
-                for(var j = 0; j < ps.Count; j++)
+                /* cell positions */ var cps = cell.positions;
+                /* cell units     */ var cus = cell.elements;
+                for(var j = 0; j < cps.Count; j++)
                 {
-                    /* unit's position 2d */ var up2 = ps[j];
+                    /* unit's position 2d */ var up2 = cps[j];
                     /* unit's position 3d */ var up3 = m.xyz(up2);
-                    /* unit               */ var   u = gus[j];
-                    /* hit radius         */ var  hr = u.HitRadius;
+                    /* unit               */ var u   = cus[j];
+                    /* hit radius         */ var hr  = u.HitRadius;
 
                     hit = rays.try_intersect_sphere(pp, dr, up3, hr, out var t) && t >= 0 && t < po;
                     if (hit)
@@ -76,7 +76,7 @@ internal class update_bullets : MassiveMechanic
                 {
                     if (first)
                         first = false;
-                    else if (hit = npp.z <= m.z(x0, y0)) //TODO: calculate z by interpolation?
+                    else if (hit = npp.z <= m.z(x1, y1)) //TODO: calculate z by interpolation?
                         break;
 
                     if (x0 == x1 && y0 == y1) break;

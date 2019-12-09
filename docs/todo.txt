@@ -7,8 +7,11 @@
   + intersect terrain
   + destruction
   - blinking when attacked
-  - scale independent bullet sprite
-- radar 
+  - scale independent bullet sprite (move quad generation to shader limit min screen size)
+- optimize search with space grid
+- radar (find all within radar range, mark as discovered if also within vision range)
+- steady update
+- fire in advance (need previous position, goes along with steady update)
 - buildings
   - factory
   - metal gatherer
