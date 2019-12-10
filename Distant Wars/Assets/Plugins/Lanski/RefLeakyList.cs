@@ -2,11 +2,14 @@ using System;
 
 namespace Plugins.Lanski
 {
-    public class LeakyList<T> where T: struct
+    // version of LeakyList, that can clean its references
+    public class RefLeakyList<T> where T: class
     {
-        public LeakyList(int initial_capacity = 4)
+        public RefLeakyList(int initial_capacity = 4)
         {
             data = new T[initial_capacity];
+            leak_start = 0;
+            leak_count = 0;
         }
 
         public int Count => count;
@@ -20,10 +23,14 @@ namespace Plugins.Lanski
                 var tmp = data;
                 data = new T[data.Length * 2];
                 Array.Copy(tmp, data, tmp.Length);
+                leak_count = 0;
+                leak_start = tmp.Length;
             }
 
             data[count] = item;
             count++;
+            leak_count = leak_count > 0 ? leak_count - 1 : 0;
+            leak_start++;
         }
 
         public void RemoveLast(int count)
@@ -33,10 +40,22 @@ namespace Plugins.Lanski
                 throw new InvalidOperationException("count must be less than the size of the array");
 
             this.count = result;
+            leak_count += count;
+            leak_start -= count;
+        }
+
+        // write default values to the elements outside of the current list
+        public void Cleanup()
+        {
+            var end = leak_start + leak_count;
+            for (var i = leak_start; i < end; i++)
+                data[i] = default;
         }
 
         public void Clear()
         {
+            leak_count += count;
+            leak_start -= count;
             count = 0;
         }
 
@@ -44,7 +63,7 @@ namespace Plugins.Lanski
 
         public struct Enumerator
         {
-            public Enumerator(LeakyList<T> list)
+            public Enumerator(RefLeakyList<T> list)
             {
                 this.i = -1;
                 this.list = list;                
@@ -59,10 +78,12 @@ namespace Plugins.Lanski
             public T Current => list[i];
 
             int i;
-            LeakyList<T> list;
+            RefLeakyList<T> list;
         }
 
         private int count;
+        private int leak_start;
+        private int leak_count;
         private T[] data;
     }
 }

@@ -37,5 +37,7 @@ internal class update_visible_other_units : MassiveMechanic
                 }
             }
         }
+
+        ovu.Cleanup();
     }
 }

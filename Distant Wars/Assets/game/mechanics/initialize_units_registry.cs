@@ -1,5 +1,6 @@
+using System.Collections.Generic;
+using Plugins.Lanski;
 using Plugins.Lanski.Behaviours;
-using Plugins.Lanski.Space;
 using UnityEngine;
 
 internal class initialize_units_registry : MassiveMechanic
@@ -36,8 +37,10 @@ internal class initialize_units_registry : MassiveMechanic
         ur.DiscoveryMesh = dmesh;
         ur.SpritesMesh = smesh;
 
-        ur.Units.Clear();
-        ur.VisionUnits.Clear();
-        ur.OtherUnits.Clear();
+        ur.VisibleOtherUnits = new RefLeakyList<Unit>();
+
+        ur.Units       = new List<Unit>();
+        ur.VisionUnits = new List<Unit>();
+        ur.OtherUnits  = new List<Unit>();
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Plugins.Lanski;
 using Plugins.Lanski.Space;
 using UnityEngine;
 
@@ -23,7 +24,7 @@ public class UnitsRegistry: MassiveRegistry<UnitsRegistry, Unit>
     public List<Unit> Units;
     public List<Unit> VisionUnits;
     public List<Unit> OtherUnits;
-    public List<Unit> VisibleOtherUnits;
+    public RefLeakyList<Unit> VisibleOtherUnits;
     public SpaceGrid2<Unit> SpaceGrid;
     public Mesh SpritesMesh;
     public Mesh VisionMesh;
