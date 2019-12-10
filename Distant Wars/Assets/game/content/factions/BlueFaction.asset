@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e2692d8da254968859c2958b1e1a793, type: 3}
   m_Name: BlueFaction
   m_EditorClassIdentifier: 
-  Color: {r: 0.17755428, g: 0.20401037, b: 0.6603774, a: 1}
+  Color: {r: 0.4438857, g: 0.46901575, b: 0.8962264, a: 1}
   Index: 0

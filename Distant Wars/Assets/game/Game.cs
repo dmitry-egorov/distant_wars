@@ -47,7 +47,6 @@ public class Game: RequiredSingleton<Game>
         _<handle_camera_movement>();
         _<prepare_camera_transformations>();
         _<prepare_world_mouse_position>();
-        _<prepare_units_scale>();
         
         _<prepare_mouse_dragging>();
         _<set_cursor_is_a_box>();
@@ -70,6 +69,7 @@ public class Game: RequiredSingleton<Game>
             _<handle_unit_attacking>();
 
             _<update_bullets>();
+            _<process_incoming_damage>();
 
             _<destroy_dead_units>();
             _<cleanup_units>();

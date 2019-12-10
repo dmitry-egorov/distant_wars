@@ -22,7 +22,11 @@ public class render_units: MassiveMechanic
         
         // generate sprites
         {
-            var /* sprites mesh */  sm = ur.SpritesMesh;
+            /* delta time         */ var dt  = Time.deltaTime;
+            /* blinking hide time */ var bht = ur.DamageBlinkHideTime;
+            /* blinking show time */ var bst = ur.DamageBlinkShowTime;
+            /* blinking period    */ var bp  = bht + bst;
+            /* sprites mesh       */ var sm  = ur.SpritesMesh;
             var sv = sprite_vertices;
             var st = sprite_triangles;
 
@@ -34,13 +38,22 @@ public class render_units: MassiveMechanic
             sv.ReserveMemoryFor(sc * 4);
             st.ReserveMemoryFor(sc * 6);
 
+            /* sprite index */ var qi = 0;
             for (var i = 0; i < sc; i++)
             {
-                var /* unit             */      u = i < ouc ? ous[i] : otu[i - ouc];
-                var /* unit is selected */    uih = u.IsHighlighted;
-                var /* unit is selected */    uis = u.IsSelected;
-                var /* faction color index */ fci = u.Faction.Index;
-                var /* highlight flags  */     hf = (uih ? 1 : 0) | (uis ? 2 : 0) | (fci << 4);
+                /* unit                   */ var u   = i < ouc ? ous[i] : otu[i - ouc];
+                /* original blinking time */ var obt = u.BlinkTimeRemaining;
+                /* updated  blinking time */ var ubt = u.BlinkTimeRemaining = obt > 0 ? obt - dt : 0;
+                // hide, when blinking and in hiding period
+                if (ubt > 0 && (ubt % bp) > bst)
+                {
+                    continue;
+                }
+
+                /* unit is selected       */ var uih = u.IsHighlighted;
+                /* unit is selected       */ var uis = u.IsSelected;
+                /* faction color index    */ var fci = u.Faction.Index;
+                /* highlight flags        */ var hf  = (uih ? 1 : 0) | (uis ? 2 : 0) | (fci << 4);
 
                 for (var j = 0; j < 4; j++)
                 {
@@ -51,7 +64,8 @@ public class render_units: MassiveMechanic
                 }
 
                 //PERF: since the quads are not changing, we should only generate additional them when capacity is increasing.
-                RenderHelper.add_quad(st, i);
+                RenderHelper.add_quad(st, qi);
+                qi++;
             }
 
             sm.Clear();
@@ -80,7 +94,7 @@ public class render_units: MassiveMechanic
             Shader.SetGlobalVectorArray(faction_colors_id, faction_colors);
         }
 
-        Shader.SetGlobalFloat(units_size_id, ur.UnitScreenSize * 32 * (Screen.height / 1080));
+        Shader.SetGlobalFloat(units_size_id, ur.SpriteSize * Screen.height / 1080);
     }
 
     readonly List<Vector3> sprite_vertices;

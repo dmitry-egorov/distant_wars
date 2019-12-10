@@ -40,6 +40,7 @@ public class Map : RequiredSingleton<Map>
         map_texture.Apply();
 
         Shader.SetGlobalTexture(_mapTex, map_texture);
+        Shader.SetGlobalFloat(map_scale_id, Scale);
     }
 
     public void initialize()
@@ -105,29 +106,6 @@ public class Map : RequiredSingleton<Map>
     private float size;
     private float ushort_z_scale;
 
-    static readonly int _mapTex                  = Shader.PropertyToID("_MapTex");
-    static readonly int _topLandColor            = Shader.PropertyToID("_TopLandColor");
-    static readonly int _bottomLandColor         = Shader.PropertyToID("_BottomLandColor");
-    static readonly int _shallowSeaColor         = Shader.PropertyToID("_ShallowSeaColor");
-    static readonly int _deepSeaColor            = Shader.PropertyToID("_DeepSeaColor");
-    static readonly int _shoreHighColor          = Shader.PropertyToID("_ShoreHighColor");
-    static readonly int _shoreLowColor           = Shader.PropertyToID("_ShoreLowColor");
-    static readonly int _seaColorGamma           = Shader.PropertyToID("_SeaColorGamma");
-    static readonly int _landColorGamma          = Shader.PropertyToID("_LandColorGamma");
-    static readonly int _shoreColorGamma         = Shader.PropertyToID("_ShoreColorGamma");
-    static readonly int _heightRange             = Shader.PropertyToID("_HeightRange");
-    static readonly int _seaLevel                = Shader.PropertyToID("_SeaLevel");
-    static readonly int _shoreWidth              = Shader.PropertyToID("_ShoreWidth");
-    static readonly int _shoreBlend              = Shader.PropertyToID("_ShoreBlend");
-    static readonly int _seaBlend                = Shader.PropertyToID("_SeaBlend");
-    static readonly int _linesIntensity          = Shader.PropertyToID("_LinesIntensity");
-    static readonly int _linesSecondaryIntensity = Shader.PropertyToID("_LinesSecondaryIntensity");
-    static readonly int _linesBands              = Shader.PropertyToID("_LinesBands");
-    static readonly int _linesSecondaryBands     = Shader.PropertyToID("_LinesSecondaryBands");
-    static readonly int _lineWidth               = Shader.PropertyToID("_LineWidth");
-    static readonly int _lineStrength            = Shader.PropertyToID("_LineStrength");
-    static readonly int _shadowIntensity         = Shader.PropertyToID("_ShadowIntensity");
-    static readonly int _visionBrightness        = Shader.PropertyToID("_VisionBrightness"); 
-    static readonly int _visionSaturation        = Shader.PropertyToID("_VisionSaturation");
-    static readonly int _visionSharpness         = Shader.PropertyToID("_VisionSharpness");
+    static readonly int _mapTex      = Shader.PropertyToID("_MapTex");
+    static readonly int map_scale_id = Shader.PropertyToID("_MapScale");
 }

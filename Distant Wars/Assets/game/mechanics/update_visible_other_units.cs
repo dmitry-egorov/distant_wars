@@ -10,17 +10,19 @@ internal class update_visible_other_units : MassiveMechanic
         var ovu = ur.VisibleOtherUnits;
 
         foreach (var vu in ovu)
+        {
             vu.IsVisible = false;
+        }
 
         ovu.Clear();
 
-        foreach (var /* own unit */ owu in ur.VisionUnits)
+        foreach (/* own unit */ var owu in ur.VisionUnits)
         {
-            var /* own position */ owp = owu.Position;
-            var /* own vision range squared*/ vr2 = owu.VisionRange.sqr();
+            /* own position             */ var owp = owu.Position;
+            /* own vision range squared */ var vr2 = owu.VisionRange.sqr();
 
             //PERF: use space grid
-            foreach (var /* other unit */ otu in ur.OtherUnits)
+            foreach (/* other unit */ var otu in ur.OtherUnits)
             {
                 if (otu.IsVisible)
                     continue;
@@ -28,7 +30,7 @@ internal class update_visible_other_units : MassiveMechanic
                 var otp = otu.Position;
                 
                 // is within range
-                if ((otp - owp).sqrMagnitude <= vr2 )
+                if ((otp - owp).sqrMagnitude <= vr2)
                 {
                     otu.IsVisible = true;
                     ovu.Add(otu);

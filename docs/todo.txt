@@ -1,13 +1,3 @@
-- firing and destruction
-  + attacking
-  + bullet firing
-  + hp
-  + ray intersect collision
-  + fire while moving
-  + intersect terrain
-  + destruction
-  - blinking when attacked
-  - scale independent bullet sprite (move quad generation to shader limit min screen size)
 - optimize search with space grid
 - radar (find all within radar range, mark as discovered if also within vision range)
 - steady update
@@ -16,9 +6,21 @@
   - factory
   - metal gatherer
   - energy gatherer
+- move command feedback
 - unity math, jobs, arrays?
 - how to preserve discovered texture??
 
+
++ firing and destruction
+  + attacking
+  + bullet firing
+  + hp
+  + ray intersect collision
+  + fire while moving
+  + intersect terrain
+  + destruction
+  + blinking when attacked
++ scale independent bullet sprite
 + space grid
 + faction colors
 + hide enemy units
@@ -27,6 +29,10 @@
 
 
 
-order : attack | move | guard | hold
 
-last_attack_target
+***|***|***
+
+1 2 3
+
+4.5
+

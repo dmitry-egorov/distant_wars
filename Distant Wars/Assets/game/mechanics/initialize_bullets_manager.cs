@@ -10,16 +10,15 @@ internal class initialize_bullets_manager : MassiveMechanic
         var  pm = ProjectilesManager.Instance;
         pm.Positions  = new List<Vector3>();
         pm.Directions = new List<Vector3>();
-        pm.Speeds  = new List<float>();
-        pm.Damages = new List<float>();
+        pm.Speeds     = new List<float>();
+        pm.Damages    = new List<int>();
 
         /* mesh renderer */ var sr = pm.SpritesRenderer;
 
         var smf = sr.RequireComponent<MeshFilter>();
         var smesh = smf.sharedMesh;
 
-        if (smesh == null) 
-            smesh = smf.sharedMesh = new Mesh {name = "projectile sprites"};
+        if (smesh == null) smesh = smf.sharedMesh = new Mesh { name = "projectile sprites" };
     
         smesh.bounds = new Bounds(Vector3.zero, new Vector3(map.Scale, map.Scale, 1));
         smesh.MarkDynamic();

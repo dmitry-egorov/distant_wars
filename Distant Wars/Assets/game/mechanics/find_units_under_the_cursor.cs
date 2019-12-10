@@ -5,15 +5,15 @@ public class find_units_under_the_cursor : MassiveMechanic
 {
     public void _()
     {
-        var /* units' repository */ ur = UnitsRegistry.Instance;
-        var /* local player      */ lp = LocalPlayer.Instance;
-        var /* units in the box  */ bu = lp.PreviousUnitsInTheCursorBox;
+        /* units' repository */ var ur = UnitsRegistry.Instance;
+        /* local player      */ var lp = LocalPlayer.Instance;
+        /* units in the box  */ var bu = lp.PreviousUnitsInTheCursorBox;
         bu.Clear();
         
         lp.PreviousUnitsInTheCursorBox = lp.UnitsInTheCursorBox;
         lp.UnitsInTheCursorBox = bu;
 
-        var /* cursor is a box */ ib = lp.IsDragging || lp.FinishedDragging;
+        /* cursor is a box */ var ib = lp.IsDragging || lp.FinishedDragging;
 
         var vus = ur.VisionUnits;
         var ous = ur.VisibleOtherUnits;
@@ -34,6 +34,7 @@ public class find_units_under_the_cursor : MassiveMechanic
             var miny = Mathf.Min(min.y, max.y);
             var maxy = Mathf.Max(min.y, max.y);
 
+            //PERF: use space grid
             for (int i = 0; i < tuc; i++)
             {
                 var /* unit */ u = i < vuc ? vus[i] : ous[i - vuc];
@@ -59,6 +60,7 @@ public class find_units_under_the_cursor : MassiveMechanic
             var /* closest unit */ cu = default(Unit);
             var /* sqr distance to the closest unit */ sqcd = float.MaxValue;
 
+            //PERF: use space grid
             for (int i = 0; i < tuc; i++)
             {
                 /* unit */ var u = i < vuc ? vus[i] : ous[i - vuc];
@@ -72,9 +74,9 @@ public class find_units_under_the_cursor : MassiveMechanic
                 }
             }
 
-            var /* units' screen size */ uss = w2st.apply_to_scalar(ur.WorldScale);
-            var /* selection distance */  sd = ur.ScreenSelectionDistance;
-            var /* adjusted selection distance */ asd = sd * uss / 2f;
+            var /* units' screen size */ uss = ur.SpriteSize;
+            var /* selection distance */ sd  = ur.ScreenSelectionDistance;
+            var /* adjusted selection distance */ asd = sd * uss * 0.5f;
             if (cu != null && sqcd < asd.sqr())
                 bu.Add(cu);
         }

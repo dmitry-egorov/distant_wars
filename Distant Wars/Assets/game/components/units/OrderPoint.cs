@@ -7,8 +7,8 @@ public class OrderPoint : RequiredSingleton<OrderPoint>
 {
     [Header("Settings")]
     public float Z = 51f;
-    public float PointSize = 1f;
-    public float LineWidth = 16f;
+    public int PointSize = 16;
+    public int LineWidth = 16;
 
     
     [Header("Auto")]

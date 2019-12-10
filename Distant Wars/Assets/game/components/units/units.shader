@@ -31,8 +31,11 @@
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
-            float _UnitsSize;
+
+
+            // Globals
             float4 _FactionColors[16];
+            float _UnitsSize;
 
             v2f vert (appdata d)
             {
@@ -46,16 +49,16 @@
                 o.flags.y = is ? 1.0 : 0.0;
                 o.color_index.x = floor(fmod(flags, 256) / 16);
                 
-                float /* offset x */ ox = fmod(flags,  8) >= 4 ? 0.5 : -0.5;
-                float /* offset y */ oy = fmod(flags, 16) >= 8 ? -0.5 : 0.5;
+                float /* offset x */ ox = fmod(flags,  8) >= 4 ?  0.5 : -0.5;
+                float /* offset y */ oy = fmod(flags, 16) >= 8 ? -0.5 :  0.5;
                 float /* offset z */ oz = (ih ? -1.0 : 0.0) + (is ? -1.0 : 0.0);
                 float4 ov = UnityObjectToClipPos(float3(v.x, v.y, oz));
 
                 float sx = _ScreenParams.x;
                 float sy = _ScreenParams.y;
                 float us = _UnitsSize;
-                ov.x = (floor(ov.x * sx) + us * ox) / sx;  
-                ov.y = (floor(ov.y * sy) + us * oy) / sy;  
+                ov.x = (floor(ov.x * sx) + us * ox) / sx;
+                ov.y = (floor(ov.y * sy) + us * oy) / sy;
                 o.vertex = ov;
                 
                 float2 uv = float2(0.5 + ox, 0.5 + oy);

@@ -2,10 +2,9 @@ using System;
 
 namespace Plugins.Lanski
 {
-    public class LeakyList<T>
-        where T: struct
+    public class LeakyList<T> where T: struct
     {
-        public LeakyList()
+        public LeakyList(int initial_capacity = 4)
         {
             data = new T[4];
         }
@@ -36,12 +35,34 @@ namespace Plugins.Lanski
             this.count = result;
         }
 
-        private int count;
-        private T[] data;
-
-        internal void Clear()
+        public void Clear()
         {
             count = 0;
         }
+
+        public Enumerator GetEnumerator() => new Enumerator(this);
+
+        public struct Enumerator
+        {
+            public Enumerator(LeakyList<T> list)
+            {
+                this.i = -1;
+                this.list = list;                
+            }
+
+            public bool MoveNext()
+            {
+                i++;
+                return i < list.Count;
+            }
+
+            public T Current => list[i];
+
+            int i;
+            LeakyList<T> list;
+        }
+
+        private int count;
+        private T[] data;
     }
 }

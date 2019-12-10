@@ -22,17 +22,16 @@ internal class update_bullets : MassiveMechanic
 
         for (int i = 0; i < c;)
         {
-            /* projectile's position  */ var pp = pps[i];
-            /* projectile's direction */ var dr = drs[i];
-            /* projectile's offset    */ var po = sps[i] * dt;
+            /* projectile's position  */ var pp  = pps[i];
+            /* projectile's direction */ var dr  = drs[i];
+            /* projectile's offset    */ var po  = sps[i] * dt;
+            /* next projectile point  */ var npp = (pp + dr * po);
             
             var hit = false;
 
             // check collision with units
             {
-                var cell = usg.get_cell_of(pp);
-                /* cell positions */ var cps = cell.positions;
-                /* cell units     */ var cus = cell.elements;
+                /* cell positions and units */ var (cps, cus) = usg.get_cell_of(npp);
                 for(var j = 0; j < cps.Count; j++)
                 {
                     /* unit's position 2d */ var up2 = cps[j];
@@ -43,7 +42,7 @@ internal class update_bullets : MassiveMechanic
                     hit = rays.try_intersect_sphere(pp, dr, up3, hr, out var t) && t >= 0 && t < po;
                     if (hit)
                     {
-                        u.HitPoints -= dms[i];
+                        u.IncomingDamages.Add(dms[i]);
                         break;
                     }
                 } 
@@ -52,7 +51,6 @@ internal class update_bullets : MassiveMechanic
             //check collision with the terrain
             if (!hit)
             {
-                /* next projectile point         */ var npp = (pp + dr * po);
                 /* projectiles int position      */ var cpc = m.coord_of(pp.xy());
                 /* projectiles next int position */ var npc = m.coord_of(npp.xy());
 
@@ -75,9 +73,14 @@ internal class update_bullets : MassiveMechanic
                 while (true)
                 {
                     if (first)
+                    {
                         first = false;
-                    else if (hit = npp.z <= m.z(x1, y1)) //TODO: calculate z by interpolation?
+                    }
+                    else if (npp.z <= m.z(x1, y1)) //TODO: calculate z by interpolation?
+                    {
+                        hit = true;
                         break;
+                    }
 
                     if (x0 == x1 && y0 == y1) break;
 

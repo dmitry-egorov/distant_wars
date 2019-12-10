@@ -13,7 +13,7 @@ public class handle_unit_attacking : MassiveMechanic
 
         foreach (var u in us)
         {
-            /* attack cooldown     */ var ocd  = u.AttackCountdown;
+            /* attack cooldown     */ var ocd = u.AttackCountdown;
             /* new attack cooldown */ var ncd = u.AttackCountdown = ocd > 0 ? ocd - dt : 0;
 
             if (ncd > 0)

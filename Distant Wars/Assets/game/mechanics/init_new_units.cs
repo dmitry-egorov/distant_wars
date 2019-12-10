@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Plugins.Lanski;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 internal class init_new_units : MassiveMechanic
@@ -43,6 +44,9 @@ internal class init_new_units : MassiveMechanic
                 {
                     u.Position = u.transform.position.xy();
                 }
+
+                u.IncomingDamages = new LeakyList<int>(4);
+                u.HitPoints = u.MaxHitPoints;
             }
         }
 

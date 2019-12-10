@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Plugins.Lanski;
+using UnityEngine;
 
 public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
 {
@@ -8,12 +9,12 @@ public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
     public float AttackRange;
     public float AttackCooldownTime;
     public float AttackVelocity;
-    public float AttackDamage;
+    public int   AttackDamage;
     public float ProjectileHeight;
     public float ProjectileOffset;
     public Faction Faction;
     public float HitRadius;
-    public float HitPoints;
+    public int MaxHitPoints;
 
     [Header("State")]
     public Vector2 Position;
@@ -23,10 +24,14 @@ public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
  
     public float AttackCountdown;
 
+    public LeakyList<int> IncomingDamages;
+    public int HitPoints;
+
     [Header("Visual State")]
     public bool IsHighlighted;
     public bool IsSelected;
     public bool IsVisible;
+    public float BlinkTimeRemaining;
 
     public void OnDrawGizmos()
     {
@@ -96,8 +101,4 @@ public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
         private Move? _move;
         private Attack? _attack;
     }
-
-    
-
-    
 }

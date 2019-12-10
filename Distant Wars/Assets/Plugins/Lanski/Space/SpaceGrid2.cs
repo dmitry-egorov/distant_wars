@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using Plugins.Lanski;
 using UnityEngine;
 
 namespace Plugins.Lanski.Space
@@ -58,6 +56,12 @@ namespace Plugins.Lanski.Space
         {
             public LeakyList<Vector2> positions;
             public List<T> elements;
+
+            public void Deconstruct(out LeakyList<Vector2> positions, out List<T> elements)
+            {
+                positions = this.positions;
+                elements = this.elements;
+            }
         }
 
         Cell[] cells;

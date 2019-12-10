@@ -36,8 +36,7 @@
         {
             var /* target position */ tp = lp.WorldMousePosition;
 
-            foreach (var u in su)
-                u.IssuedOrder = Unit.Order.move(tp);
+            foreach (var u in su) u.IssuedOrder = Unit.Order.move(tp);
         }
     }
 }

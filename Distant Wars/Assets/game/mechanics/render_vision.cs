@@ -38,7 +38,7 @@ internal class render_vision : MassiveMechanic
         dv.ReserveMemoryFor(vc * 4);
         dt.ReserveMemoryFor(vc * 6);
 
-        /* vision quad index */ var qi = 0;
+        /* quad index */ var qi = 0;
         for (var i = 0; i < vc; i++)
         {
             var /* unit        */  u = ous[i];

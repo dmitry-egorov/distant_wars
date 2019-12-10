@@ -22,22 +22,22 @@ public class render_order_point : MassiveMechanic
             && u.IssuedOrder.is_move(out var /* move order */ tp)
         )
         {
-            /* orders z          */ var z  = op.Z;
-            /* size              */ var s  = op.PointSize;
-            /* units registry    */ var ur = UnitsRegistry.Instance;
-            /* units world scale */ var us = ur.WorldScale;
+            /* strategic camera  */ var sc  = StrategicCamera.Instance;
+            /* screen to world   */ var s2w = sc.ScreenToWorldTransform;
+            /* orders z          */ var z   = op.Z;
 
             // render point
             {
+                /* size */ var s = op.PointSize;
+
                 omr.transform.position = tp.xy(z);
-                omr.transform.localScale = (s * us).v3();
+                omr.transform.localScale = s2w.apply_to_scalar(s).v3();
                 omr.enabled = true;                
             }
 
             // render line
             {
-                var /* strategic camera */ sc = StrategicCamera.Instance;
-                var /* line width */ w = op.LineWidth * sc.SizeProportion;
+                var /* line width */ w = s2w.apply_to_scalar(op.LineWidth);
 
                 olr.SetPosition(0, u.Position.xy(z));
                 olr.SetPosition(1, tp.xy(z));

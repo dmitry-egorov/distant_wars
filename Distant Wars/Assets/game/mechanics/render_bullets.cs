@@ -12,7 +12,6 @@ public class render_bullets : MassiveMechanic
 
     public void _()
     {
-        /* bullet size     */ const float bs = 2f;
         /* units' registry */ var pm = ProjectilesManager.Instance;
 
         // generate sprites
@@ -35,7 +34,7 @@ public class render_bullets : MassiveMechanic
             
             for (var j = 0; j < 4; j++)
             {
-                sv.Add((p + bs * (j % 2 - 0.5f) * Vector2.right + bs * (j / 2 - 0.5f) * Vector2.down).xy(j));
+                sv.Add(p.xy(j));
             }
 
             //PERF: since the quads are not changing, we should only generate them when capacity is increasing.
@@ -45,8 +44,13 @@ public class render_bullets : MassiveMechanic
         sm.Clear();
         sm.SetVertices(sv);
         sm.SetTriangles(st, 0, false);
+
+        Shader.SetGlobalFloat(bullets_size_id, pm.SpriteSize * Screen.height / 1080);
     }
     
     private List<Vector3> sprite_vertices;
     private List<int> sprite_triangles;
+
+    static readonly int bullets_size_id = Shader.PropertyToID("_BulletsSize");
+
 }
