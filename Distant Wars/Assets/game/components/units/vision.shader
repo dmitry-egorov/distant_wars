@@ -21,6 +21,7 @@
             
             #include "UnityCG.cginc"
 
+            float sqr(float v) { return v*v; }
             float sstep(float min, float max, float width) { return smoothstep(min - width, min + width, max); }
 
             struct appdata
@@ -50,7 +51,7 @@
                 float dx = i.uv.x;
                 float dy = i.uv.y;
                 float w = fwidth(dx) * 2;
-                float v = sstep(dx*dx + dy*dy, 0.5*0.5 - w, w);
+                float v = sstep(dx*dx + dy*dy, sqr(0.5), w);
                 //float v = step(dx*dx + dy*dy, 0.5*0.5);
                 if (v == 0) discard;
                 return float4(v,v,v,1);

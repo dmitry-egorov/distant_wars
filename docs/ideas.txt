@@ -9,12 +9,13 @@
 - water simulation
 - melting sand
 - forest fire
-- waporising lakes
+- vaporising lakes
 - fog
 - unit overheating
 - hero pilots with passive and active perks
 - underground units? or underground level
 - vision by unit clusters (omptimization)
+- player gather blueprints for unique units on the map
 
 - session multiplayer
 - players arrive at the sight early, acid fog covers the map (planning phase)

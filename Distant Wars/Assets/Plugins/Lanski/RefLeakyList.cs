@@ -2,7 +2,7 @@ using System;
 
 namespace Plugins.Lanski
 {
-    // version of LeakyList, that can clean its references
+    // version of LeakyList for reference types; can cleanup its references
     public class RefLeakyList<T> where T: class
     {
         public RefLeakyList(int initial_capacity = 4)
@@ -47,9 +47,9 @@ namespace Plugins.Lanski
         // write default values to the elements outside of the current list
         public void Cleanup()
         {
-            var end = leak_start + leak_count;
-            for (var i = leak_start; i < end; i++)
-                data[i] = default;
+            Array.Clear(data, leak_start, leak_count);
+            leak_count = 0;
+            leak_start = count;
         }
 
         public void Clear()

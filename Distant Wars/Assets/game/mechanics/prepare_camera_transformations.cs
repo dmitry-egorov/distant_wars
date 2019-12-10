@@ -24,6 +24,6 @@ internal class prepare_camera_transformations: MassiveMechanic
 
         var wsmin = s2w.apply_to_point(new Vector2(0, 0));
         var wsmax = s2w.apply_to_point(sr);
-        sc.WorldScreen = new FRect(wsmin, wsmax);
+        sc.WorldScreen = new Plugins.Lanski.Space.Rect(wsmin, wsmax);
     }
 }

@@ -63,7 +63,7 @@ public class render_units: MassiveMechanic
                     sv.Add(p.xy(fl));
                 }
 
-                //PERF: since the quads are not changing, we should only generate additional them when capacity is increasing.
+                //PERF: since the quads are not changing, we should only generate them when capacity is increasing.
                 RenderHelper.add_quad(st, qi);
                 qi++;
             }
@@ -75,10 +75,10 @@ public class render_units: MassiveMechanic
 
         // generate faction colors
         {
-            var fs = Faction.Factions;
+            var fs  = Faction.Factions;
             var fsc = fs.Count;
             var mfc = MaxNumberOfFactionColors;
-            var cs = fsc;
+            var cs  = fsc;
 
             if (fsc > mfc)
             {

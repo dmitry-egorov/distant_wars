@@ -1,4 +1,4 @@
-- optimize search with space grid
+- space grid per team
 - radar (find all within radar range, mark as discovered if also within vision range)
 - steady update
 - fire in advance (need previous position, goes along with steady update)
@@ -11,6 +11,7 @@
 - how to preserve discovered texture??
 
 
++ optimize search with space grid
 + firing and destruction
   + attacking
   + bullet firing
@@ -28,11 +29,7 @@
 + terrain movement speed modifier
 
 
+* find min/max of the vision
+* mark all
 
-
-***|***|***
-
-1 2 3
-
-4.5
 

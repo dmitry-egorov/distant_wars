@@ -12,10 +12,10 @@ internal class update_units_space_grid : MassiveMechanic
         var w = ur.SpaceGridWidth;
         var sg = ur.SpaceGrid;
         
-        if (sg == null || sg.Size.x != w || sg.Size.y != h)
+        if (sg == null || sg.size.x != w || sg.size.y != h)
         {
             /* half scale */ var hs = map.Scale * 0.5f;
-            var rect = new FRect(-hs.xy(), hs.xy());
+            var rect = new Plugins.Lanski.Space.Rect(-hs.xy(), hs.xy());
             sg = ur.SpaceGrid = new SpaceGrid2<Unit>(rect, new Vector2Int(w, h));
         }
 

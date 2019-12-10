@@ -13,12 +13,14 @@ internal class update_bullets : MassiveMechanic
         var dms = pm.Damages;
 
         // update position
-        /* delta time     */ var dt  = Time.deltaTime;
-        /* map            */ var  m  = Map.Instance;
-        /* units registry */ var ur  = UnitsRegistry.Instance;
-        /* units          */ var us  = ur.Units;
-        /* units          */ var usg = ur.SpaceGrid;
-        /* count          */ var   c = pps.Count;
+        /* delta time          */ var dt   = Time.deltaTime;
+        /* map                 */ var m    = Map.Instance;
+        /* units registry      */ var ur   = UnitsRegistry.Instance;
+        /* units               */ var us   = ur.Units;
+        /* units' space grid   */ var usg  = ur.SpaceGrid;
+        /* cells unit postions */ var csps = usg.cells_positions;
+        /* cells units         */ var csus = usg.cells_elements;
+        /* count               */ var c    = pps.Count;
 
         for (int i = 0; i < c;)
         {
@@ -31,7 +33,10 @@ internal class update_bullets : MassiveMechanic
 
             // check collision with units
             {
-                /* cell positions and units */ var (cps, cus) = usg.get_cell_of(npp);
+                //TODO?: check more than one cell
+                /* cell's index     */ var ci  = usg.get_index_of(npp);
+                /* cell's positions */ var cps = csps[ci];
+                /* cell's units     */ var cus = csus[ci];
                 for(var j = 0; j < cps.Count; j++)
                 {
                     /* unit's position 2d */ var up2 = cps[j];
@@ -76,7 +81,7 @@ internal class update_bullets : MassiveMechanic
                     {
                         first = false;
                     }
-                    else if (npp.z <= m.z(x1, y1)) //TODO: calculate z by interpolation?
+                    else if (npp.z <= m.z(x1, y1)) //TODO?: calculate z by interpolation
                     {
                         hit = true;
                         break;

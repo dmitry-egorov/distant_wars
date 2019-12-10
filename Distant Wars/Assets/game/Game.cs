@@ -61,19 +61,28 @@ public class Game: RequiredSingleton<Game>
         #endif
 
         // simulation
-        if (Application.isPlaying)
         {
-            _<cleanup_unit_orders>();
-            _<handle_unit_movement>();
-            _<update_units_space_grid>();
-            _<handle_unit_attacking>();
+            if (Application.isPlaying)
+            {
+                _<cleanup_unit_orders>();
+                _<handle_unit_movement>();
+                _<update_units_space_grid>();
+                _<handle_unit_attacking>();
 
-            _<update_bullets>();
-            _<process_incoming_damage>();
+                _<update_bullets>();
+                _<handle_incoming_damage>();
 
-            _<destroy_dead_units>();
-            _<cleanup_units>();
+                _<destroy_dead_units>();
+                _<cleanup_units>();
+            }
         }
+        
+        #if UNITY_EDITOR
+            if (!Application.isPlaying)
+            {
+                _<update_units_space_grid>();
+            }
+        #endif
 
         _<update_visible_other_units>();
         _<update_units_style>();
@@ -91,9 +100,23 @@ public class Game: RequiredSingleton<Game>
 
         _<resize_discovery_texture>();
         _<resize_vision_texture>();
+
+        finish_frame();
+        debug_time<update_visible_other_units>();
+        if (Application.isPlaying)
+        {
+            debug_time<handle_unit_attacking>();
+            debug_time<update_bullets>();
+        }
         
         time += Time.deltaTime;
         DebugText.set_text("time", time.ToString());
+    }
+
+    void debug_time<T>() where T: class, MassiveMechanic, new()
+    {
+        var (n,t) = show_time_for<T>();
+        DebugText.set_text("time of " + n, t);
     }
 
     [NonSerialized]bool initialized;

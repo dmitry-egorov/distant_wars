@@ -51,7 +51,7 @@
                 float y = i.uv.y;
 
                 float w = fwidth(x) * 3;
-                float v = sstep(x*x + y*y, 0.5*0.5 - w, w);
+                float v = sstep(x*x + y*y, 0.5*0.5, w);
                 if (v == 0) discard;
                 return float4(v,v,v,1);
             }

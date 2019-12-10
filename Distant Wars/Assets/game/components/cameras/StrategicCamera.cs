@@ -22,7 +22,7 @@ public partial class StrategicCamera : RequiredSingleton<StrategicCamera>
     public UniformSpaceTransform2 WorldToScreenTransform;
     public UniformSpaceTransform2 ScreenToWorldTransform;
     public Vector2 ScreenResolution;
-    public FRect WorldScreen;
+    public Plugins.Lanski.Space.Rect WorldScreen;
 
     public float SizeProportion => Size / MaxOrthographicSize;
 }
