@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using Plugins.Lanski;
 using UnityEngine;
 
-internal class render_vision : MassiveMechanic
+internal class generate_vision_mesh : MassiveMechanic
 {
-    public render_vision()
+    public generate_vision_mesh()
     {
         vision_vertices = new List<Vector3>(0);
         vision_triangles = new List<int>(0);
@@ -17,7 +17,7 @@ internal class render_vision : MassiveMechanic
         var /* units' registry  */ ur  = UnitsRegistry.Instance;
         var /* vision mesh      */ vm  = ur.VisionMesh;
         var /* vision mesh      */ dm  = ur.DiscoveryMesh;
-        var /* units            */ ous = ur.VisionUnits;
+        var /* units            */ ous = ur.OwnTeamUnits;
         var /* own unit's count */ ouc = ous.Count;
 
         /* strategic camera */ var sc  = StrategicCamera.Instance;

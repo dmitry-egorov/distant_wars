@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using Plugins.Lanski;
 using UnityEngine;
 
-public class render_units: MassiveMechanic
+public class generate_units_mesh: MassiveMechanic
 {
-    public render_units()
+    public generate_units_mesh()
     {
         sprite_vertices = new List<Vector3>(0);
         sprite_triangles = new List<int>(0);
@@ -14,8 +14,8 @@ public class render_units: MassiveMechanic
     public void _()
     {
         var /* units' registry */  ur = UnitsRegistry.Instance;
-        var /* units           */ ous = ur.VisionUnits;
-        var /* units           */ otu = ur.VisibleOtherUnits;
+        var /* units           */ ous = ur.OwnTeamUnits;
+        var /* units           */ otu = ur.OtherTeamsVisibleUnits;
 
         var /* own unit's count   */ ouc = ous.Count;
         var /* other unit's count */ otc = otu.Count;

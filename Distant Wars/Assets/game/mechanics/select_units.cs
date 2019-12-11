@@ -26,7 +26,7 @@ public class select_units : MassiveMechanic
                 su.Add(u);
         }
 
-        lp.PreviouslySelectedUnits.clean_up_expired_objects();
-        lp.SelectedUnits.clean_up_expired_objects();
+        lp.PreviouslySelectedUnits.CleanUpExpiredObjects();
+        lp.SelectedUnits.CleanUpExpiredObjects();
     }
 }

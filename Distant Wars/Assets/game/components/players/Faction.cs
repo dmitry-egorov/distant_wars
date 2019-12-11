@@ -9,9 +9,10 @@ public class Faction : ScriptableObject
 
     public int Index;
 
-    void OnEnable() => Index = Factions.add(this);
+    public Team Team;
+
+    void OnEnable() => Index = Factions.AddAndGetIndex(this);
 
     public static List<Faction> Factions => factions != null ? factions : factions = new List<Faction>();
-
     private static List<Faction> factions;
 }

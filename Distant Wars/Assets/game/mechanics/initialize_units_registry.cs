@@ -37,10 +37,10 @@ internal class initialize_units_registry : MassiveMechanic
         ur.DiscoveryMesh = dmesh;
         ur.SpritesMesh = smesh;
 
-        ur.VisibleOtherUnits = new RefLeakyList<Unit>();
+        ur.OtherTeamsVisibleUnits = new RefLeakyList<Unit>();
 
         ur.Units       = new List<Unit>();
-        ur.VisionUnits = new List<Unit>();
-        ur.OtherUnits  = new List<Unit>();
+        ur.OwnTeamUnits = new List<Unit>();
+        ur.OtherTeamsUnits  = new List<Unit>();
     }
 }

@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: BlueFaction
   m_EditorClassIdentifier: 
   Color: {r: 0.4438857, g: 0.46901575, b: 0.8962264, a: 1}
-  Index: 0
+  Index: 1
+  Team: {fileID: 11400000, guid: dbfddfb75ad23410cab1b5899d93436e, type: 2}

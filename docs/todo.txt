@@ -1,3 +1,6 @@
+- filter vision quads by fully visible grid cells
+- filter unit sprites
+- find visibility for all teams
 - space grid per team
 - radar (find all within radar range, mark as discovered if also within vision range)
 - steady update
@@ -6,7 +9,9 @@
   - factory
   - metal gatherer
   - energy gatherer
+- show hp when zomming in
 - move command feedback
+
 - unity math, jobs, arrays?
 - how to preserve discovered texture??
 

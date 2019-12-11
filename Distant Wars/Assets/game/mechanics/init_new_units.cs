@@ -6,8 +6,17 @@ internal class init_new_units : MassiveMechanic
 {
     public void _()
     {
-        var /* units registry */ ur = UnitsRegistry.Instance;
-        var      /* new units */ nu = ur.NewObjects;
+        /* units registry */ var ur = UnitsRegistry.Instance;
+        /* new units      */ var nu = ur.NewObjects;
+        /* local player   */ var lp = LocalPlayer.Instance;
+        /* local player's team id */ var lptid = lp.Faction.Team.Index;
+
+        /* space grid       */ var sg = ur.SpaceGrid;
+        /* grid positions   */ var ps  = sg.cells_positions;
+        /* grid team ids    */ var ts  = sg.cells_team_ids;
+        /* grid units       */ var us  = sg.cells_units;
+        /* grid visiblities */ var vs  = sg.cells_visibilities;
+        /* grid cell count  */ var ccount = ps.Length;
 
         foreach (var u in nu)
         {
@@ -16,16 +25,23 @@ internal class init_new_units : MassiveMechanic
 
             ur.Units.Add(u);
 
-            if (u.Faction == LocalPlayer.Instance.Faction)
+            var tid = u.Faction.Team.Index;
+
+            if (tid == lptid)
             {
-                u.IsVisible = true;
-                ur.VisionUnits.Add(u);
+                ur.OwnTeamUnits.Add(u);
             }
             else
             {
-                u.IsVisible = false;
-                ur.OtherUnits.Add(u);
+                ur.OtherTeamsUnits.Add(u);
             }
+
+            /* unit's position */ var p = u.Position;
+            var ui = sg.get_index_of(p);
+            ps[ui].Add(p);
+            ts[ui].Add(tid);
+            us[ui].Add(u);
+            vs[ui].Add(tid == lptid);
         }
 
         if (Application.isPlaying)

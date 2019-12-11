@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Plugins.Lanski;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -7,6 +8,8 @@ using static Massive;
 [ExecuteInEditMode]
 public class Game: RequiredSingleton<Game>
 {
+    public double MeasuringWeight = 0.1;
+
     void Update()
     {
         if (!initialized)
@@ -15,6 +18,8 @@ public class Game: RequiredSingleton<Game>
                 Assert.raiseExceptions = true;
                 MassiveDebug.Action = s => DebugText.set_text("error", s);
             #endif
+
+            moving_average_weight = MeasuringWeight;
 
             _<initialize_map>();
             _<initialize_local_player>();
@@ -31,6 +36,8 @@ public class Game: RequiredSingleton<Game>
             
             initialized = true;
         }
+
+        start_update();
         
         // debug
         {
@@ -38,7 +45,8 @@ public class Game: RequiredSingleton<Game>
             _<disable_debug_text>();
         }
 
-        _<init_new_units>();
+        _<resize_space_grid>();
+
         _<set_position_from_transform_in_editor>();
 
         _<prepare_mouse_clicking>();
@@ -62,14 +70,17 @@ public class Game: RequiredSingleton<Game>
 
         // simulation
         {
+            _<init_new_units>();
+
             if (Application.isPlaying)
             {
                 _<cleanup_unit_orders>();
-                _<handle_unit_movement>();
-                _<update_units_space_grid>();
-                _<handle_unit_attacking>();
+                _<handle_movement>();
+                _<update_space_grid>();
+                _<find_visible_units_from_other_teams>();
+                _<find_and_attack_target>();
 
-                _<update_bullets>();
+                _<update_projectiles>();
                 _<handle_incoming_damage>();
 
                 _<destroy_dead_units>();
@@ -80,17 +91,17 @@ public class Game: RequiredSingleton<Game>
         #if UNITY_EDITOR
             if (!Application.isPlaying)
             {
-                _<update_units_space_grid>();
+                _<update_space_grid>();
             }
         #endif
 
-        _<update_visible_other_units>();
+        //_<find_visible_units_from_other_teams>();
         _<update_units_style>();
 
         _<render_order_point>();
-        _<render_units>();
-        _<render_vision>();
-        _<render_bullets>();
+        _<generate_units_mesh>();
+        _<generate_vision_mesh>();
+        _<generate_projectiles_mesh>();
         _<render_selection_box>();
 
         // debug
@@ -101,21 +112,30 @@ public class Game: RequiredSingleton<Game>
         _<resize_discovery_texture>();
         _<resize_vision_texture>();
 
-        finish_frame();
-        debug_time<update_visible_other_units>();
+        finish_update();
+
+        /*debug_time<find_other_teams_visible_units>();
+        debug_time<update_space_grid>();
         if (Application.isPlaying)
         {
-            debug_time<handle_unit_attacking>();
+            debug_time<find_and_attack_target>();
             debug_time<update_bullets>();
-        }
-        
-        time += Time.deltaTime;
-        DebugText.set_text("time", time.ToString());
+        }*/
+
+        DebugText.set_text("avg frame time", get_avg_frame_time());
+
+        DebugText.set_text("avg update time", get_avg_update_time());
+
+        var top_avg_times = string.Join("", get_top_avg_times(10).Select(x => $"\n\t{x.name}: {x.time}"));
+        DebugText.set_text("top times", top_avg_times);
+
+        DebugText.set_text("total units", UnitsRegistry.Instance.Units.Count.ToString());
+        DebugText.set_text("total projectiles", ProjectilesManager.Instance.Positions.Count.ToString());
     }
 
     void debug_time<T>() where T: class, MassiveMechanic, new()
     {
-        var (n,t) = show_time_for<T>();
+        var (n,t) = get_avg_time_for<T>();
         DebugText.set_text("time of " + n, t);
     }
 

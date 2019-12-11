@@ -30,7 +30,7 @@ public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
     [Header("Visual State")]
     public bool IsHighlighted;
     public bool IsSelected;
-    public bool IsVisible;
+    //public bool IsVisible;
     public float BlinkTimeRemaining;
 
     public void OnDrawGizmos()
@@ -42,16 +42,16 @@ public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
 
     public struct Order
     {
-        public static Order guard(Unit t) => new Order {_guard = new Guard {Target = t}};
-        public static Order move(Vector2 t) => new Order {_move = new Move {Target = t}};
-        public static Order attack(Unit t) => new Order {_attack = new Attack {Target = t}};
-        public static Order idle() => new Order();
+        public static Order guard (Unit t)    => new Order {type = Type.Guard,  _guard  = new Guard  {Target = t}};
+        public static Order move  (Vector2 t) => new Order {type = Type.Move,   _move   = new Move   {Target = t}};
+        public static Order attack(Unit t)    => new Order {type = Type.Attack, _attack = new Attack {Target = t}};
+        public static Order idle  ()          => new Order {};
 
-        public bool is_guard(out Unit t) 
+        public bool is_guard(out Unit t)
         {
-            if (_guard.try_get(out var g))
+            if (type == Type.Guard)
             {
-                t = g.Target;
+                t = _guard.Target;
                 return true;
             }
             t = default;
@@ -60,9 +60,9 @@ public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
         
         public bool is_move(out Vector2 t)
         {
-            if (_move.try_get(out var g))
+            if (type == Type.Move)
             {
-                t = g.Target;
+                t = _move.Target;
                 return true;
             }
             t = default;
@@ -71,16 +71,16 @@ public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
 
         public bool is_attack(out Unit t) 
         {
-            if (_attack.try_get(out var g))
+            if (type == Type.Attack)
             {
-                t = g.Target;
+                t = _attack.Target;
                 return true;
             }
             t = default;
             return false;
         }
 
-        public bool is_idle() => !_guard.HasValue && !_move.HasValue && !_attack.HasValue;
+        public bool is_idle() => type == Type.Idle;
 
         public struct Guard
         {
@@ -97,8 +97,17 @@ public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
             public Unit Target;
         }
 
-        private Guard? _guard;
-        private Move? _move;
-        private Attack? _attack;
+        enum Type
+        {
+            Idle = 0,
+            Guard,
+            Move,
+            Attack,
+        }
+
+        Type type;
+        Guard _guard;
+        Move _move;
+        Attack _attack;
     }
 }

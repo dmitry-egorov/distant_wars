@@ -5,7 +5,13 @@ public class find_units_under_the_cursor : MassiveMechanic
 {
     public void _()
     {
-        /* units' repository */ var ur = UnitsRegistry.Instance;
+        /* units' repository   */ var ur   = UnitsRegistry.Instance;
+        /* space grid          */ var sg   = ur.SpaceGrid;
+        /* cells unit postions */ var csps = sg.cells_positions;
+        /* cells unit postions */ var csvs = sg.cells_visibilities;
+        /* cells units         */ var csus = sg.cells_units;
+        /* cells centers       */ var cscs = sg.cells_centers;
+
         /* local player      */ var lp = LocalPlayer.Instance;
         /* units in the box  */ var bu = lp.PreviousUnitsInTheCursorBox;
         bu.Clear();
@@ -15,8 +21,8 @@ public class find_units_under_the_cursor : MassiveMechanic
 
         /* cursor is a box */ var ib = lp.IsDragging || lp.FinishedDragging;
 
-        var vus = ur.VisionUnits;
-        var ous = ur.VisibleOtherUnits;
+        var vus = ur.OwnTeamUnits;
+        var ous = ur.OtherTeamsVisibleUnits;
 
         var vuc = vus.Count;
         var ouc = ous.Count;
@@ -54,31 +60,48 @@ public class find_units_under_the_cursor : MassiveMechanic
         else
         {
             /* strategic camera */ var sc   = StrategicCamera.Instance;
-            /* multiplier       */ var w2st = sc.WorldToScreenTransform;
-            /* mouse position   */ var mp   = lp.ScreenMousePosition;
+            /* multiplier       */ var s2wt = sc.ScreenToWorldTransform;
+            /* mouse position   */ var mpos = lp.WorldMousePosition;
 
-            var /* closest unit */ cu = default(Unit);
-            var /* sqr distance to the closest unit */ sqcd = float.MaxValue;
+            /* units' screen size                */ var uss  = ur.SpriteSize;
+            /* selection distance                */ var sd   = ur.ScreenSelectionDistance;
+            /* adjusted selection distance       */ var asd  = sd * uss * 0.5f;
+            /* world space selection distance    */ var wsd  = s2wt.apply_to_scalar(asd);
+            /* world space selection distance ^2 */ var wsd2 = wsd.sqr();
 
-            //PERF: use space grid
-            for (int i = 0; i < tuc; i++)
+            /* closest unit */ var cu = default(Unit);
+            /* min distance to the closest unit ^2 */ var mind2 = float.MaxValue;
+            /* grid vision area */ var gva = sg.get_rect_of_circle(mpos, wsd);
+            for (var yi = gva.min.y; yi <= gva.max.y; yi++)
+            for (var xi = gva.min.x; xi <= gva.max.x; xi++)
             {
-                /* unit */ var u = i < vuc ? vus[i] : ous[i - vuc];
-                /* world space unit position  */ var  wp = u.Position;
-                /* screen space unit position */ var  sp = w2st.apply_to_point(wp);
-                /* sqr distance to the unit   */ var sqd = (sp - mp).sqrMagnitude;
-                if (sqd < sqcd)
+                /* cell index        */ var ci  = sg.get_index_of(xi, yi);
+                /* cell positions    */ var cps = csps[ci];
+                /* cell visibilities */ var cvs = csvs[ci];
+                /* cell units        */ var cus = csus[ci];
+                /* cell units count  */ var cuc = cps.Count;
+
+                for (var i = 0; i < cuc; i++)
                 {
-                    cu = u;
-                    sqcd = sqd;
+                    /* cell visibilities */ var cuv = cvs[i];
+                    if (!cuv)
+                        continue;
+                    
+                    /* world space unit position */ ref var pos = ref cps[i];
+                    /* sqr distance to the unit  */ var dist2 = (pos - mpos).sqrMagnitude;
+                    if (dist2 < mind2 && dist2 < wsd2)
+                    {
+                        /* potential unit */ var pu = cus[i];
+                        cu = pu;
+                        mind2 = dist2;
+                    }
                 }
             }
-
-            var /* units' screen size */ uss = ur.SpriteSize;
-            var /* selection distance */ sd  = ur.ScreenSelectionDistance;
-            var /* adjusted selection distance */ asd = sd * uss * 0.5f;
-            if (cu != null && sqcd < asd.sqr())
+            
+            if (cu != null)
+            {
                 bu.Add(cu);
+            }
         }
     }
 }

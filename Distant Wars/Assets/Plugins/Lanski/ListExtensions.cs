@@ -23,20 +23,20 @@ namespace Plugins.Lanski
             if (l.Capacity < count) l.Capacity = count;
         }
 
-        public static void replace_with_last<T>(this List<T> l, int i)
+        public static void ReplaceWithLast<T>(this List<T> l, int i)
         {
             var last = l.Count - 1;
             l[i] = l[last];
             l.RemoveAt(l.Count - 1);
         }
 
-        public static int add<T>(this List<T> list, T e)
+        public static int AddAndGetIndex<T>(this List<T> list, T e)
         {
             list.Add(e);
             return list.Count - 1;
         }
 
-        public static int clean_up_expired_objects<T>(this List<T> list)
+        public static int CleanUpExpiredObjects<T>(this List<T> list)
             where T: Object
         {
             var count = 0;
@@ -45,7 +45,7 @@ namespace Plugins.Lanski
             {
                 if (list[i] == null)
                 {
-                    list.replace_with_last(i);
+                    list.ReplaceWithLast(i);
                     count++;
                 }
                 else
