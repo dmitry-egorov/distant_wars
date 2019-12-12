@@ -9,13 +9,13 @@ internal class init_new_units : MassiveMechanic
         /* units registry */ var ur = UnitsRegistry.Instance;
         /* new units      */ var nu = ur.NewObjects;
         /* local player   */ var lp = LocalPlayer.Instance;
-        /* local player's team id */ var lptid = lp.Faction.Team.Index;
+        /* local player's team mask */ var lp_team_mask = lp.Faction.Team.Mask;
 
         /* space grid       */ var sg = ur.SpaceGrid;
-        /* grid positions   */ var ps  = sg.cells_positions;
-        /* grid team ids    */ var ts  = sg.cells_team_ids;
-        /* grid units       */ var us  = sg.cells_units;
-        /* grid visiblities */ var vs  = sg.cells_visibilities;
+        /* grid positions   */ var ps  = sg.unit_positions;
+        /* grid team ids    */ var ts  = sg.unit_team_masks;
+        /* grid units       */ var us  = sg.unit_refs;
+        /* grid visiblities */ var vs  = sg.unit_visibilities;
         /* grid cell count  */ var ccount = ps.Length;
 
         foreach (var u in nu)
@@ -25,32 +25,23 @@ internal class init_new_units : MassiveMechanic
 
             ur.Units.Add(u);
 
-            var tid = u.Faction.Team.Index;
+            var unit_team_mask = u.Faction.Team.Mask;
 
-            if (tid == lptid)
+            if (unit_team_mask == lp_team_mask)
             {
                 ur.OwnTeamUnits.Add(u);
-            }
-            else
-            {
-                ur.OtherTeamsUnits.Add(u);
             }
 
             /* unit's position */ var p = u.Position;
             var ui = sg.get_index_of(p);
             ps[ui].Add(p);
-            ts[ui].Add(tid);
+            ts[ui].Add(unit_team_mask);
             us[ui].Add(u);
-            vs[ui].Add(tid == lptid);
-        }
-
-        if (Application.isPlaying)
-        {
-            foreach (var u in nu)
+            vs[ui].Add(unit_team_mask);
+            #if UNITY_EDITOR
+            if (Application.isPlaying)
+            #endif
             {
-                if (u == null)
-                    continue;
-                
                 // assert data is set
                 {
                     Assert.IsNotNull(u.Faction);

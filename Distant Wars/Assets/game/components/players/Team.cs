@@ -7,9 +7,9 @@ public class Team : ScriptableObject
 {
     public Color Color;
 
-    public int Index;
+    public byte Mask;
 
-    void OnEnable() => Index = Teams.AddAndGetIndex(this);
+    void OnEnable() => Mask = (byte)(1 << Teams.AddAndGetIndex(this));
 
     public static List<Team> Teams => teams != null ? teams : teams = new List<Team>();
     private static List<Team> teams;

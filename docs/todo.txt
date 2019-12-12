@@ -1,21 +1,24 @@
-- filter vision quads by fully visible grid cells
-- filter unit sprites
-- find visibility for all teams
-- space grid per team
-- radar (find all within radar range, mark as discovered if also within vision range)
+- rework grid iteration
 - steady update
+- render space grid lines
+- filter vision quads by fully visible grid cells (+discovery)
 - fire in advance (need previous position, goes along with steady update)
+- radar (find all within radar range, mark as discovered if also within vision range)
+- ballistics
 - buildings
   - factory
   - metal gatherer
   - energy gatherer
 - show hp when zomming in
-- move command feedback
+- move command visual feedback
 
 - unity math, jobs, arrays?
 - how to preserve discovered texture??
+- space grid per team
 
-
++ box selection -> use grid
++ find visibility for all teams
++ filter unit sprites
 + optimize search with space grid
 + firing and destruction
   + attacking
@@ -32,9 +35,4 @@
 + hide enemy units
 + screen space visibility
 + terrain movement speed modifier
-
-
-* find min/max of the vision
-* mark all
-
 

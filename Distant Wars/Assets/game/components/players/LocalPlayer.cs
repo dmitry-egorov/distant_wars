@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Plugins.Lanski;
+using Plugins.Lanski.Space;
 using UnityEngine;
 
 public class LocalPlayer : RequiredSingleton<LocalPlayer>
@@ -25,12 +26,12 @@ public class LocalPlayer : RequiredSingleton<LocalPlayer>
     public Vector2 WorldDragStartPosition;
     
     public bool CursorIsABox;
-    public Rect ScreenCursorBox;
-    public Rect WorldCursorBox;
+    public FRect ScreenCursorBox;
+    public FRect WorldCursorBox;
 
     // Units under the cursor or the cursor box
-    public List<Unit> UnitsInTheCursorBox;
-    public List<Unit> PreviousUnitsInTheCursorBox;
-    public List<Unit> SelectedUnits;
-    public List<Unit> PreviouslySelectedUnits;
+    public RefLeakyList<Unit> UnitsInTheCursorBox;
+    public RefLeakyList<Unit> PreviousUnitsInTheCursorBox;
+    public RefLeakyList<Unit> SelectedUnits;
+    public RefLeakyList<Unit> PreviouslySelectedUnits;
 }

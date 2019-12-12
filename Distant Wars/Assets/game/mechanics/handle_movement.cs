@@ -9,9 +9,9 @@ internal class handle_movement : MassiveMechanic
 
     public void _()
     {
-        /* easing distance                 */ var ed   = EasingDistance;
-        /* stopping distance               */ var sd   = StoppingDistance;
-        /* guard approach distance         */ var gad  = GuardApproachDistance;
+        /* easing distance         */ var ed   = EasingDistance;
+        /* stopping distance       */ var stop_dist   = StoppingDistance;
+        /* guard approach distance */ var gad  = GuardApproachDistance;
         /* attack approach distance margin */ var aadm = AttackApproachDistanceMargin;
 
         /* units' registry */ var ur  = UnitsRegistry.Instance;
@@ -21,16 +21,12 @@ internal class handle_movement : MassiveMechanic
 
         foreach (var u in us)
         {
-            /* unit's position 2d   */ var up  = u.Position;
-            /* possible move target */ var possible_target = default(Vector2?);
+            /* unit's position 2d   */ var upos = u.Position;
+            /* has move target      */ var has_target = false;
 
-            var is_move_order = u.IssuedOrder.is_move(out var mo);
+            var is_move_order = has_target = u.IssuedOrder.is_move(out var target);
 
-            if (is_move_order)
-            {
-                possible_target = mo;
-            }
-            else 
+            if (!is_move_order)
             {
                 var ot = default(Unit);
                 var igo = u.IssuedOrder.is_guard(out ot);
@@ -40,29 +36,32 @@ internal class handle_movement : MassiveMechanic
                 {
                     /* approach distance  */ var ad = igo ? gad : u.AttackRange - aadm;
                     /* target's position  */ var tp = ot.Position;
-                    /* target's offset    */ var to = tp - up;
+                    /* target's offset    */ var to = tp - upos;
                     /* distance to target */ var td = to.magnitude;
                     /* distance remaining */ var dr = td - ad;
 
                     if (dr > 0)
                     {
                         /* direction towards target */ var tdir = to / td;
-                        /* approach point           */ var ap = up + dr * tdir;
-                        possible_target = ap;
+                        /* approach point           */ var ap = upos + dr * tdir;
+                        has_target = true;
+                        target = ap;
                     }
                 }
             }
 
-            if (possible_target.try_get(/* move target */ out var mt))
+            if (has_target)
             {
-                /* delta */ var d = (mt - up).magnitude;
-                if (d > sd)
+                /* movement delta     */ var dpos = (target - upos);
+                /* distance to target */ var dist = dpos.magnitude;
+                if (dist > stop_dist)
                 {
-                    /* speed */ var sp = u.BaseSpeed;
-                    /* slope */ var sl = -0.5f * Mathf.Max(map.slope2(up, (mt - up).normalized), 0.0f);
+                    /* speed     */ var sp = u.BaseSpeed;
+                    /* direction */ var dir = dpos / dist;
+                    /* slope     */ var sl = -0.5f * Mathf.Max(map.slope2(upos, dir), 0.0f);
                     /* terrain speed  */ var ts = sp * Mathf.Exp(sl);
-                    /* smoothed speed */ var ss = ts * Mathf.Clamp01(d / ed);
-                    u.Position = Vector2.MoveTowards(up, mt, ss * dt);
+                    /* smoothed speed */ var ss = ts * Mathf.Clamp01(dist / ed);
+                    u.Position = Vector2.MoveTowards(upos, target, ss * dt);
                 }
                 else if (is_move_order)
                 {

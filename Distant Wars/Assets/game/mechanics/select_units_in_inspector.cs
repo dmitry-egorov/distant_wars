@@ -1,5 +1,4 @@
 #if UNITY_EDITOR
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,9 +7,9 @@ internal class select_units_in_inspector : MassiveMechanic
     public void _()
     {
         var su = LocalPlayer.Instance.SelectedUnits;
-        if (su.Count != 0)
+        if (su.Count == 1)
         {
-            Selection.objects = su.Select(x => x.gameObject).ToArray();
+            Selection.activeGameObject = su[0].gameObject;
         }
     }   
 

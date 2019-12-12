@@ -7,23 +7,25 @@ public class select_units : MassiveMechanic
     {
         if (!Application.isPlaying) return;
         
-        var /* local player            */ lp = LocalPlayer.Instance;
-        var /* left mouse button is up */ mu = lp.LeftMouseButtonIsDown;
-        var /* finished dragging       */ fd = lp.FinishedDragging;
+        var /* local player              */ lp = LocalPlayer.Instance;
+        var /* left mouse button is down */ lmb_down = lp.LeftMouseButtonIsDown;
+        var /* finished dragging         */ fd = lp.FinishedDragging;
 
-        if (mu || fd)
+        if (lmb_down || fd)
         {
-            var us = lp.UnitsInTheCursorBox;
+            var cursor_units = lp.UnitsInTheCursorBox;
             
             //swap arrays of selected units
-            /* selected units */ var su = lp.PreviouslySelectedUnits;
-            su.Clear();
+            var selected_units = lp.PreviouslySelectedUnits;
+            selected_units.Clear();
             
             lp.PreviouslySelectedUnits = lp.SelectedUnits;
-            lp.SelectedUnits = su;
+            lp.SelectedUnits = selected_units;
 
-            foreach (var u in us) 
-                su.Add(u);
+            foreach (var u in cursor_units) 
+                selected_units.Add(u);
+            
+            selected_units.Cleanup();
         }
 
         lp.PreviouslySelectedUnits.CleanUpExpiredObjects();

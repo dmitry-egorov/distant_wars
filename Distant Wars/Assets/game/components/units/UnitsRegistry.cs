@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Plugins.Lanski;
-using Plugins.Lanski.Space;
 using UnityEngine;
 
 public class UnitsRegistry: MassiveRegistry<UnitsRegistry, Unit>
@@ -23,9 +22,7 @@ public class UnitsRegistry: MassiveRegistry<UnitsRegistry, Unit>
     [Header("State")]
     public List<Unit> Units;
     public List<Unit> OwnTeamUnits;
-    public List<Unit> OtherTeamsUnits;
-    public RefLeakyList<Unit> OtherTeamsVisibleUnits;
-    public SpaceGrid2 SpaceGrid;
+    public UnitsSpaceGrid2 SpaceGrid;
     public Mesh SpritesMesh;
     public Mesh VisionMesh;
     public Mesh DiscoveryMesh;

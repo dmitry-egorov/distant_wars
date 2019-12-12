@@ -96,7 +96,7 @@ public class Map : RequiredSingleton<Map>
         if (x < 0 || x >= width || y < 0 || y >= height) return 0;
         
         var i = 2 * (w * y + x);
-        return ((map_data[i]) + (map_data[i + 1] << 8)) * ushort_z_scale;
+        return (map_data[i] + (map_data[i + 1] << 8)) * ushort_z_scale;
     }
 
     private byte[] map_data;

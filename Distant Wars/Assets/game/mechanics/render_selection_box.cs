@@ -7,8 +7,8 @@ public class render_selection_box : MassiveMechanic
 
         if (lp.IsDragging)
         {
-            var /* position */  p = lp.WorldCursorBox.center;
-            var /* scale */     s = lp.WorldCursorBox.size;
+            var /* position */  p = lp.WorldCursorBox.get_center();
+            var /* scale */     s = lp.WorldCursorBox.get_size();
             var /* transform */ t = sb.transform;
             t.position = p.xy(t.position.z);
             t.localScale = s.xy1();

@@ -13,7 +13,6 @@ public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
     public float ProjectileHeight;
     public float ProjectileOffset;
     public Faction Faction;
-    public float HitRadius;
     public int MaxHitPoints;
 
     [Header("State")]

@@ -11,11 +11,11 @@ public class find_and_attack_target : MassiveMechanic
         /* bullet's manager */ var pm  = ProjectilesManager.Instance;
         /* delta time       */ var dt  = Time.deltaTime;
 
-        /* unit's space grid   */ var usg = ur.SpaceGrid;
-        /* cells unit postions */ var csps = usg.cells_positions;
-        /* cells unit postions */ var ctis = usg.cells_team_ids;
-        /* cells units         */ var csus = usg.cells_units;
-        /* cells centers       */ var cscs = usg.cells_centers;
+        /* unit's space grid   */ var usg  = ur.SpaceGrid;
+        /* cells unit postions */ var csps = usg.unit_positions;
+        /* cells unit postions */ var ctis = usg.unit_team_masks;
+        /* cells units         */ var csus = usg.unit_refs;
+        /* cells centers       */ var cscs = usg.cell_centers;
                     
         foreach (var u in us)
         {
@@ -42,45 +42,44 @@ public class find_and_attack_target : MassiveMechanic
             // find first enemy in range
             else
             {
-                #if false
-                    foreach (/* other unit */ var ou in us)
-                    {
-                        if (try_set_attack_target(ou)) break;
-                    }
-                #else
-                    var uti = u.Faction.Team.Index;
+                var uteam_mask = u.Faction.Team.Mask;
 
-                    //PERF: can probably be done faster by walking outwards from the center
-                    /* attack range ^2        */ var ar2 = ar.sqr();
-                    /* min distance ^2 so far */ var mindst2 = float.MaxValue;
-                    /* grid attack area       */ var gaa = usg.get_rect_of_circle(up2, ar);
-                    for (var yi = gaa.min.y; yi <= gaa.max.y; yi++)
-                    for (var xi = gaa.min.x; xi <= gaa.max.x; xi++)
-                    {
-                        var ci = usg.get_index_of(xi, yi);
-                        /* cell positions   */ var cps = csps[ci];
-                        /* cell positions   */ var cts = ctis[ci];
-                        /* cell units       */ var cus = csus[ci];
-                        /* cell units count */ var cuc = cps.Count;
+                //PERF: can probably be done faster by walking outwards from the center
+                /* attack range ^2        */ var ar2 = ar.sqr();
+                /* min distance ^2 so far */ var mindst2 = float.MaxValue;
+                /* grid attack area       */ var gaa = usg.get_coord_rect_of_circle(up2, ar);
 
-                        for (int i = 0; i < cuc; i++)
+                var minx = gaa.min.x;
+                var miny = gaa.min.y;
+                var maxx = gaa.max.x;
+                var maxy = gaa.max.y;
+
+                for (var yi = miny; yi <= maxy; yi++)
+                for (var xi = minx; xi <= maxx; xi++)
+                {
+                    var ci = usg.get_index_of(xi, yi);
+                    /* cell positions   */ var cps = csps[ci];
+                    /* cell positions   */ var cts = ctis[ci];
+                    /* cell units       */ var cus = csus[ci];
+                    /* cell units count */ var cuc = cps.Count;
+
+                    for (int i = 0; i < cuc; i++)
+                    {
+                        /* target's team */ var tt = cts[i];
+                        if (tt == uteam_mask) continue;
+
+                        //TODO: must be visible by the unit's team
+
+                        /* target's position 2d  */ var tp2 = cps[i];
+                        /* target's offset       */ var to  = tp2 - up2;
+                        /* distance to target ^2 */ var td2 = to.sqrMagnitude;
+                        if (td2 < mindst2 && td2 < ar2)
                         {
-                            /* target's team */ var tt = cts[i];
-                            if (tt == uti) continue;
-
-                            //TODO: must be visible by the unit's team
-
-                            /* target's position 2d  */ var tp2 = cps[i];
-                            /* target's offset       */ var to  = tp2 - up2;
-                            /* distance to target ^2 */ var td2 = to.sqrMagnitude;
-                            if (td2 < mindst2 && td2 < ar2)
-                            {
-                                mindst2 = td2;
-                                ptu = cus[i];
-                            }
+                            mindst2 = td2;
+                            ptu = cus[i];
                         }
                     }
-                #endif
+                }
             }
 
             if (ptu != null)
@@ -122,7 +121,5 @@ public class find_and_attack_target : MassiveMechanic
                 return false;
             }
         }
-
-        
     }
 }

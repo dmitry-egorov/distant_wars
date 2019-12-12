@@ -1,7 +1,6 @@
 ﻿using Plugins.Lanski;
 using Plugins.Lanski.Space;
 using UnityEngine;
-using Rect = Plugins.Lanski.Space.Rect;
 
 public partial class StrategicCamera : RequiredSingleton<StrategicCamera>
 {
@@ -23,7 +22,7 @@ public partial class StrategicCamera : RequiredSingleton<StrategicCamera>
     public UniformSpaceTransform2 WorldToScreenTransform;
     public UniformSpaceTransform2 ScreenToWorldTransform;
     public Vector2 ScreenResolution;
-    public Rect WorldScreen;
+    public FRect WorldScreen;
 
     public float SizeProportion => Size / MaxOrthographicSize;
 }

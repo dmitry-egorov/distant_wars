@@ -1,5 +1,5 @@
 using Plugins.Lanski;
-using UnityEngine;
+using Plugins.Lanski.Space;
 
 public class prepare_mouse_dragging : MassiveMechanic
 {
@@ -9,15 +9,15 @@ public class prepare_mouse_dragging : MassiveMechanic
         
         lp.FinishedDragging = false;
 
-        var /* mouse is down */ id = lp.LeftMouseButtonIsDown;
-        var /* mouse is held */ ih = lp.LeftMouseButtonIsHeld;
+        var /* mouse is down */ is_down = lp.LeftMouseButtonIsDown;
+        var /* mouse is held */ is_held = lp.LeftMouseButtonIsHeld;
         
-        if (id)
+        if (is_down)
         {
             lp.ScreenDragStartPosition = lp.ScreenMousePosition;
             lp.WorldDragStartPosition = lp.WorldMousePosition;
         }
-        else if (ih && !lp.IsDragging) //is holding the mouse button in place
+        else if (is_held && !lp.IsDragging) //is holding the mouse button in place
         {
             var    /* selection box */ sb = lp.ScreenCursorBox;
             var /* min box distance */ md = lp.CursorBoxMinDistance;
@@ -33,7 +33,7 @@ public class prepare_mouse_dragging : MassiveMechanic
             lp.FinishedDragging = true;
         }
 
-        lp.ScreenCursorBox = new Rect { min = lp.ScreenDragStartPosition, max = lp.ScreenMousePosition };
-        lp.WorldCursorBox = new Rect { min = lp.WorldDragStartPosition, max = lp.WorldMousePosition};
+        lp.ScreenCursorBox = new FRect { min = lp.ScreenDragStartPosition, max = lp.ScreenMousePosition };
+        lp.WorldCursorBox = new FRect { min = lp.WorldDragStartPosition, max = lp.WorldMousePosition};
     }
 }

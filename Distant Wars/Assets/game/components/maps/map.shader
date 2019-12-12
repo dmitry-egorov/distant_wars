@@ -292,7 +292,6 @@
             float4 frag (v2f i) : SV_Target
             {
                 float2 uv = i.uv;
-                ///* vision    */ float v = tex2D(_VisionTex, i.screenPos).x;
                 /* vision    */ float v = filtered_vision_texture_fetch(uv).x;
                 /* discovery */ float d = filtered_discovery_texture_fetch(uv).x;
                 

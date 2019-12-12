@@ -1,9 +1,11 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Plugins.Lanski
 {
     // version of LeakyList for reference types; can cleanup its references
-    public class RefLeakyList<T> where T: class
+    public class RefLeakyList<T>: IEnumerable<T> where T: class
     {
         public RefLeakyList(int initial_capacity = 4)
         {
@@ -44,6 +46,13 @@ namespace Plugins.Lanski
             leak_start -= count;
         }
 
+        public void ReplaceWithLast(int i)
+        {
+            var last = count - 1;
+            data[i] = data[last];
+            RemoveLast(1);
+        }
+
         // write default values to the elements outside of the current list
         public void Cleanup()
         {
@@ -60,8 +69,10 @@ namespace Plugins.Lanski
         }
 
         public Enumerator GetEnumerator() => new Enumerator(this);
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public struct Enumerator
+        public struct Enumerator: IEnumerator<T>
         {
             public Enumerator(RefLeakyList<T> list)
             {
@@ -75,7 +86,18 @@ namespace Plugins.Lanski
                 return i < list.Count;
             }
 
+            public void Reset()
+            {
+                this.i = -1;
+            }
+
+            public void Dispose()
+            {
+            }
+
             public T Current => list[i];
+
+            object IEnumerator.Current => Current;
 
             int i;
             RefLeakyList<T> list;

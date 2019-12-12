@@ -1,6 +1,5 @@
 using Plugins.Lanski.Space;
 using UnityEngine;
-using Rect = Plugins.Lanski.Space.Rect;
 
 internal class prepare_camera_transformations: MassiveMechanic
 {
@@ -25,6 +24,6 @@ internal class prepare_camera_transformations: MassiveMechanic
 
         var wsmin = s2w.apply_to_point(new Vector2(0, 0));
         var wsmax = s2w.apply_to_point(sr);
-        sc.WorldScreen = new Rect(wsmin, wsmax);
+        sc.WorldScreen = new FRect(wsmin, wsmax);
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Plugins.Lanski;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -41,8 +40,10 @@ public class Game: RequiredSingleton<Game>
         
         // debug
         {
-            _<pause_on_p>();
+            _<pause_on_key>();
             _<disable_debug_text>();
+            _<change_grid_size_on_key>();
+            _<hide_vision_quads_on_key>();
         }
 
         _<resize_space_grid>();
@@ -77,7 +78,7 @@ public class Game: RequiredSingleton<Game>
                 _<cleanup_unit_orders>();
                 _<handle_movement>();
                 _<update_space_grid>();
-                _<find_visible_units_from_other_teams>();
+                _<update_unit_visibility>();
                 _<find_and_attack_target>();
 
                 _<update_projectiles>();
@@ -104,39 +105,17 @@ public class Game: RequiredSingleton<Game>
         _<generate_projectiles_mesh>();
         _<render_selection_box>();
 
-        // debug
-        {
-            _<debug_show_mouse_text>();
-        }
+        
 
         _<resize_discovery_texture>();
         _<resize_vision_texture>();
 
         finish_update();
 
-        /*debug_time<find_other_teams_visible_units>();
-        debug_time<update_space_grid>();
-        if (Application.isPlaying)
+        // debug
         {
-            debug_time<find_and_attack_target>();
-            debug_time<update_bullets>();
-        }*/
-
-        DebugText.set_text("avg frame time", get_avg_frame_time());
-
-        DebugText.set_text("avg update time", get_avg_update_time());
-
-        var top_avg_times = string.Join("", get_top_avg_times(10).Select(x => $"\n\t{x.name}: {x.time}"));
-        DebugText.set_text("top times", top_avg_times);
-
-        DebugText.set_text("total units", UnitsRegistry.Instance.Units.Count.ToString());
-        DebugText.set_text("total projectiles", ProjectilesManager.Instance.Positions.Count.ToString());
-    }
-
-    void debug_time<T>() where T: class, MassiveMechanic, new()
-    {
-        var (n,t) = get_avg_time_for<T>();
-        DebugText.set_text("time of " + n, t);
+            _<show_debug_text>();
+        }
     }
 
     [NonSerialized]bool initialized;

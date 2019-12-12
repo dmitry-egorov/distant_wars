@@ -68,7 +68,6 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
-
                 fixed col = tex2Dlod(_MainTex, float4(i.uv, 0, 0));
                 
                 if (col > 0.75)
@@ -80,11 +79,6 @@
                 float4 bc = lerp(float4(0,0,0,1), float4(1,1,1,1), saturate(ih + is));
                 float4 fc = _FactionColors[i.color_index.x];
 
-                //return i.flags.z;
-                //return float4(1,1,1,1);
-                //return _FactionColors[1];
-
-                
                 return step(col, 0.25) * ic 
                      + (step(col, 0.5 ) - step(col, 0.25)) * bc
                      + (step(col, 0.75) - step(col, 0.5 )) * fc

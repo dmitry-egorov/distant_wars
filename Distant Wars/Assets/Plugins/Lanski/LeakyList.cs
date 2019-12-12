@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Plugins.Lanski
 {
-    public class LeakyList<T> where T: struct
+    public class LeakyList<T>: IList<T> where T: struct
     {
         public LeakyList(int initial_capacity = 4)
         {
@@ -10,6 +12,8 @@ namespace Plugins.Lanski
         }
 
         public int Count => count;
+
+        
 
         public ref T this[int i] => ref data[i];
 
@@ -48,8 +52,44 @@ namespace Plugins.Lanski
         }
 
         public Enumerator GetEnumerator() => new Enumerator(this);
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public struct Enumerator
+        public bool IsReadOnly => false;
+
+        T IList<T>.this[int index] { get => this[index]; set => this[index] = value; }
+
+        int IList<T>.IndexOf(T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IList<T>.Insert(int index, T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IList<T>.RemoveAt(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        bool ICollection<T>.Contains(T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        void ICollection<T>.CopyTo(T[] array, int arrayIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+        bool ICollection<T>.Remove(T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public struct Enumerator: IEnumerator<T>
         {
             public Enumerator(LeakyList<T> list)
             {
@@ -63,7 +103,18 @@ namespace Plugins.Lanski
                 return i < list.Count;
             }
 
+            public void Reset()
+            {
+                this.i = -1;
+            }
+
+            public void Dispose()
+            {
+            }
+
             public T Current => list[i];
+
+            object IEnumerator.Current => Current;
 
             int i;
             LeakyList<T> list;
