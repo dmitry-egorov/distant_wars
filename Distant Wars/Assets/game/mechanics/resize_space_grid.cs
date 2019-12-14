@@ -3,7 +3,7 @@ using Plugins.Lanski;
 using Plugins.Lanski.Space;
 using UnityEngine;
 
-internal class resize_space_grid : MassiveMechanic
+internal class init_space_grid : MassiveMechanic
 {
     public void _()
     {
@@ -25,19 +25,22 @@ internal class resize_space_grid : MassiveMechanic
             sg.cell_size = (spc.max - spc.min) / sz;
             sg.cell_radius = 0.5f * sg.cell_size.magnitude;
             
-            var g2w = new SpaceTransform2(sg.cell_size, spc.min);
+            var g2w = sg.grid_to_world = new SpaceTransform2(sg.cell_size, spc.min);
             sg.world_to_grid = g2w.inverse();
 
-            var count = sz.x * sz.y + 1;
-            var ps = sg.unit_positions    = new LeakyList<Vector2>[count];
-            var vs = sg.unit_visibilities = new LeakyList<byte>[count];
-            var ts = sg.unit_team_masks   = new LeakyList<byte>[count];
-            var us = sg.unit_refs         = new List<Unit>[count];
 
-            sg.cell_centers = new Vector2[count];
-            sg.cell_full_visibilities = new byte[count];
+            var gucount = sz.x * sz.y + 1;
+            var guposs  = sg.unit_positions      = new LeakyList<Vector2>[gucount];
+            var gupposs = sg.unit_prev_positions = new LeakyList<Vector2>[gucount];
+            var guviss  = sg.unit_visibilities   = new LeakyList<byte>[gucount];
+            var guteams = sg.unit_team_masks     = new LeakyList<byte>[gucount];
+            var gunits  = sg.unit_refs           = new List<Unit>[gucount];
 
-            for (int i = 0; i < count; i++)
+            sg.cell_centers = new Vector2[gucount];
+            sg.cell_full_visibilities = new byte[gucount];
+            sg.cell_full_discoveries  = new bool[gucount];
+
+            for (int i = 0; i < gucount; i++)
             {
                 if (i > 0)
                 {
@@ -46,22 +49,29 @@ internal class resize_space_grid : MassiveMechanic
                     sg.cell_centers[i] = wc;
                 }
 
-                ps[i] = new LeakyList<Vector2>();
-                vs[i] = new LeakyList<byte>();
-                ts[i] = new LeakyList<byte>();
-                us[i] = new List<Unit>();
+                guposs [i] = new LeakyList<Vector2>();
+                gupposs[i] = new LeakyList<Vector2>();
+                guviss [i] = new LeakyList<byte>();
+                guteams[i] = new LeakyList<byte>();
+                gunits [i] = new List<Unit>();
             }
 
-            foreach(var u in ur.Units)
+            foreach(var unit in ur.Units)
             {
-                /* unit's position */ var p = u.Position;
-                var ut = u.Faction.Team.Mask;
-                var ui = sg.get_index_of(p);
-                ps[ui].Add(p);
-                ts[ui].Add(ut);
-                us[ui].Add(u);
-                vs[ui].Add(ut);
+                /* unit's position */ var pos = unit.Position;
+                var uteam = unit.Faction.Team.Mask;
+                var ui = sg.get_index_of(pos);
+
+                var cunits = gunits[ui];
+                unit.SpaceGridIndex = (ui, cunits.Count);
+                cunits.Add(unit);
+                guposs [ui].Add(pos);
+                gupposs[ui].Add(pos);
+                guteams[ui].Add(uteam);
+                guviss [ui].Add(uteam);
             }
+
+            Debug.Log("Space grid resized");
         }
     }
 }

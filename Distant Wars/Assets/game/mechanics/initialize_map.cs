@@ -1,6 +1,6 @@
 using Plugins.Lanski;
 
-internal class initialize_map : MassiveMechanic
+internal class init_map : MassiveMechanic
 {
     public void _()
     {

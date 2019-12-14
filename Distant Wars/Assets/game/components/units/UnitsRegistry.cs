@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Plugins.Lanski;
 using UnityEngine;
 
 public class UnitsRegistry: MassiveRegistry<UnitsRegistry, Unit>
@@ -16,14 +15,18 @@ public class UnitsRegistry: MassiveRegistry<UnitsRegistry, Unit>
 
     [Header("Dependencies")]
     public MeshRenderer SpritesRenderer;
-    public MeshRenderer VisionRenderer;
-    public MeshRenderer DiscoveryRenderer;
+    public MeshRenderer VisionCirclesRenderer;
+    public MeshRenderer VisionQuadsRenderer;
+    public MeshRenderer DiscoveryCirclesRenderer;
+    public MeshRenderer DiscoveryQuadsRenderer;
 
     [Header("State")]
     public List<Unit> Units;
     public List<Unit> OwnTeamUnits;
     public UnitsSpaceGrid2 SpaceGrid;
     public Mesh SpritesMesh;
-    public Mesh VisionMesh;
-    public Mesh DiscoveryMesh;
+    public Mesh VisionCirclesMesh;
+    public Mesh VisionQuadsMesh;
+    public Mesh DiscoveryCirclesMesh;
+    public Mesh DiscoveryQuadsMesh;
 }

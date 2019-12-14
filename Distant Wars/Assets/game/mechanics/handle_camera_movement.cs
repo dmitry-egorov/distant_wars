@@ -9,7 +9,7 @@ public class handle_camera_movement: MassiveMechanic
     {
         var sc = StrategicCamera.Instance;
         
-        var /* delta time */ dt = Time.deltaTime;
+        var /* delta time */ dt = Game.Instance.DeltaTime;
         var res = Camera.main.pixelRect;
         var ar = res.width / res.height;
         

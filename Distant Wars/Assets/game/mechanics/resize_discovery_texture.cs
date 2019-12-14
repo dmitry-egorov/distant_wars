@@ -1,6 +1,7 @@
+using System;
 using UnityEngine;
 
-internal class resize_discovery_texture : MassiveMechanic
+internal class init_discovery_texture : MassiveMechanic
 {
     public void _()
     {
@@ -21,6 +22,13 @@ internal class resize_discovery_texture : MassiveMechanic
             Shader.SetGlobalTexture(_discoveryTex, t);
             map.DiscoveryTexture = t;
             map.DiscoveryCamera.targetTexture = t;
+            map.TexturesReady = false;
+
+            var grid = UnitsRegistry.Instance.SpaceGrid;
+            var ds = grid.cell_full_discoveries;
+            Array.Clear(ds, 0, ds.Length);
+
+            Debug.Log("Discovery texture resized");
         }
     }
 

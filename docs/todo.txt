@@ -1,9 +1,10 @@
-- rework grid iteration
-- steady update
+- optimize presentation, when there was no simulation tick
+- don't start blinking when outside the screen?
+- separate editor mechanics
 - render space grid lines
-- filter vision quads by fully visible grid cells (+discovery)
 - fire in advance (need previous position, goes along with steady update)
 - radar (find all within radar range, mark as discovered if also within vision range)
+- explosion after bullet hit
 - ballistics
 - buildings
   - factory
@@ -12,10 +13,15 @@
 - show hp when zomming in
 - move command visual feedback
 
+- store unit's interpolated positions?
 - unity math, jobs, arrays?
 - how to preserve discovered texture??
 - space grid per team
 
++ steady update
++ filter discovery quads by fully visible grid cells
++ rework grid iteration
++ filter vision quads by fully visible grid cells
 + box selection -> use grid
 + find visibility for all teams
 + filter unit sprites

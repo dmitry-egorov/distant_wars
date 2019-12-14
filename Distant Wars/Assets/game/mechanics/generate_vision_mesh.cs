@@ -6,86 +6,228 @@ internal class generate_vision_mesh : MassiveMechanic
 {
     public generate_vision_mesh()
     {
-        vision_vertices = new List<Vector3>(0);
-        vision_triangles = new List<int>(0);
-        discovery_vertices = new List<Vector3>(0);
-        discovery_triangles = new List<int>(0);
+        vision_circles_vertices     = new List<Vector3>(0);
+        vision_circles_triangles    = new List<int>(0);
+        vision_quads_vertices       = new List<Vector3>(0);
+        vision_quads_triangles      = new List<int>(0);
+        discovery_circles_vertices  = new List<Vector3>(0);
+        discovery_circles_triangles = new List<int>(0);
+        discovery_quads_vertices    = new List<Vector3>(0);
+        discovery_quads_triangles   = new List<int>(0);
     }
     
     public void _()
     {
-        var /* units' registry  */ ur  = UnitsRegistry.Instance;
-        var /* vision mesh      */ vm  = ur.VisionMesh;
-        var /* vision mesh      */ dm  = ur.DiscoveryMesh;
-        var /* units            */ ous = ur.OwnTeamUnits;
-        var /* own unit's count */ ouc = ous.Count;
 
-        /* strategic camera */ var sc  = StrategicCamera.Instance;
+        var map = Map.Instance;
+        if (!map.TexturesReady)
+        {
+            map.TexturesReady = true; // textures are ready the next frame
+            return;
+        }
+
+        var time_ratio = Game.Instance.PresentationToSimulationFrameTimeRatio;
+
+        /* units' registry  */ var ur  = UnitsRegistry.Instance;
+        /* vision circles mesh    */ var vcm = ur.VisionCirclesMesh;
+        /* vision quads mesh      */ var vqm = ur.VisionQuadsMesh;
+        /* discovery circles mesh */ var dcm = ur.DiscoveryCirclesMesh;
+        /* discovery circles mesh */ var dqm = ur.DiscoveryQuadsMesh;
+        /* units            */ var ounits = ur.OwnTeamUnits;
+        /* own unit's count */ var oucount = ounits.Count;
+
+        /* local player        */ var lp = LocalPlayer.Instance;
+        /* local player's team */ var lpteam_mask = lp.Faction.Team.Mask;
+
+        /* units grid             */ var grid = ur.SpaceGrid;
+        /* grid cell centers      */ var ccenters = grid.cell_centers;
+        /* fully visible cells    */ var cfviss   = grid.cell_full_visibilities;
+        /* fully discovered cells */ var cfdscs   = grid.cell_full_discoveries;
+        /* gird cell count        */ var ccount   = cfviss.Length;
+        /* cell's radius          */ var cell_radius = grid.cell_radius;
+
+        /* strategic camera */ var sc = StrategicCamera.Instance;
         /* screen rect in world space */ var ws = sc.WorldScreen;
 
-        var vv = vision_vertices;
-        var vt = vision_triangles;
-        var dv = discovery_vertices;
-        var dt = discovery_triangles;
+        var vcvrts = vision_circles_vertices;
+        var vctris = vision_circles_triangles;
+        var vqvrts = vision_quads_vertices;
+        var vqtris = vision_quads_triangles;
+        var dcvrts = discovery_circles_vertices;
+        var dctris = discovery_circles_triangles;
+        var dqvrts = discovery_quads_vertices;
+        var dqtris = discovery_quads_triangles;
 
-        var /* visions count */ vc = ouc;
-        vv.Clear();
-        vt.Clear();
-        dv.Clear();
-        dt.Clear();
-        vv.ReserveMemoryFor(vc * 4);
-        vt.ReserveMemoryFor(vc * 6);
-        dv.ReserveMemoryFor(vc * 4);
-        dt.ReserveMemoryFor(vc * 6);
+        /* visions count */ var vcount = oucount;
+        vcvrts.Clear();
+        vctris.Clear();
+        vqvrts.Clear();
+        vqtris.Clear();
+        dcvrts.Clear();
+        dctris.Clear();
+        dqvrts.Clear();
+        dqtris.Clear();
+        vcvrts.ReserveMemoryFor(vcount * 4);
+        vctris.ReserveMemoryFor(vcount * 6);
+        vqvrts.ReserveMemoryFor(vcount * 4);
+        vqtris.ReserveMemoryFor(vcount * 6);
+        dcvrts.ReserveMemoryFor(vcount * 4);
+        dctris.ReserveMemoryFor(vcount * 6);
+        dqvrts.ReserveMemoryFor(vcount * 4);
+        dqtris.ReserveMemoryFor(vcount * 6);
 
-        /* quad index */ var qi = 0;
-        for (var i = 0; i < vc; i++)
+
+        /* rect for intersecting quads */ var qscreen = ws.wider_by(cell_radius);
+        var vquad_i = 0;
+        var dquad_i = 0;
+        for (var cell_i = 1; cell_i < ccount; cell_i++)
         {
-            var /* unit        */  u = ous[i];
-            var /* vision size */ vs = u.VisionRange * 2.0f;
+            // cell is not fully visible
+            if ((cfviss[cell_i] & lpteam_mask) == 0)
+                continue;
+            
+            /* cell center */ var c = ccenters[cell_i];
 
-            var p = u.Position;
-            var qmin = new Vector2(p.x - 0.5f * vs, p.y - 0.5f * vs);
-            var qmax = new Vector2(p.x + 0.5f * vs, p.y + 0.5f * vs);
+            var visible = qscreen.contains(c);
+            var discovered = cfdscs[cell_i];
+            if (!discovered)
+            {
+                cfdscs[cell_i] = true;
+            }
 
-            var tl = new Vector3(p.x - 0.5f * vs, p.y + 0.5f * vs, 0);
-            var br = new Vector3(p.x + 0.5f * vs, p.y - 0.5f * vs, 3);
+            for (var i = 0; i < 4; i++)
+            {
+                var vert = c.xy(i);
+                if (visible)
+                {
+                    vqvrts.Add(vert);
+                }
+                if (!discovered)
+                {
+                    dqvrts.Add(vert);
+                }
+            }
+            
+            if (visible)
+            {
+                RenderHelper.add_quad(vqtris, vquad_i);
+                vquad_i++;
+            }
+
+            if (!discovered)
+            {
+                RenderHelper.add_quad(dqtris, dquad_i);
+                dquad_i++;
+            }
+        }
+
+        /* vision    circle index */ var vcircle_i = 0;
+        /* discovery circle index */ var dcircle_i = 0;
+        for (var i = 0; i < vcount; i++)
+        {
+            /* unit          */ var u  = ounits[i];
+            /* vision radius */ var vs = u.VisionRange;
+            var upos  = u.Position;
+            var upp   = u.PrevPosition;
+            var uipos = Vector2.Lerp(upp, upos, time_ratio);
+            
+            var fully_visible = true;
+            /* own vision range ^2     */ var uvis2 = vs.sqr();
+            /* vision + cell radius ^2 */ var uvis_p_crad2 = (vs + cell_radius).sqr();
+            /* vision - cell radius    */ var uvis_m_crad  = vs - cell_radius;
+            /* vision - cell radius ^2 */ var uvis_m_crad2 = uvis_m_crad >= 0 ? uvis_m_crad.sqr() : -1;
+            var it = grid.get_iterator_of_circle(uipos, vs);
+            while (it.next(out var cell_i))
+            {
+                if (cell_i != 0) // is the external cell
+                {
+                    // cell is fully visible
+                    if ((cfviss[cell_i] & lpteam_mask) > 0)
+                        continue;
+
+                    /* cell's center */ var ccenter = ccenters[cell_i];
+                    /* delta from unit to cell's center       */ var ucdelta = ccenter - upos;
+                    /* distance ^2 from unit to cell's center */ var ucdist2 = ucdelta.sqrMagnitude;
+
+                    // cell is outside the vision circle
+                    if (ucdist2 > uvis_p_crad2)
+                        continue;
+                }
+                
+                fully_visible = false;
+                break;
+            }
+
+            if (fully_visible)
+                continue;
+
+            var qmin = new Vector2(uipos.x - vs, uipos.y - vs);
+            var qmax = new Vector2(uipos.x + vs, uipos.y + vs);
+
+            var tl = new Vector3(uipos.x - vs, uipos.y + vs, 0);
+            var br = new Vector3(uipos.x + vs, uipos.y - vs, 3);
             var tr = qmax.xy(1);
             var bl = qmin.xy(2);
 
             // is within the screen rect
             if (ws.intersects(qmin, qmax))
             {
-                vv.Add(tl);
-                vv.Add(tr);
-                vv.Add(bl);
-                vv.Add(br);
+                vcvrts.Add(tl);
+                vcvrts.Add(tr);
+                vcvrts.Add(bl);
+                vcvrts.Add(br);
 
-                RenderHelper.add_quad(vt, qi);
-                qi++;
+                RenderHelper.add_quad(vctris, vcircle_i);
+                vcircle_i++;
             }
 
-            dv.Add(tl);
-            dv.Add(tr);
-            dv.Add(bl);
-            dv.Add(br);
+            dcvrts.Add(tl);
+            dcvrts.Add(tr);
+            dcvrts.Add(bl);
+            dcvrts.Add(br);
 
-            RenderHelper.add_quad(dt, i);
+            RenderHelper.add_quad(dctris, dcircle_i);
+            dcircle_i++;
         }
 
-        vm.Clear();
-        vm.SetVertices(vv);
-        vm.SetTriangles(vt, 0, false);
+        vcm.Clear();
+        vcm.SetVertices(vcvrts);
+        vcm.SetTriangles(vctris, 0, false);
 
-        dm.Clear();
-        dm.SetVertices(dv);
-        dm.SetTriangles(dt, 0, false);
+        vqm.Clear();
+        vqm.SetVertices(vqvrts);
+        vqm.SetTriangles(vqtris, 0, false);
 
-        DebugText.set_text("vision quads", $"{qi}");
+        dcm.Clear();
+        dcm.SetVertices(dcvrts);
+        dcm.SetTriangles(dctris, 0, false);
+
+        dqm.Clear();
+        dqm.SetVertices(dqvrts);
+        dqm.SetTriangles(dqtris, 0, false);
+
+        /* grid cell size */ var gcsize = 0.5f * grid.cell_size;
+        Shader.SetGlobalVector(grid_cell_size_id, new Vector4(gcsize.x, gcsize.y, 0, 0));
+
+        DebugText.set_text
+        ("vision",
+            $"\n\tv circles: {vcircle_i}"
+           +$"\n\tv quads: {vquad_i}"
+           +$"\n\td circles: {dcircle_i}"
+           +$"\n\td quads: {dquad_i}"
+        );
     }
 
-    readonly List<Vector3> vision_vertices;
-    readonly List<int> vision_triangles;
-    readonly List<Vector3> discovery_vertices;
-    readonly List<int> discovery_triangles;
+    static readonly int grid_cell_size_id = Shader.PropertyToID("_GridCellSize");
+
+    readonly List<Vector3> vision_circles_vertices;
+    readonly List<int>     vision_circles_triangles;
+    readonly List<Vector3> vision_quads_vertices;
+    readonly List<int>     vision_quads_triangles;
+    readonly List<Vector3> discovery_circles_vertices;
+    readonly List<int>     discovery_circles_triangles;
+    readonly List<Vector3> discovery_quads_vertices;
+    readonly List<int>     discovery_quads_triangles;
+
+    bool render_frame;
 }

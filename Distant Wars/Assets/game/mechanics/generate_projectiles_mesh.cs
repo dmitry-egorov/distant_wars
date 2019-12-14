@@ -14,13 +14,16 @@ public class generate_projectiles_mesh : MassiveMechanic
     {
         /* units' registry */ var pm = ProjectilesManager.Instance;
 
+        var time_ratio = Game.Instance.PresentationToSimulationFrameTimeRatio;
+
         // generate sprites
         var sm = pm.SpritesMesh;
         var sv = sprite_vertices;
         var st = sprite_triangles;
 
-        var /* positions     */ ps = pm.Positions;
-        var /* sprites count */ sc = ps.Count;
+        /* positions     */ var ps  = pm.positions;
+        /* positions     */ var pps = pm.prev_positions;
+        /* sprites count */ var sc  = ps.Count;
 
         sv.Clear();
         st.Clear();
@@ -30,11 +33,13 @@ public class generate_projectiles_mesh : MassiveMechanic
 
         for (var i = 0; i < sc; i++)
         {
-            var /* position */ p = ps[i].xy();
+            /* position      */ var p  = ps [i].xy();
+            /* prev position */ var pp = pps[i];
+            /* interpolated position */ var ip = Vector2.Lerp(pp, p, time_ratio);
             
             for (var j = 0; j < 4; j++)
             {
-                sv.Add(p.xy(j));
+                sv.Add(ip.xy(j));
             }
 
             //PERF: since the quads are not changing, we should only generate them when capacity is increasing.

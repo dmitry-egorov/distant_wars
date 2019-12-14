@@ -2,16 +2,17 @@ using Plugins.Lanski;
 using Plugins.Lanski.Behaviours;
 using UnityEngine;
 
-internal class initialize_bullets_manager : MassiveMechanic
+internal class init_bullets_manager : MassiveMechanic
 {
     public void _()
     {
         var map = Map.Instance;
         var  pm = ProjectilesManager.Instance;
-        pm.Positions  = new LeakyList<Vector3>();
-        pm.Directions = new LeakyList<Vector3>();
-        pm.Speeds     = new LeakyList<float>();
-        pm.Damages    = new LeakyList<int>();
+        pm.positions      = new LeakyList<Vector3>();
+        pm.prev_positions = new LeakyList<Vector2>();
+        pm.directions     = new LeakyList<Vector3>();
+        pm.speeds         = new LeakyList<float>();
+        pm.damages        = new LeakyList<int>();
 
         /* mesh renderer */ var sr = pm.SpritesRenderer;
 

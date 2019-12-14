@@ -1,6 +1,6 @@
 using UnityEngine;
 
-internal class resize_vision_texture : MassiveMechanic
+internal class init_vision_texture : MassiveMechanic
 {
     public void _()
     {
@@ -21,6 +21,8 @@ internal class resize_vision_texture : MassiveMechanic
             Shader.SetGlobalTexture(_visionTex, t);
             map.VisionTexture = t;
             map.VisionCamera.targetTexture = t;
+            
+            Debug.Log("Vision texture resized");
         }
     }
 

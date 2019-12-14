@@ -6,6 +6,8 @@ namespace Plugins.Lanski.Space
     {
         public IntRect(Vector2Int min, Vector2Int max)
         {
+            Debug.Assert(min.x <= max.x && min.y <= max.y);
+
             this.min = min;
             this.max = max;
         }

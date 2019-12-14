@@ -1,5 +1,6 @@
 ﻿using System;
 using Plugins.Lanski;
+using UnityEngine;
 
 // find visible units other than the player's
 internal class update_unit_visibility : MassiveMechanic
@@ -11,20 +12,18 @@ internal class update_unit_visibility : MassiveMechanic
 
         var ur = UnitsRegistry.Instance;
 
-        /* unit's grids */ var usg  = ur.SpaceGrid;
-        /* grid units   */ var sgu  = usg.unit_refs;
-        /* grid unit positions    */ var gposs   = usg.unit_positions;
-        /* grid unit visibilities */ var gviss   = usg.unit_visibilities;
-        /* grids' cell count      */ var gccount = sgu.Length;
+        /* units' grids            */ var grid   = ur.SpaceGrid;
+        /* grid unit positions     */ var guposs = grid.unit_positions;
+        /* grid unit visibilities  */ var guviss = grid.unit_visibilities;
 
-        /* fully visible cells */ var c_fviss = usg.cell_full_visibilities;
-        Array.Clear(c_fviss, 0, c_fviss.Length);
+        /* grid's fully visible cells */ var gcfviss = grid.cell_full_visibilities;
+        Array.Clear(gcfviss, 0, gcfviss.Length);
 
-        /* cell's radius  */ var cell_radius  = usg.cell_radius;
-        /* cell's centers */ var ccenters = usg.cell_centers;
+        /* cell's radius  */ var cell_radius  = grid.cell_radius;
+        /* cell's centers */ var ccenters = grid.cell_centers;
 
-        var units = ur.Units;
-        var ucount = units.Count;
+        /* all units      */ var units  = ur.Units;
+        /* all unit count */ var ucount = units.Count;
 
         //var total_cells = 0;
         //var full_cells = 0;
@@ -37,28 +36,20 @@ internal class update_unit_visibility : MassiveMechanic
             /* the unit         */ var unit = units[unit_i];
             /* unit's position  */ var upos = unit.Position;
             /* unit's team mask */ var uteam_mask = unit.Faction.Team.Mask;
+
             /* own vision range        */ var uvis  = unit.VisionRange;
             /* own vision range ^2     */ var uvis2 = uvis.sqr();
             /* vision + cell radius ^2 */ var uvis_p_crad2 = (uvis + cell_radius).sqr();
-            /* vision - cell radius ^2 */ var uvis_m_crad2 = (uvis - cell_radius).sqr();//Case, when vision radius is less than cell's?
-            /* unit's grid vision area */ var uvis_area = usg.get_coord_rect_of_circle(upos, uvis);
+            /* vision - cell radius    */ var uvis_m_crad  = uvis - cell_radius;
+            /* vision - cell radius ^2 */ var uvis_m_crad2 = uvis_m_crad >= 0 ? uvis_m_crad.sqr() : -1;
 
-            var minx = uvis_area.min.x;
-            var miny = uvis_area.min.y;
-            var maxx = uvis_area.max.x;
-            var maxy = uvis_area.max.y;
-            
-            for (var yi = miny; yi <= maxy; yi++)
-            for (var xi = minx; xi <= maxx; xi++)
+            var it = grid.get_iterator_of_circle(upos, uvis);
+            while (it.next(out var cell_i))
             {
-                //total_cells++;
-
-                /* the cell */ var cell_i = usg.get_index_of(xi, yi);
-
                 if (cell_i != 0) // is not in the outer cell
                 {
                     // cell was already fully visible
-                    if ((c_fviss[cell_i] & uteam_mask) > 0)
+                    if ((gcfviss[cell_i] & uteam_mask) > 0)
                     {
                         //skipped_cells_fully_visible++;
                         continue;
@@ -74,20 +65,20 @@ internal class update_unit_visibility : MassiveMechanic
                         //skipped_cells_outside++;
                         continue;
                     }
-                    else
+                    
                     // cell is compeletely inside the vision area
                     if (ucdist2 <= uvis_m_crad2)
                     {
                         //full_cells++;
 
-                        /* cell units visibilities */ var cuviss  = gviss[cell_i];
+                        /* cell units visibilities */ var cuviss  = guviss[cell_i];
                         /* cell units count        */ var cucount = cuviss.Count;
-                        for (int i = 0; i < cucount; i++)
+                        for (var ui = 0; ui < cucount; ui++)
                         {
-                            cuviss[i] = (byte)(cuviss[i] | uteam_mask); // mark unit as visible
+                            cuviss[ui] = (byte)(cuviss[ui] | uteam_mask); // mark unit as visible
                         }
 
-                        c_fviss[cell_i] = (byte)(c_fviss[cell_i] | uteam_mask); // mark cell as visible
+                        gcfviss[cell_i] = (byte)(gcfviss[cell_i] | uteam_mask); // mark cell as visible
                         continue;
                     }
                 }
@@ -96,17 +87,17 @@ internal class update_unit_visibility : MassiveMechanic
                 {
                     //partial_cells++;
 
-                    /* cell positions    */ var cuposs  = gposs[cell_i];
-                    /* cell visibilities */ var cuviss  = gviss[cell_i];
+                    /* cell positions    */ var cuposs  = guposs[cell_i];
+                    /* cell visibilities */ var cuviss  = guviss[cell_i];
                     /* cell units count  */ var cucount = cuposs.Count;
 
-                    for (int i = 0; i < cucount; i++)
+                    for (int ui = 0; ui < cucount; ui++)
                     {
-                        ref var ou_vis = ref cuviss[i];
+                        /* other unit's visibility */ ref var ou_vis = ref cuviss[ui];
                         if ((ou_vis & uteam_mask) > 0) // other unit is already marked as visible 
                                 continue;
 
-                        /* other unit's position */ var oup = cuposs[i];
+                        /* other unit's position */ var oup = cuposs[ui];
                         if ((oup - upos).sqrMagnitude > uvis2) // other unit is outside the range
                             continue;
 
@@ -114,6 +105,8 @@ internal class update_unit_visibility : MassiveMechanic
                     }
                 }
             }
+
+            Debug.Assert(gcfviss[0] == 0); // sanity check: external cell is not fully visible
         }
 
         //DebugText.set_text("total cells",   total_cells.ToString());

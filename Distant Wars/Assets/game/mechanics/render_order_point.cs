@@ -1,7 +1,7 @@
 using Plugins.Lanski;
 using UnityEngine;
 
-public class render_order_point : MassiveMechanic
+public class update_order_point : MassiveMechanic
 {
     public void _()
     {

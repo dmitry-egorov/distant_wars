@@ -1,4 +1,4 @@
-internal class initialize_camera : MassiveMechanic
+internal class init_camera : MassiveMechanic
 {
     public void _()
     {

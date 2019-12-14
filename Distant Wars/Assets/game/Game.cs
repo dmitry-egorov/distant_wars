@@ -1,116 +1,109 @@
 using System;
-using Plugins.Lanski;
 using UnityEngine;
 using UnityEngine.Assertions;
-using static Massive;
 
 [ExecuteInEditMode]
-public class Game: RequiredSingleton<Game>
+public class Game: MassiveGame<Game>
 {
-    public double MeasuringWeight = 0.1;
-
     void Update()
     {
-        if (!initialized)
-        {
-            #if DEVELOPMENT_BUILD || UNITY_EDITOR
-                Assert.raiseExceptions = true;
-                MassiveDebug.Action = s => DebugText.set_text("error", s);
-            #endif
+        game_loop(
+            init: () => 
+            {
+                #if DEVELOPMENT_BUILD || UNITY_EDITOR
+                    Assert.raiseExceptions = true;
+                    MassiveDebug.Action = s => DebugText.set_text("error", s);
+                #endif
 
-            moving_average_weight = MeasuringWeight;
+                _<init_map>();
+                _<init_local_player>();
+                _<init_units_registry>();
+                _<init_bullets_manager>();
+                _<init_selection_box>();
+                _<init_order_point>();
+                _<init_camera>();
 
-            _<initialize_map>();
-            _<initialize_local_player>();
-            _<initialize_units_registry>();
-            _<initialize_bullets_manager>();
-            _<initialize_selection_box>();
-            _<initialize_order_point>();
-            _<initialize_camera>();
+                //Note: camera movement requires transformations from the previous frame, that's why the call is duplicated in the initialisation
+                _<prepare_camera_transformations>();
+            },
+            update_input: () => 
+            {
+                // debug
+                {
+                    _<pause_on_key>();
+                    _<disable_debug_text>();
+                    _<change_grid_size_on_key>();
+                    _<hide_vision_on_key>();
+                }
 
-            //Note: camera movement requires transformations from the previous frame, that's why the call is duplicated in the initialisation
-            _<prepare_camera_transformations>();
-            
-            _<cleanup_units>();
-            
-            initialized = true;
-        }
+                _<init_space_grid>();
 
-        start_update();
-        
-        // debug
-        {
-            _<pause_on_key>();
-            _<disable_debug_text>();
-            _<change_grid_size_on_key>();
-            _<hide_vision_quads_on_key>();
-        }
+                _<prepare_mouse_clicking>();
+                _<prepare_screen_mouse_position>();
+                _<prepare_world_mouse_position>();
+                _<handle_camera_movement>();
+                _<prepare_camera_transformations>();
+                _<prepare_world_mouse_position>();
+                
+                _<prepare_mouse_dragging>();
+                _<set_cursor_is_a_box>();
 
-        _<resize_space_grid>();
+                _<find_units_under_the_cursor>();
 
-        _<set_position_from_transform_in_editor>();
+                _<select_units>();
+                _<issue_unit_orders>();
 
-        _<prepare_mouse_clicking>();
-        _<prepare_screen_mouse_position>();
-        _<prepare_world_mouse_position>();
-        _<handle_camera_movement>();
-        _<prepare_camera_transformations>();
-        _<prepare_world_mouse_position>();
-        
-        _<prepare_mouse_dragging>();
-        _<set_cursor_is_a_box>();
+                #if UNITY_EDITOR
+                    _<select_units_in_inspector>();
+                #endif
+            },
+            update_simulation: () =>
+            {
+                #if UNITY_EDITOR
+                if (Application.isPlaying)
+                #endif
+                {
+                    _<init_new_units>();
 
-        _<find_units_under_the_cursor>();
+                    _<handle_movement>();
+                    _<update_space_grid>();
+                    
+                    _<update_projectiles>();
+                    _<handle_incoming_damage>();
 
-        _<select_units>();
-        _<issue_unit_orders>();
+                    _<cleanup_units>();
+                    _<cleanup_unit_orders>();
+
+                    _<update_unit_visibility>();
+                    _<find_and_attack_target>();
+                }
+            },
+            post_simulation_update: () => 
+            {
+                _<update_order_point>();
+            },
+            present: () => 
+            {
+                _<init_discovery_texture>();
+                _<init_vision_texture>();
+
+                _<update_units_style>();
+
+                _<generate_units_mesh>();
+                _<generate_vision_mesh>();
+                _<generate_projectiles_mesh>();
+                _<update_selection_box>();
+            }
+        );
 
         #if UNITY_EDITOR
-            _<select_units_in_inspector>();
-        #endif
-
-        // simulation
+        if (!Application.isPlaying)
         {
+            _<set_position_from_transform_in_editor>();
             _<init_new_units>();
-
-            if (Application.isPlaying)
-            {
-                _<cleanup_unit_orders>();
-                _<handle_movement>();
-                _<update_space_grid>();
-                _<update_unit_visibility>();
-                _<find_and_attack_target>();
-
-                _<update_projectiles>();
-                _<handle_incoming_damage>();
-
-                _<destroy_dead_units>();
-                _<cleanup_units>();
-            }
+            _<update_space_grid>();
         }
-        
-        #if UNITY_EDITOR
-            if (!Application.isPlaying)
-            {
-                _<update_space_grid>();
-            }
         #endif
-
-        //_<find_visible_units_from_other_teams>();
-        _<update_units_style>();
-
-        _<render_order_point>();
-        _<generate_units_mesh>();
-        _<generate_vision_mesh>();
-        _<generate_projectiles_mesh>();
-        _<render_selection_box>();
-
-        
-
-        _<resize_discovery_texture>();
-        _<resize_vision_texture>();
-
-        finish_update();
 
         // debug
         {

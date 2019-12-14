@@ -1,12 +1,12 @@
 using System.Linq;
 
-using static Massive;
 using static DebugText;
 
 internal class show_debug_text : MassiveMechanic
 {
     public void _() 
     {
+        var g = Game.Instance;
         var ur  = UnitsRegistry.Instance;
         var map = Map.Instance;
         var mwp = LocalPlayer.Instance.WorldMousePosition;
@@ -25,14 +25,14 @@ internal class show_debug_text : MassiveMechanic
             debug_time<update_bullets>();
         }*/
 
-        set_text("avg frame time", get_avg_frame_time());
-        set_text("avg update time", get_avg_update_time());
+        set_text("avg frame time", g.get_avg_frame_time());
+        set_text("avg update time", g.get_avg_update_time());
 
-        var top_avg_times = string.Join("", get_top_avg_times(10).Select(x => $"\n\t{x.name}: {x.time}"));
+        var top_avg_times = string.Join("", g.get_top_avg_times(10).Select(x => $"\n\t{x.name}: {x.time}"));
         set_text("top times", top_avg_times);
 
         set_text("total units", ur.Units.Count.ToString());
-        set_text("total projectiles", ProjectilesManager.Instance.Positions.Count.ToString());
+        set_text("total projectiles", ProjectilesManager.Instance.positions.Count.ToString());
         set_text("space grid size", ur.SpaceGridWidth.ToString());
     }
 }

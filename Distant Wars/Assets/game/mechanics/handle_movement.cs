@@ -17,12 +17,14 @@ internal class handle_movement : MassiveMechanic
         /* units' registry */ var ur  = UnitsRegistry.Instance;
         /* units           */ var us  = ur.Units;
         /* map             */ var map = Map.Instance;
-        /* delta time      */ var dt  = Time.deltaTime;
+        /* delta time      */ var dt  = Game.Instance.DeltaTime;
 
         foreach (var u in us)
         {
             /* unit's position 2d   */ var upos = u.Position;
             /* has move target      */ var has_target = false;
+
+            u.PrevPosition = upos;
 
             var is_move_order = has_target = u.IssuedOrder.is_move(out var target);
 
@@ -61,6 +63,7 @@ internal class handle_movement : MassiveMechanic
                     /* slope     */ var sl = -0.5f * Mathf.Max(map.slope2(upos, dir), 0.0f);
                     /* terrain speed  */ var ts = sp * Mathf.Exp(sl);
                     /* smoothed speed */ var ss = ts * Mathf.Clamp01(dist / ed);
+                    
                     u.Position = Vector2.MoveTowards(upos, target, ss * dt);
                 }
                 else if (is_move_order)

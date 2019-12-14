@@ -13,6 +13,7 @@ public class Map : RequiredSingleton<Map>
     public Camera DiscoveryCamera;
     public int VisionTextureSize;
     public int DiscoveryTextureSize;
+    public bool TexturesReady;
     public MeshRenderer MapRenderer;
 
     [Header("State")]

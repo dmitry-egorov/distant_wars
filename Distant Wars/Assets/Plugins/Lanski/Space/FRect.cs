@@ -10,6 +10,8 @@ namespace Plugins.Lanski.Space
 
         public FRect(Vector2 min, Vector2 max)
         {
+            Debug.Assert(min.x <= max.x && min.y <= max.y);
+
             this.min = min;
             this.max = max;
         }
@@ -20,6 +22,8 @@ namespace Plugins.Lanski.Space
         public Vector2 get_center() => 0.5f * (min + max);
 
         public Vector2 get_size() => max - min;
+
+        public bool contains(Vector2 v) => v.x >= min.x && v.x <= max.x && v.y >= min.y && v.y <= max.y;
 
         public bool intersects(in FRect o) => !(max.x < o.min.x || max.y < o.min.y || o.max.x < min.x || o.max.y < min.y);
         public bool intersects(in Vector2 omin, in Vector2 omax) => !(max.x < omin.x || max.y < omin.y || omax.x < min.x || omax.y < min.y);

@@ -17,6 +17,10 @@ public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
 
     [Header("State")]
     public Vector2 Position;
+    public Vector2 PrevPosition;
+
+    public (int cell, int index) SpaceGridIndex;
+    public int OwnUnitsIndex;
     
     public Order IssuedOrder;
     public Unit LastAttackTarget;
@@ -29,7 +33,6 @@ public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
     [Header("Visual State")]
     public bool IsHighlighted;
     public bool IsSelected;
-    //public bool IsVisible;
     public float BlinkTimeRemaining;
 
     public void OnDrawGizmos()

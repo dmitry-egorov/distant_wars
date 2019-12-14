@@ -6,12 +6,16 @@ public class find_units_under_the_cursor : MassiveMechanic
 {
     public void _()
     {
+        var time_ratio = Game.Instance.PresentationToSimulationFrameTimeRatio;
+
         /* units' repository   */ var ur = UnitsRegistry.Instance;
-        /* space grid          */ var sg = ur.SpaceGrid;
-        /* cells unit postions */ var poss  = sg.unit_positions;
-        /* cells unit postions */ var viss  = sg.unit_visibilities;
-        /* cells units         */ var units = sg.unit_refs;
-        /* cells centers       */ var ccenters = sg.cell_centers;
+
+        /* space grid */ var sg = ur.SpaceGrid;
+        /* cells unit postions      */ var poss  = sg.unit_positions;
+        /* cells unit prev postions */ var pposs = sg.unit_prev_positions;
+        /* cells unit visibilities  */ var viss  = sg.unit_visibilities;
+        /* cells units              */ var units = sg.unit_refs;
+        /* cells centers            */ var ccenters = sg.cell_centers;
 
         /* local player      */ var lp = LocalPlayer.Instance;
         /* player team mask  */ var pteam_mask = lp.Faction.Team.Mask;  
@@ -36,16 +40,9 @@ public class find_units_under_the_cursor : MassiveMechanic
 
             var proper_rect = new FRect(bminx, bminy, bmaxx, bmaxy);
 
-            /* grid vision area */ var gva = sg.get_coord_rect_of(proper_rect);
-            var minx = gva.min.x;
-            var miny = gva.min.y;
-            var maxx = gva.max.x;
-            var maxy = gva.max.y;
-
-            for (var yi = miny; yi <= maxy; yi++)
-            for (var xi = minx; xi <= maxx; xi++)
+            /* grid vision area iterator */ var gva = sg.get_iterator_of(proper_rect);
+            while (gva.next(out var cell_i))
             {
-                /* cell index             */ var cell_i = sg.get_index_of(xi, yi);
                 /* cell unit positions    */ var cuposs = poss[cell_i];
                 /* cell unit visibilities */ var cuviss = viss[cell_i];
                 /* cell units        */ var cunits  = units[cell_i];
@@ -89,20 +86,14 @@ public class find_units_under_the_cursor : MassiveMechanic
 
             /* closest unit */ var cunit = default(Unit);
             /* min distance to the closest unit ^2 */ var min_dist_2 = float.MaxValue;
-            /* grid vision area */ var g_vis_area = sg.get_coord_rect_of_circle(mouse_pos, wsd);
-            var minx = g_vis_area.min.x;
-            var miny = g_vis_area.min.y;
-            var maxx = g_vis_area.max.x;
-            var maxy = g_vis_area.max.y;
-
-            for (var yi = miny; yi <= maxy; yi++)
-            for (var xi = minx; xi <= maxx; xi++)
+            /* grid vision area iterator */ var it = sg.get_iterator_of_circle(mouse_pos, wsd);
+            while (it.next(out var cell_i))
             {
-                /* cell index             */ var cell_i  = sg.get_index_of(xi, yi);
-                /* cell unit positions    */ var cuposs   = poss[cell_i];
-                /* cell unit visibilities */ var cuviss  = viss[cell_i];
-                /* cell units        */ var cunits  = units[cell_i];
-                /* cell units count  */ var cucount = cuposs.Count;
+                /* cell unit positions      */ var cuposs  = poss [cell_i];
+                /* cell unit prev positions */ var cupposs = pposs[cell_i];
+                /* cell unit visibilities   */ var cuviss  = viss [cell_i];
+                /* cell units               */ var cunits  = units[cell_i];
+                /* cell units count         */ var cucount = cuposs.Count;
 
                 for (var i = 0; i < cucount; i++)
                 {
@@ -110,8 +101,11 @@ public class find_units_under_the_cursor : MassiveMechanic
                     if ((cvis & pteam_mask) == 0)
                         continue;
                     
-                    /* world space unit position */ ref var pos = ref cuposs[i];
-                    /* sqr distance to the unit  */ var dist2 = (pos - mouse_pos).sqrMagnitude;
+                    /* unit's position      */ var upos  = cuposs [i];
+                    /* unit's prev position */ var uppos = cupposs[i];
+                    /* unit's interpolated position */ var uipos = Vector2.Lerp(uppos, upos, time_ratio);
+                    
+                    /* sqr distance to the unit  */ var dist2 = (uipos - mouse_pos).sqrMagnitude;
                     if (dist2 < min_dist_2 && dist2 < sel_dist_2)
                     {
                         /* potential unit */ var pu = cunits[i];

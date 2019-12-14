@@ -1,13 +1,19 @@
 using UnityEngine;
 
-internal class hide_vision_quads_on_key : MassiveMechanic
+internal class hide_vision_on_key : MassiveMechanic
 {
     public void _()
     {
         if (Input.GetKeyDown(KeyCode.V))
         {
-            var vr = UnitsRegistry.Instance.VisionRenderer;
-            vr.enabled = !vr.enabled;
+            var r = UnitsRegistry.Instance.VisionCirclesRenderer;
+            r.enabled = !r.enabled;
+        }
+
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            var r = UnitsRegistry.Instance.VisionQuadsRenderer;
+            r.enabled = !r.enabled;
         }
     }
 }

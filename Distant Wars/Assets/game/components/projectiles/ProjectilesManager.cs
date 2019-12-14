@@ -9,9 +9,11 @@ public class ProjectilesManager : RequiredSingleton<ProjectilesManager>
     public MeshRenderer SpritesRenderer;
 
     [Header("Data")]
-    public LeakyList<Vector3> Positions;
-    public LeakyList<Vector3> Directions;
-    public LeakyList<float> Speeds;
-    public LeakyList<int> Damages;
+    public LeakyList<Vector3> positions;
+    public LeakyList<Vector2> prev_positions;
+    public LeakyList<Vector3> directions;
+    public LeakyList<float> speeds;
+    public LeakyList<int> damages;
+
     public Mesh SpritesMesh;
 }

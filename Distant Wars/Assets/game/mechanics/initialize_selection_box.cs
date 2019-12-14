@@ -1,7 +1,7 @@
 using Plugins.Lanski.Behaviours;
 using UnityEngine;
 
-internal class initialize_selection_box : MassiveMechanic
+internal class init_selection_box : MassiveMechanic
 {
     public void _()
     {

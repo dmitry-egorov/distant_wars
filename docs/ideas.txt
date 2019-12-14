@@ -16,6 +16,7 @@
 - underground units? or underground level
 - vision by unit clusters (omptimization)
 - player gather blueprints for unique units on the map
+- static teleporter
 
 - session multiplayer
 - players arrive at the sight early, acid fog covers the map (planning phase)

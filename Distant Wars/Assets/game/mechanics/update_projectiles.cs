@@ -1,30 +1,30 @@
 ﻿using Plugins.Lanski;
-using UnityEngine;
 
 internal class update_projectiles : MassiveMechanic
 {
     public void _()
     {
         var pm  = ProjectilesManager.Instance;
-        /* positions  */ var poss = pm.Positions;
-        /* directions */ var dirs = pm.Directions;
-        /* speeds     */ var spds = pm.Speeds;
-        /* damages    */ var dmgs = pm.Damages;
+        /* positions  */ var poss  = pm.positions;
+        /* positions  */ var pposs = pm.prev_positions;
+        /* directions */ var dirs  = pm.directions;
+        /* speeds     */ var spds  = pm.speeds;
+        /* damages    */ var dmgs  = pm.damages;
         /* count      */ var count = poss.Count;
         /* hit radius */ var hradius  = pm.HitRadius;
 
-        /* delta time           */ var dt     = Time.deltaTime;
+        /* delta time           */ var dt     = Game.Instance.DeltaTime;
         /* map                  */ var map    = Map.Instance;
         /* units registry       */ var ur     = UnitsRegistry.Instance;
         /* units' space grids   */ var grid   = ur.SpaceGrid;
         /* grid's unit postions */ var uposs  = grid.unit_positions;
         /* grid's units         */ var units  = grid.unit_refs;
 
-        for (int proj_i = 0; proj_i < count;)
+        for (int iproj = 0; iproj < count;)
         {
-            /* projectile's position    */ var pos  = poss[proj_i];
-            /* projectile's direction   */ var dir  = dirs[proj_i];
-            /* projectile's frame speed */ var spd  = spds[proj_i] * dt;
+            /* projectile's position    */ var pos  = poss[iproj];
+            /* projectile's direction   */ var dir  = dirs[iproj];
+            /* projectile's frame speed */ var spd  = spds[iproj] * dt;
             /* next projectile point    */ var npos = pos + dir * spd;
             
             var hit = false;
@@ -44,7 +44,7 @@ internal class update_projectiles : MassiveMechanic
                     hit = rays.try_intersect_sphere(pos, dir, upos3, hradius, out var t) && t >= 0 && t < spd;
                     if (hit)
                     {
-                        cunits[unit_i].IncomingDamages.Add(dmgs[proj_i]);
+                        cunits[unit_i].IncomingDamages.Add(dmgs[iproj]);
                         break;
                     }
                 }
@@ -103,17 +103,19 @@ internal class update_projectiles : MassiveMechanic
             if (hit)
             {
                 // remove projectile
-                poss.ReplaceWithLast(proj_i);
-                dirs.ReplaceWithLast(proj_i);
-                dmgs.ReplaceWithLast(proj_i);
-                spds.ReplaceWithLast(proj_i);
+                poss .ReplaceWithLast(iproj);
+                pposs.ReplaceWithLast(iproj);
+                dirs .ReplaceWithLast(iproj);
+                dmgs .ReplaceWithLast(iproj);
+                spds .ReplaceWithLast(iproj);
                 count--;
             }
             else
             {
                 // update position
-                poss[proj_i] = npos;
-                proj_i++;
+                pposs[iproj] = poss[iproj].xy();
+                poss [iproj] = npos;
+                iproj++;
             }
         }
     }

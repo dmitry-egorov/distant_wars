@@ -13,6 +13,8 @@ public class generate_units_mesh: MassiveMechanic
     
     public void _()
     {
+        var time_ratio = Game.Instance.PresentationToSimulationFrameTimeRatio;
+
         /* local player    */ var lp = LocalPlayer.Instance;
         /* local player's team mask */ var lp_team_mask = lp.Faction.Team.Mask;
 
@@ -21,7 +23,7 @@ public class generate_units_mesh: MassiveMechanic
         
         // generate sprites
         {
-            /* delta time         */ var dt  = Time.deltaTime;
+            /* delta time         */ var dt  = Game.Instance.DeltaTime;
             /* blinking hide time */ var bht = ur.DamageBlinkHideTime;
             /* blinking show time */ var bst = ur.DamageBlinkShowTime;
             /* blinking period    */ var bp  = bht + bst;
@@ -33,68 +35,73 @@ public class generate_units_mesh: MassiveMechanic
             st.Clear();
 
             /* sprite index */ var qi = 0;
-            /* units space grid  */ var ug   = ur.SpaceGrid;
-            /* grid positions    */ var gps  = ug.unit_positions;
-            /* grid units        */ var gus  = ug.unit_refs;
-            /* grid visiblities  */ var gvs  = ug.unit_visibilities;
+            /* units space grid */ var grid   = ur.SpaceGrid;
+            /* grid positions      */ var gposs  = grid.unit_positions;
+            /* grid prev positions */ var gpposs = grid.unit_prev_positions;
+            /* grid units          */ var gunits = grid.unit_refs;
+            /* grid visiblities    */ var gviss  = grid.unit_visibilities;
 
             /* camera            */ var cam = StrategicCamera.Instance;
             /* screen rectangle  */ var rscreen = cam.WorldScreen;
             /* screen to worlds  */ var s2w = cam.ScreenToWorldTransform;
             /* screen rect offset to accomodate unit's size */ var offset = ssize * MathEx.Root2;
-            /* adjusted screen rectangle */ var arscreen = rscreen.wider_by(offset); 
-            /* screen grid area */ var sga = ug.get_coord_rect_of(arscreen);
+            /* adjusted screen rectangle */ var arscreen = rscreen.wider_by(offset);
+            /* screen grid area iterator */ var it = grid.get_iterator_of(arscreen);
 
-            var minx = sga.min.x;
-            var miny = sga.min.y;
-            var maxx = sga.max.x;
-            var maxy = sga.max.y;
-
-            for (var yi = miny; yi <= maxy; yi++)
-            for (var xi = minx; xi <= maxx; xi++)
+            while (it.next(out var cell_i))
             {
-                var ci = ug.get_index_of(xi, yi);
-                /* cell unit positions    */ var cuposs  = gps[ci];
-                /* cell units             */ var cunits  = gus[ci];
-                /* cell unit visibilities */ var cuviss  = gvs[ci];
-                /* cell units count       */ var cucount = cuposs.Count;
-                for(var i = 0; i < cucount; i++)
+                /* cell unit positions      */ var cuposs  = gposs [cell_i];
+                /* cell unit prev positions */ var cupposs = gpposs[cell_i];
+                /* cell units               */ var cunits  = gunits[cell_i];
+                /* cell unit visibilities   */ var cuviss  = gviss [cell_i];
+                /* cell units count         */ var cucount = cuposs.Count;
+                for (var iunit = 0; iunit < cucount; iunit++)
                 {
-                    //TODO!: are own unit marked as visible???
-                    if ((cuviss[i] & lp_team_mask) == 0)
+                    // hide when not visible by the local player
+                    if ((cuviss[iunit] & lp_team_mask) == 0)
                         continue;
 
-                    /* unit                   */ var u   = cunits[i];
-                    /* original blinking time */ var obt = u.BlinkTimeRemaining;
-                    /* new blinking time      */ var nbt = obt - dt;
-                    // hide, when blinking and in hiding period
-                    if (nbt > 0)
-                    {
-                        u.BlinkTimeRemaining = nbt;
-                        if((nbt % bp) > bst)
-                            continue;
-                    }
-                    else if (obt != 0)
-                    {
-                        u.BlinkTimeRemaining = 0;
-                    }
+                    /* unit */ var u = cunits[iunit];
 
-                    /* unit is selected    */ var uih = u.IsHighlighted;
-                    /* unit is selected    */ var uis = u.IsSelected;
-                    /* faction color index */ var fci = u.Faction.Index;
-                    /* highlight flags     */ var hf  = (uih ? 1 : 0) | (uis ? 2 : 0) | (fci << 4);
+                    // hide/show when blinking
+                    {
+                        /* original blinking time */ var obt = u.BlinkTimeRemaining;
+                        /* new blinking time      */ var nbt = obt - dt;
+                        // hide, when blinking and in hiding period
+                        if (nbt > 0)
+                        {
+                            u.BlinkTimeRemaining = nbt;
+                            if((nbt % bp) > bst)
+                                continue;
+                        }
+                        else if (obt != 0)
+                        {
+                            u.BlinkTimeRemaining = 0;
+                        }
+                    }
                     
-                    var p = cuposs[i];
-                    for (var j = 0; j < 4; j++)
+                    // generate sprite
                     {
-                        // flags for the vertex shader, right to left: is highlighted (1 bit), is selected (1 bit), quad index (2 bits), color index (4 bits) 
-                        var fl = hf | j << 2;
-                        sv.Add(p.xy(fl));
-                    }
+                        /* unit is selected    */ var uih = u.IsHighlighted;
+                        /* unit is selected    */ var uis = u.IsSelected;
+                        /* faction color index */ var fci = u.Faction.Index;
+                        /* highlight flags     */ var hf  = (uih ? 1 : 0) | (uis ? 2 : 0) | (fci << 4);
+                        
+                        /* unit's position      */ var upos  = cuposs [iunit];
+                        /* unit's prev position */ var uppos = cupposs[iunit];
+                        /* unit's interpolated position */ var uipos = Vector2.Lerp(uppos, upos, time_ratio);
+                        for (var j = 0; j < 4; j++)
+                        {
+                            // flags for the vertex shader, right to left: is highlighted (1 bit), is selected (1 bit), quad index (2 bits), color index (4 bits) 
+                            var fl = hf | j << 2;
+                            sv.Add(uipos.xy(fl));
+                        }
 
-                    //PERF: since the quads are not changing, we should only generate them when capacity is increasing.
-                    RenderHelper.add_quad(st, qi);
-                    qi++;
+                        //PERF: since the quads are not changing, we should only generate them when capacity is increasing.
+                        RenderHelper.add_quad(st, qi);
+                        qi++;
+                    }
+                    
                 }
             }
 
@@ -134,5 +141,4 @@ public class generate_units_mesh: MassiveMechanic
     const int MaxNumberOfFactionColors = 16;
     static readonly int units_size_id = Shader.PropertyToID("_UnitsSize");
     static readonly int faction_colors_id = Shader.PropertyToID("_FactionColors");
-
 }
