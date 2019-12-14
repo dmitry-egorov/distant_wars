@@ -18,15 +18,13 @@ public class generate_units_mesh: MassiveMechanic
         /* local player    */ var lp = LocalPlayer.Instance;
         /* local player's team mask */ var lp_team_mask = lp.Faction.Team.Mask;
 
-        /* units' registry */ var  ur = UnitsRegistry.Instance;
-        /* adjasted sprite size */ var ssize = (float)(ur.SpriteSize * (Screen.height / 1080));
+        /* units' registry */ var ur  = UnitsRegistry.Instance;
+        /* camera          */ var cam = StrategicCamera.Instance;
+        /* adjasted sprite size */ var ssize = (float)(ur.SpriteSize * (cam.ScreenResolution.y / 1080));
         
         // generate sprites
         {
             /* delta time         */ var dt  = Game.Instance.DeltaTime;
-            /* blinking hide time */ var bht = ur.DamageBlinkHideTime;
-            /* blinking show time */ var bst = ur.DamageBlinkShowTime;
-            /* blinking period    */ var bp  = bht + bst;
             /* sprites mesh       */ var sm  = ur.SpritesMesh;
             var sv = sprite_vertices;
             var st = sprite_triangles;
@@ -41,13 +39,12 @@ public class generate_units_mesh: MassiveMechanic
             /* grid units          */ var gunits = grid.unit_refs;
             /* grid visiblities    */ var gviss  = grid.unit_visibilities;
 
-            /* camera            */ var cam = StrategicCamera.Instance;
+
             /* screen rectangle  */ var rscreen = cam.WorldScreen;
             /* screen to worlds  */ var s2w = cam.ScreenToWorldTransform;
             /* screen rect offset to accomodate unit's size */ var offset = ssize * MathEx.Root2;
             /* adjusted screen rectangle */ var arscreen = rscreen.wider_by(offset);
             /* screen grid area iterator */ var it = grid.get_iterator_of(arscreen);
-
             while (it.next(out var cell_i))
             {
                 /* cell unit positions      */ var cuposs  = gposs [cell_i];
@@ -63,45 +60,27 @@ public class generate_units_mesh: MassiveMechanic
 
                     /* unit */ var u = cunits[iunit];
 
-                    // hide/show when blinking
-                    {
-                        /* original blinking time */ var obt = u.BlinkTimeRemaining;
-                        /* new blinking time      */ var nbt = obt - dt;
-                        // hide, when blinking and in hiding period
-                        if (nbt > 0)
-                        {
-                            u.BlinkTimeRemaining = nbt;
-                            if((nbt % bp) > bst)
-                                continue;
-                        }
-                        else if (obt != 0)
-                        {
-                            u.BlinkTimeRemaining = 0;
-                        }
-                    }
-                    
-                    // generate sprite
-                    {
-                        /* unit is selected    */ var uih = u.IsHighlighted;
-                        /* unit is selected    */ var uis = u.IsSelected;
-                        /* faction color index */ var fci = u.Faction.Index;
-                        /* highlight flags     */ var hf  = (uih ? 1 : 0) | (uis ? 2 : 0) | (fci << 4);
-                        
-                        /* unit's position      */ var upos  = cuposs [iunit];
-                        /* unit's prev position */ var uppos = cupposs[iunit];
-                        /* unit's interpolated position */ var uipos = Vector2.Lerp(uppos, upos, time_ratio);
-                        for (var j = 0; j < 4; j++)
-                        {
-                            // flags for the vertex shader, right to left: is highlighted (1 bit), is selected (1 bit), quad index (2 bits), color index (4 bits) 
-                            var fl = hf | j << 2;
-                            sv.Add(uipos.xy(fl));
-                        }
+                    if (u.IsBlinking)
+                        continue;
 
-                        //PERF: since the quads are not changing, we should only generate them when capacity is increasing.
-                        RenderHelper.add_quad(st, qi);
-                        qi++;
-                    }
+                    /* unit is selected    */ var uih = u.IsHighlighted;
+                    /* unit is selected    */ var uis = u.IsSelected;
+                    /* faction color index */ var fci = u.Faction.Index;
+                    /* highlight flags     */ var hf  = (uih ? 1 : 0) | (uis ? 2 : 0) | (fci << 4);
                     
+                    /* unit's position      */ var upos  = cuposs [iunit];
+                    /* unit's prev position */ var uppos = cupposs[iunit];
+                    /* unit's interpolated position */ var uipos = Vector2.Lerp(uppos, upos, time_ratio);
+                    for (var j = 0; j < 4; j++)
+                    {
+                        // flags for the vertex shader, right to left: is highlighted (1 bit), is selected (1 bit), quad index (2 bits), color index (4 bits) 
+                        var fl = hf | j << 2;
+                        sv.Add(uipos.xy(fl));
+                    }
+
+                    //PERF: since the quads are not changing, we should only generate them when capacity is increasing.
+                    RenderHelper.add_quad(st, qi);
+                    qi++;
                 }
             }
 

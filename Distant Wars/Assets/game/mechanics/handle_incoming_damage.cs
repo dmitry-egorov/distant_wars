@@ -4,7 +4,6 @@
     {
         var ur = UnitsRegistry.Instance;
         var us = ur.Units;
-        /* damage blink time */ var bt = ur.DamageBlinkCount * (ur.DamageBlinkShowTime + ur.DamageBlinkHideTime);
 
         foreach (var u in us)
         {
@@ -19,7 +18,7 @@
             if (idc > 0)
             {
                 ids.Clear();
-                u.BlinkTimeRemaining = bt;
+                u.ReceivedDamageSinceLastPresentation = true;
             }
         }
     }

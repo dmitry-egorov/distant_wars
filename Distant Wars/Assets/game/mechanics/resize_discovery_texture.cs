@@ -25,7 +25,7 @@ internal class init_discovery_texture : MassiveMechanic
             map.TexturesReady = false;
 
             var grid = UnitsRegistry.Instance.SpaceGrid;
-            var ds = grid.cell_full_discoveries;
+            var ds = grid.cell_full_discoveries_by_local_player;
             Array.Clear(ds, 0, ds.Length);
 
             Debug.Log("Discovery texture resized");

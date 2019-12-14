@@ -8,7 +8,9 @@ public class Map : RequiredSingleton<Map>
     public int Width = 1025;
     public int Height = 1025;
     public float Scale = 8000;
-    public float ZScale = 4000;
+    public float ZScale = 1000;
+    public float BoundingRadius = 6000;
+
     public Camera VisionCamera;
     public Camera DiscoveryCamera;
     public int VisionTextureSize;

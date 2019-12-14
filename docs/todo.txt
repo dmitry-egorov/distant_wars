@@ -1,5 +1,3 @@
-- optimize presentation, when there was no simulation tick
-- don't start blinking when outside the screen?
 - separate editor mechanics
 - render space grid lines
 - fire in advance (need previous position, goes along with steady update)
@@ -12,12 +10,14 @@
   - energy gatherer
 - show hp when zomming in
 - move command visual feedback
+- decals and procedural texture for flat surfaces
 
 - store unit's interpolated positions?
 - unity math, jobs, arrays?
 - how to preserve discovered texture??
 - space grid per team
 
++ don't start blinking when outside the screen
 + steady update
 + filter discovery quads by fully visible grid cells
 + rework grid iteration

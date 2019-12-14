@@ -12,55 +12,63 @@ internal class init_space_grid : MassiveMechanic
 
         var h  = ur.SpaceGridHeight;
         var w  = ur.SpaceGridWidth;
-        var sg = ur.SpaceGrid;
+        var grid = ur.SpaceGrid;
 
-        if (sg == null || sg.size.x != w || sg.size.y != h)
+        if (grid == null || grid.size.x != w || grid.size.y != h)
         {
             /* half scale */ var hs   = map.Scale * 0.5f;
             /* map area   */ var spc = new FRect(-hs.xy(), hs.xy());
             var sz = new Vector2Int(w, h);
-            sg = ur.SpaceGrid = new UnitsSpaceGrid2();
+            grid = ur.SpaceGrid = new UnitsSpaceGrid2();
 
-            sg.size = sz;
-            sg.cell_size = (spc.max - spc.min) / sz;
-            sg.cell_radius = 0.5f * sg.cell_size.magnitude;
+            grid.size = sz;
+            grid.cell_size = (spc.max - spc.min) / sz;
+            grid.cell_radius = 0.5f * grid.cell_size.magnitude;
             
-            var g2w = sg.grid_to_world = new SpaceTransform2(sg.cell_size, spc.min);
-            sg.world_to_grid = g2w.inverse();
+            var g2w = grid.grid_to_world = new SpaceTransform2(grid.cell_size, spc.min);
+            grid.world_to_grid = g2w.inverse();
 
+            var gccount = sz.x * sz.y + 1;
+            var guposs  = grid.unit_positions      = new LeakyList<Vector2>[gccount];
+            var gupposs = grid.unit_prev_positions = new LeakyList<Vector2>[gccount];
+            var guviss  = grid.unit_visibilities   = new LeakyList<byte>[gccount];
+            var guteams = grid.unit_team_masks     = new LeakyList<byte>[gccount];
+            var gunits  = grid.unit_refs           = new List<Unit>[gccount];
 
-            var gucount = sz.x * sz.y + 1;
-            var guposs  = sg.unit_positions      = new LeakyList<Vector2>[gucount];
-            var gupposs = sg.unit_prev_positions = new LeakyList<Vector2>[gucount];
-            var guviss  = sg.unit_visibilities   = new LeakyList<byte>[gucount];
-            var guteams = sg.unit_team_masks     = new LeakyList<byte>[gucount];
-            var gunits  = sg.unit_refs           = new List<Unit>[gucount];
+            var cc = grid.cell_centers = new Vector2[gccount];
+            grid.cell_full_visibilities = new byte[gccount];
+            grid.cell_full_discoveries_by_local_player = new bool[gccount];
+            var vqvrts = grid.vision_quads_vertices = new Vector3[4 * (gccount - 1)];
 
-            sg.cell_centers = new Vector2[gucount];
-            sg.cell_full_visibilities = new byte[gucount];
-            sg.cell_full_discoveries  = new bool[gucount];
-
-            for (int i = 0; i < gucount; i++)
+            // intialize unit data arrays
+            for (var cell_i = 0; cell_i < gccount; cell_i++)
             {
-                if (i > 0)
+                if (cell_i > 0) // set cell center; the external cell is at (0,0), so we dont need to initialize it
                 {
-                    /* cell's grid  center */ var ic = new Vector2((i - 1) % sz.y + 0.5f, (i - 1) / sz.y + 0.5f);
+                    /* cell's grid  center */ var ic = new Vector2((cell_i - 1) % sz.y + 0.5f, (cell_i - 1) / sz.y + 0.5f);
                     /* cell's world center */ var wc = g2w.apply_to_point(ic);
-                    sg.cell_centers[i] = wc;
+                    cc[cell_i] = wc;
+
+                    for (var i = 0; i < 4; i++)
+                        vqvrts[4 * (cell_i - 1) + i] = wc.xy(i);
                 }
 
-                guposs [i] = new LeakyList<Vector2>();
-                gupposs[i] = new LeakyList<Vector2>();
-                guviss [i] = new LeakyList<byte>();
-                guteams[i] = new LeakyList<byte>();
-                gunits [i] = new List<Unit>();
+                guposs [cell_i] = new LeakyList<Vector2>();
+                gupposs[cell_i] = new LeakyList<Vector2>();
+                guviss [cell_i] = new LeakyList<byte>();
+                guteams[cell_i] = new LeakyList<byte>();
+                gunits [cell_i] = new List<Unit>();
             }
 
+            ur.VisionQuadsMesh   .vertices = vqvrts;
+            ur.DiscoveryQuadsMesh.vertices = vqvrts;
+
+            // fill unit data arrays
             foreach(var unit in ur.Units)
             {
                 /* unit's position */ var pos = unit.Position;
                 var uteam = unit.Faction.Team.Mask;
-                var ui = sg.get_index_of(pos);
+                var ui = grid.get_index_of(pos);
 
                 var cunits = gunits[ui];
                 unit.SpaceGridIndex = (ui, cunits.Count);

@@ -18,7 +18,7 @@ internal class prepare_camera_transformations: MassiveMechanic
         var m = scs.y / ss;
         var o = scs - sc.Position * m;
 
-        sc.ScreenResolution = sr;
+        sc.ScreenResolution = new Vector2Int(w, h);
         sc.WorldToScreenTransform = new UniformSpaceTransform2(m, o);
         var s2w = sc.ScreenToWorldTransform = new UniformSpaceTransform2(1 / m, -o / m);
 

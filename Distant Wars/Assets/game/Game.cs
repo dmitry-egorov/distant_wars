@@ -1,10 +1,15 @@
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 [ExecuteInEditMode]
 public class Game: MassiveGame<Game>
 {
+    [Header("State")]
+    public int VisionCirclesCount;
+    public int DiscoveryCirclesCount;
+    public int VisionQuadsCount;
+    public int DiscoveryQuadsCount;
+
     void Update()
     {
         game_loop(
@@ -28,34 +33,38 @@ public class Game: MassiveGame<Game>
             },
             update_input: () => 
             {
-                // debug
-                {
-                    _<pause_on_key>();
-                    _<disable_debug_text>();
-                    _<change_grid_size_on_key>();
-                    _<hide_vision_on_key>();
-                }
-
                 _<init_space_grid>();
 
-                _<prepare_mouse_clicking>();
-                _<prepare_screen_mouse_position>();
-                _<prepare_world_mouse_position>();
-                _<handle_camera_movement>();
-                _<prepare_camera_transformations>();
-                _<prepare_world_mouse_position>();
-                
-                _<prepare_mouse_dragging>();
-                _<set_cursor_is_a_box>();
-
-                _<find_units_under_the_cursor>();
-
-                _<select_units>();
-                _<issue_unit_orders>();
-
                 #if UNITY_EDITOR
-                    _<select_units_in_inspector>();
+                if (Application.isPlaying)
                 #endif
+                {
+                    // debug
+                    {
+                        _<pause_on_key>();
+                        _<disable_debug_text>();
+                        _<change_grid_size_on_key>();
+                        _<hide_vision_on_key>();
+                    }
+
+                    _<prepare_mouse_clicking>();
+                    _<prepare_screen_mouse_position>();
+                    _<prepare_world_mouse_position>();
+                    
+                    _<prepare_mouse_dragging>();
+                    _<set_cursor_is_a_box>();
+
+                    _<find_units_under_the_cursor>();
+                    _<select_units>();
+                    _<issue_unit_orders>();
+
+                    _<handle_camera_movement>();
+                    _<prepare_camera_transformations>();
+
+                    #if UNITY_EDITOR
+                        _<select_units_in_inspector>();
+                    #endif
+                }
             },
             update_simulation: () =>
             {
@@ -78,19 +87,21 @@ public class Game: MassiveGame<Game>
                     _<find_and_attack_target>();
                 }
             },
-            post_simulation_update: () => 
+            present: (had_steady_update) => 
             {
                 _<update_order_point>();
-            },
-            present: () => 
-            {
+                
                 _<init_discovery_texture>();
                 _<init_vision_texture>();
 
                 _<update_units_style>();
 
+                _<generate_vision_quads>();
+                _<generate_vision_circles>();
+
+                _<update_unit_blinking>();
                 _<generate_units_mesh>();
-                _<generate_vision_mesh>();
+                
                 _<generate_projectiles_mesh>();
                 _<update_selection_box>();
             }
@@ -110,8 +121,4 @@ public class Game: MassiveGame<Game>
             _<show_debug_text>();
         }
     }
-
-    [NonSerialized]bool initialized;
-
-    static float time;
 }

@@ -19,6 +19,7 @@ internal class update_projectiles : MassiveMechanic
         /* units' space grids   */ var grid   = ur.SpaceGrid;
         /* grid's unit postions */ var uposs  = grid.unit_positions;
         /* grid's units         */ var units  = grid.unit_refs;
+        /* bounding radius ^2   */ var bradius2 = map.BoundingRadius.sqr();
 
         for (int iproj = 0; iproj < count;)
         {
@@ -98,6 +99,11 @@ internal class update_projectiles : MassiveMechanic
                         y0 += sy;
                     }
                 }
+            }
+
+            if (!hit && npos.xy().sqrMagnitude > bradius2)
+            {
+                hit = true;
             }
 
             if (hit)

@@ -2,7 +2,6 @@
 using Plugins.Lanski;
 using UnityEngine;
 
-// find visible units other than the player's
 internal class update_unit_visibility : MassiveMechanic
 {
     public void _()

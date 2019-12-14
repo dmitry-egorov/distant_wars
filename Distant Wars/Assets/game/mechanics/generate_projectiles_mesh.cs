@@ -50,7 +50,7 @@ public class generate_projectiles_mesh : MassiveMechanic
         sm.SetVertices(sv);
         sm.SetTriangles(st, 0, false);
 
-        Shader.SetGlobalFloat(bullets_size_id, pm.SpriteSize * Screen.height / 1080);
+        Shader.SetGlobalFloat(bullets_size_id, pm.SpriteSize * (Screen.height / 1080));
     }
     
     private List<Vector3> sprite_vertices;

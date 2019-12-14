@@ -54,7 +54,7 @@ public class MassiveGame<TGame>: RequiredSingleton<TGame> where TGame: MassiveGa
         }
     }
 
-    public void game_loop(Action init, Action update_input, Action update_simulation, Action post_simulation_update, Action present)
+    public void game_loop(Action init, Action update_input, Action update_simulation, Action<bool> present)
     {
         // initialisation
         if (!initialized)
@@ -98,13 +98,7 @@ public class MassiveGame<TGame>: RequiredSingleton<TGame> where TGame: MassiveGa
             DeltaTime = Time.deltaTime;
             PresentationToSimulationFrameTimeRatio = (float)((PresentationTotalTime - (SteadySimulationTotalTime - steady_delta_time)) / steady_delta_time);
 
-            // post steady update, executes if at least one steady update was performed this frame
-            if (had_at_least_one_steady_update)
-            {
-                post_simulation_update();
-            }
-            
-            present();
+            present(had_at_least_one_steady_update);
         }
 
         // measuring update time
@@ -138,17 +132,15 @@ public class MassiveGame<TGame>: RequiredSingleton<TGame> where TGame: MassiveGa
         }
     }
 
-    public string get_avg_frame_time()  => $"{to_ms_string(average_frame_time)}, { to_ms_string(current_frame_time)}";
-    public string get_avg_update_time() => $"{to_ms_string(average_update_time)}, {to_ms_string(current_update_time)}";
+    public (double avg, double cur) get_avg_frame_time()  => (average_frame_time, current_frame_time);
+    public (double avg, double cur) get_avg_update_time() => (average_update_time, current_update_time);
 
-    public IEnumerable<(string name, string time)> get_top_avg_times(int count) => 
+    public IEnumerable<(string name, double avg, double cur)> get_top_avg_times(int count) => 
         frame_time_measures
             .OrderByDescending(x => x.Value.average)
             .Take(count)
-            .Select(x => (x.Key, $"{to_ms_string(x.Value.average)}, {to_ms_string(x.Value.current)}"))
+            .Select(x => (x.Key, x.Value.average, x.Value.current))
         ;
-
-    private static string to_ms_string(double ticks) => (Math.Floor(ticks / (Stopwatch.Frequency / 1_000_000.0)) / 1000.0).ToString() + "ms";
 
     static class Registry<T> where T : class, new()
     {

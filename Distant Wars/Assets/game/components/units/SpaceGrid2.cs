@@ -20,7 +20,9 @@ public class UnitsSpaceGrid2
 
     // Cell dynamic
     public byte[] cell_full_visibilities;
-    public bool[] cell_full_discoveries;
+    public bool[] cell_full_discoveries_by_local_player;
+
+    public Vector3[] vision_quads_vertices;
 
     // Cell static
     public Vector2[] cell_centers;

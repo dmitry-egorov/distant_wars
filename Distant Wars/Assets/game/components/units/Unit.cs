@@ -33,7 +33,10 @@ public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
     [Header("Visual State")]
     public bool IsHighlighted;
     public bool IsSelected;
+    
+    public bool ReceivedDamageSinceLastPresentation;
     public float BlinkTimeRemaining;
+    public bool IsBlinking;
 
     public void OnDrawGizmos()
     {
