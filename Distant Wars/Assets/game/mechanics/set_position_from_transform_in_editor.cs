@@ -1,5 +1,5 @@
 #if UNITY_EDITOR
-internal class set_position_from_transform_in_editor : MassiveMechanic
+internal class editor_set_position_from_transform : MassiveMechanic
 {
     public void _()
     {

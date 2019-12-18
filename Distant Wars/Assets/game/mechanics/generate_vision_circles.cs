@@ -45,83 +45,87 @@ public class generate_vision_circles : MassiveMechanic
         /* vision    circle index */ var vcircle_i = 0;
         /* discovery circle index */ var dcircle_i = 0;
 
-        // generate circles
+        var vcvrts = vision_circles_vertices;
+        var vctris = vision_circles_triangles;
+        var dcvrts = discovery_circles_vertices;
+        var dctris = discovery_circles_triangles;
+
+        /* visions count */ var vcount = oucount;
+        vcvrts.Clear();
+        vctris.Clear();
+        dcvrts.Clear();
+        dctris.Clear();
+        vcvrts.ReserveMemoryFor(vcount * 4);
+        vctris.ReserveMemoryFor(vcount * 6);
+        dcvrts.ReserveMemoryFor(vcount * 4);
+        dctris.ReserveMemoryFor(vcount * 6);
+
+        for (var i = 0; i < vcount; i++)
         {
-            var vcvrts = vision_circles_vertices;
-            var vctris = vision_circles_triangles;
-            var dcvrts = discovery_circles_vertices;
-            var dctris = discovery_circles_triangles;
+            /* unit          */ var u  = ounits[i];
+            /* vision radius */ var vrange = u.VisionRange;
+            /* vision radius */ var rrange = vrange + u.RadarRange;
+            var upos  = u.Position;
+            var upp   = u.PrevPosition;
+            var uipos = Vector2.Lerp(upp, upos, time_ratio);
+            
+            /* at least one cell of the circle is partially visible (not fully) */ 
+            var partially_visible = false;
 
-            /* visions count */ var vcount = oucount;
-            vcvrts.Clear();
-            vctris.Clear();
-            dcvrts.Clear();
-            dctris.Clear();
-            vcvrts.ReserveMemoryFor(vcount * 4);
-            vctris.ReserveMemoryFor(vcount * 6);
-            dcvrts.ReserveMemoryFor(vcount * 4);
-            dctris.ReserveMemoryFor(vcount * 6);
-
-            for (var i = 0; i < vcount; i++)
+            /* vision + cell radius ^2 */ var uvis_p_crad2 = (vrange + cell_radius).sqr();
+            var it = grid.get_iterator_of_circle(uipos, vrange);
+            while (it.next(out var cell_i))
             {
-                /* unit          */ var u  = ounits[i];
-                /* vision radius */ var vs = u.VisionRange;
-                var upos  = u.Position;
-                var upp   = u.PrevPosition;
-                var uipos = Vector2.Lerp(upp, upos, time_ratio);
-                
-                /* at least one cell of the circle is partially visible (not fully) */ 
-                var partially_visible = false;
-
-                /* own vision range ^2     */ var uvis2 = vs.sqr();
-                /* vision + cell radius ^2 */ var uvis_p_crad2 = (vs + cell_radius).sqr();
-                /* vision - cell radius    */ var uvis_m_crad  = vs - cell_radius;
-                /* vision - cell radius ^2 */ var uvis_m_crad2 = uvis_m_crad >= 0 ? uvis_m_crad.sqr() : -1;
-                var it = grid.get_iterator_of_circle(uipos, vs);
-                while (it.next(out var cell_i))
+                if (cell_i != 0) 
+                // is not the external cell
                 {
-                    if (cell_i != 0) // is the external cell
-                    {
-                        // cell is fully visible
-                        if ((cfviss[cell_i] & lpteam_mask) > 0)
-                            continue;
+                    // cell is fully visible
+                    if ((cfviss[cell_i] & lpteam_mask) > 0)
+                        continue;
 
-                        /* cell's center */ var ccenter = ccenters[cell_i];
-                        /* delta from unit to cell's center       */ var ucdelta = ccenter - upos;
-                        /* distance ^2 from unit to cell's center */ var ucdist2 = ucdelta.sqrMagnitude;
+                    /* cell's center */ var ccenter = ccenters[cell_i];
+                    /* delta from unit to cell's center       */ var ucdelta = ccenter - upos;
+                    /* distance ^2 from unit to cell's center */ var ucdist2 = ucdelta.sqrMagnitude;
 
-                        // cell is outside the vision circle
-                        if (ucdist2 > uvis_p_crad2)
-                            continue;
-                    }
-
-                    partially_visible = true;
-                    break;
+                    // cell is outside the vision circle
+                    if (ucdist2 > uvis_p_crad2)
+                        continue;
                 }
 
-                if (!partially_visible)
-                    continue;
+                partially_visible = true;
+                break;
+            }
 
-                var qmin = new Vector2(uipos.x - vs, uipos.y - vs);
-                var qmax = new Vector2(uipos.x + vs, uipos.y + vs);
+            if (!partially_visible)
+                continue;
 
-                var tl = new Vector3(uipos.x - vs, uipos.y + vs, 0);
-                var br = new Vector3(uipos.x + vs, uipos.y - vs, 3);
+            var qmin = new Vector2(uipos.x - vrange, uipos.y - vrange);
+            var qmax = new Vector2(uipos.x + vrange, uipos.y + vrange);
+
+            // is within the screen rect
+            if (ws.intersects(qmin, qmax))
+            {
+                var tl = new Vector3(uipos.x - vrange, uipos.y + vrange, 0);
                 var tr = qmax.xy(1);
                 var bl = qmin.xy(2);
+                var br = new Vector3(uipos.x + vrange, uipos.y - vrange, 3);
+                
+                vcvrts.Add(tl);
+                vcvrts.Add(tr);
+                vcvrts.Add(bl);
+                vcvrts.Add(br);
 
-                // is within the screen rect
-                if (ws.intersects(qmin, qmax))
-                {
-                    vcvrts.Add(tl);
-                    vcvrts.Add(tr);
-                    vcvrts.Add(bl);
-                    vcvrts.Add(br);
+                RenderHelper.add_quad(vctris, vcircle_i);
+                vcircle_i++;
+            }
 
-                    RenderHelper.add_quad(vctris, vcircle_i);
-                    vcircle_i++;
-                }
-
+            {
+                //PERF: don't draw circles fully covered by radar quads (right now only the ones covered by vision are eliminated)
+                var tl = new Vector3(uipos.x - rrange, uipos.y + rrange, 0);
+                var tr = new Vector3(uipos.x + rrange, uipos.y + rrange, 1);
+                var bl = new Vector3(uipos.x - rrange, uipos.y - rrange, 2);
+                var br = new Vector3(uipos.x + rrange, uipos.y - rrange, 3);
+                
                 dcvrts.Add(tl);
                 dcvrts.Add(tr);
                 dcvrts.Add(bl);
@@ -130,15 +134,15 @@ public class generate_vision_circles : MassiveMechanic
                 RenderHelper.add_quad(dctris, dcircle_i);
                 dcircle_i++;
             }
-
-            vcm.Clear();
-            vcm.SetVertices(vcvrts);
-            vcm.SetTriangles(vctris, 0, false);
-
-            dcm.Clear();
-            dcm.SetVertices(dcvrts);
-            dcm.SetTriangles(dctris, 0, false);
         }
+
+        vcm.Clear();
+        vcm.SetVertices(vcvrts);
+        vcm.SetTriangles(vctris, 0, false);
+
+        dcm.Clear();
+        dcm.SetVertices(dcvrts);
+        dcm.SetTriangles(dctris, 0, false);
         
         game.VisionCirclesCount = vcircle_i;
         game.DiscoveryCirclesCount = dcircle_i;

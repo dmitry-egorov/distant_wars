@@ -14,12 +14,13 @@ internal class init_new_units : MassiveMechanic
         /* local player's team mask */ var lp_team_mask = lp.Faction.Team.Mask;
 
         /* space grid */ var sg = ur.SpaceGrid;
-        /* grid positions      */ var guposs  = sg.unit_positions;
-        /* grid prev positions */ var gupposs = sg.unit_prev_positions;
-        /* grid team ids       */ var guteams = sg.unit_team_masks;
-        /* grid units          */ var gunits  = sg.unit_refs;
-        /* grid visiblities    */ var guviss  = sg.unit_visibilities;
-        /* grid cell count     */ var ccount  = guposs.Length;
+        /* grid positions      */ var guposs  = sg?.unit_positions;
+        /* grid prev positions */ var gupposs = sg?.unit_prev_positions;
+        /* grid team ids       */ var guteams = sg?.unit_team_masks;
+        /* grid units          */ var gunits  = sg?.unit_refs;
+        /* grid visiblities    */ var guviss  = sg?.unit_detections;
+        /* grid visiblities    */ var gudiss  = sg?.unit_discoveries;
+        /* grid cell count     */ var ccount  = guposs?.Length;
 
         foreach (var u in nu)
         {
@@ -40,18 +41,6 @@ internal class init_new_units : MassiveMechanic
                 u.OwnUnitsIndex = -1;
             }
 
-            /* unit's position */ var upos = u.Position;
-            var icell = sg.get_index_of(upos);
-
-            var cunits = gunits[icell];
-            u.SpaceGridIndex = (icell, cunits.Count);
-            cunits.Add(u);
-            guposs [icell].Add(upos);
-            gupposs[icell].Add(upos);
-            guteams[icell].Add(utmask);
-            guviss [icell].Add(utmask);
-
-
             #if UNITY_EDITOR
             if (Application.isPlaying)
             #endif
@@ -68,6 +57,18 @@ internal class init_new_units : MassiveMechanic
 
                 u.IncomingDamages = new LeakyList<int>(4);
                 u.HitPoints = u.MaxHitPoints;
+
+                /* unit's position */ var upos = u.Position;
+                var icell = sg.get_index_of(upos);
+
+                var cunits = gunits[icell];
+                u.SpaceGridIndex = (icell, cunits.Count);
+                cunits.Add(u);
+                guposs [icell].Add(upos);
+                gupposs[icell].Add(upos);
+                guteams[icell].Add(utmask);
+                guviss [icell].Add(utmask);
+                gudiss [icell].Add(utmask);
             }
         }
 

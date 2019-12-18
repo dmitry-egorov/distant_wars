@@ -14,12 +14,14 @@ public class UnitsSpaceGrid2
     // Units
     public LeakyList<Vector2>[] unit_positions;
     public LeakyList<Vector2>[] unit_prev_positions;
-    public LeakyList<byte>[]    unit_visibilities;
-    public LeakyList<byte>[]    unit_team_masks;
-    public List<Unit>[]         unit_refs;
+    public LeakyList<byte>[] unit_detections; // whether the unit is detected by radar or vision
+    public LeakyList<byte>[] unit_discoveries; // whether the unit is discovered, i.e. was in the vision range once
+    public LeakyList<byte>[] unit_team_masks;
+    public List<Unit>[] unit_refs;
 
     // Cell dynamic
     public byte[] cell_full_visibilities;
+    public byte[] cell_full_detections;
     public bool[] cell_full_discoveries_by_local_player;
 
     public Vector3[] vision_quads_vertices;

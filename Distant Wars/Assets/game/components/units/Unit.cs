@@ -6,12 +6,11 @@ public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
     [Header("Settings")]
     public float BaseSpeed;
     public float VisionRange;
+    public float RadarRange; // outside the vision range
     public float AttackRange;
     public float AttackCooldownTime;
-    public float AttackVelocity;
-    public int   AttackDamage;
-    public float ProjectileHeight;
-    public float ProjectileOffset;
+    public float ProjectileSpeed;
+    public int   ProjectileDamage;
     public Faction Faction;
     public int MaxHitPoints;
 

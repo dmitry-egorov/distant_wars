@@ -24,11 +24,13 @@ internal class init_discovery_texture : MassiveMechanic
             map.DiscoveryCamera.targetTexture = t;
             map.TexturesReady = false;
 
+            // reset discovery flags
+            // should instead copy discovery data from the old texture
             var grid = UnitsRegistry.Instance.SpaceGrid;
             var ds = grid.cell_full_discoveries_by_local_player;
             Array.Clear(ds, 0, ds.Length);
 
-            Debug.Log("Discovery texture resized");
+            map.DiscoveryCamera.enabled = true;
         }
     }
 

@@ -28,6 +28,7 @@ public class generate_vision_quads : MassiveMechanic
         /* units grid          */ var grid = ur.SpaceGrid;
         /* grid cell centers   */ var ccenters = grid.cell_centers;
         /* fully visible cells */ var cfviss   = grid.cell_full_visibilities;
+        /* fully visible cells */ var cfrviss  = grid.cell_full_detections;
         /* gird cell count     */ var ccount   = cfviss.Length;
         /* cell's radius       */ var cell_radius = grid.cell_radius;
 
@@ -51,24 +52,31 @@ public class generate_vision_quads : MassiveMechanic
             for (var cell_i = 1; cell_i < ccount; cell_i++)
             {
                 if ((cfviss[cell_i] & lpteam_mask) == 0)
-                    continue; // cell is not fully visible
+                // cell is not fully visible
+                    continue;
                 
-                /* cell center */ var c = ccenters[cell_i];
+                /* cell's center */ var c = ccenters[cell_i];
+
+                var within_screen = qscreen.contains(c);
+                if (within_screen)
+                // cell is visible on the screen
+                {
+                    RenderHelper.add_quad(vqtris, cell_i - 1);
+                    vquad_i++;
+                }
+
+                if ((cfrviss[cell_i] & lpteam_mask) == 0)
+                // cell is not fully visible on radar
+                    continue; 
 
                 var discovered = cdiscs_lp[cell_i];
                 if (!discovered)
+                // cell was not fully discovered before
                 {
                     RenderHelper.add_quad(dqtris, cell_i - 1);
                     dquad_i++;
 
                     cdiscs_lp[cell_i] = true;
-                }
-
-                var within_screen = qscreen.contains(c);
-                if (within_screen)
-                {
-                    RenderHelper.add_quad(vqtris, cell_i - 1);
-                    vquad_i++;
                 }
             }
 
@@ -76,7 +84,7 @@ public class generate_vision_quads : MassiveMechanic
             dqm.SetTriangles(dqtris, 0, false);
         }
 
-        /* grid cell size */ var gcsize = 0.5f * grid.cell_size;
+        /* grid cell size */ var gcsize = grid.cell_size;
         Shader.SetGlobalVector(grid_cell_size_id, new Vector4(gcsize.x, gcsize.y, 0, 0));
 
         var game = Game.Instance;

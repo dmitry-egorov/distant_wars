@@ -7,7 +7,6 @@
     SubShader
     {
         Tags { "RenderType"="Opaque" }
-        LOD 100
 
         Pass
         {
@@ -16,6 +15,7 @@
             #pragma fragment frag
             
             #include "UnityCG.cginc"
+            #include "Assets/Plugins/shader_common/shader_common.cginc"
 
             struct appdata
             {

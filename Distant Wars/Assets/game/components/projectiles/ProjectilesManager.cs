@@ -1,4 +1,5 @@
-﻿using Plugins.Lanski;
+﻿using System.Collections.Generic;
+using Plugins.Lanski;
 using UnityEngine;
 
 public class ProjectilesManager : RequiredSingleton<ProjectilesManager>
@@ -9,6 +10,7 @@ public class ProjectilesManager : RequiredSingleton<ProjectilesManager>
     public MeshRenderer SpritesRenderer;
 
     [Header("Data")]
+    public List<Unit> shooters;
     public LeakyList<Vector3> positions;
     public LeakyList<Vector2> prev_positions;
     public LeakyList<Vector3> directions;

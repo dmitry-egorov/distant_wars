@@ -1,4 +1,5 @@
 ﻿using Plugins.Lanski;
+using Plugins.Lanski.Space;
 using UnityEngine;
 
 public class Map : RequiredSingleton<Map>
@@ -19,15 +20,23 @@ public class Map : RequiredSingleton<Map>
     public MeshRenderer MapRenderer;
 
     [Header("State")]
-    public Texture2D map_texture;
+    public Texture2D MapTexture;
     public RenderTexture VisionTexture;
     public RenderTexture DiscoveryTexture;
 
+    public SpaceTransform2 world_to_map;
+    public SpaceTransform2 map_to_world;
+    public byte[] map_data;
+    public float cell_size;
+    public int width;
+    public int height;
+    public float ushort_z_scale;
+
     public void reload()
     {
-        if (map_texture == null)
+        if (MapTexture == null)
         {
-            map_texture = new Texture2D(Width, Height, TextureFormat.R16, false, true)
+            MapTexture = new Texture2D(Width, Height, TextureFormat.R16, false, true)
             {
                 name = "Height Map"
             };
@@ -35,28 +44,15 @@ public class Map : RequiredSingleton<Map>
 
         if (HeightMap != null)
         {
-            map_texture.LoadRawTextureData(HeightMap.bytes);
+            MapTexture.LoadRawTextureData(HeightMap.bytes);
         }
 
-        map_texture.filterMode = FilterMode.Point;
-        map_texture.anisoLevel = 0;
-        map_texture.Apply();
+        MapTexture.filterMode = FilterMode.Point;
+        MapTexture.anisoLevel = 0;
+        MapTexture.Apply();
 
-        Shader.SetGlobalTexture(_mapTex, map_texture);
+        Shader.SetGlobalTexture(_mapTex, MapTexture);
         Shader.SetGlobalFloat(map_scale_id, Scale);
-    }
-
-    public void initialize()
-    {
-        reload();
-
-        MapRenderer.transform.localScale = Scale.v3();
-        map_data = HeightMap.bytes;
-        cell_size = Scale / Width;
-        width = Width;
-        height = Height;
-        size = Scale;
-        ushort_z_scale = ZScale / (float)ushort.MaxValue;
     }
 
     public float slope(Vector2 position, Vector2 direction) => slope2(position, direction.normalized);
@@ -67,9 +63,9 @@ public class Map : RequiredSingleton<Map>
         var nd = normalized_direction;
 
         var coord = coord_of(p);
-        var offset = new Vector2Int(Mathf.RoundToInt(nd.x), Mathf.RoundToInt(nd.y));
+        var offset = Vector2Int.FloorToInt(nd);
         var ocoord = coord + offset;
-        var h = z(coord);
+        var h  = z(coord);
         var ho = z(ocoord);
 
         return (ho - h) / cell_size;
@@ -86,7 +82,8 @@ public class Map : RequiredSingleton<Map>
     public Vector2Int coord_of(Vector2 position)
     {
         var p = position;
-        return new Vector2Int(width / 2 + Mathf.RoundToInt(p.x / cell_size), height / 2 + Mathf.RoundToInt(p.y / cell_size));
+        var w2m = world_to_map;
+        return Vector2Int.FloorToInt(w2m.apply_to_point(p));
     }
 
     public float z(Vector2Int coord) => z(coord.x, coord.y);
@@ -96,18 +93,11 @@ public class Map : RequiredSingleton<Map>
         var w = width;
         var h = height;
 
-        if (x < 0 || x >= width || y < 0 || y >= height) return 0;
+        if (x < 0 || x >= w || y < 0 || y >= h) return 0;
         
         var i = 2 * (w * y + x);
         return (map_data[i] + (map_data[i + 1] << 8)) * ushort_z_scale;
     }
-
-    private byte[] map_data;
-    private float cell_size;
-    private int width;
-    private int height;
-    private float size;
-    private float ushort_z_scale;
 
     static readonly int _mapTex      = Shader.PropertyToID("_MapTex");
     static readonly int map_scale_id = Shader.PropertyToID("_MapScale");

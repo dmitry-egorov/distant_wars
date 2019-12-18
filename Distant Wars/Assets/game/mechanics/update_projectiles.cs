@@ -1,60 +1,75 @@
 ﻿using Plugins.Lanski;
+using UnityEngine;
 
 internal class update_projectiles : MassiveMechanic
 {
     public void _()
     {
         var pm  = ProjectilesManager.Instance;
-        /* positions  */ var poss  = pm.positions;
-        /* positions  */ var pposs = pm.prev_positions;
-        /* directions */ var dirs  = pm.directions;
-        /* speeds     */ var spds  = pm.speeds;
-        /* damages    */ var dmgs  = pm.damages;
-        /* count      */ var count = poss.Count;
-        /* hit radius */ var hradius  = pm.HitRadius;
+        /* shooters */ var pshooters = pm.shooters;
+        /* positions      */ var poss  = pm.positions;
+        /* prev positions */ var pposs = pm.prev_positions;
+        /* directions     */ var dirs  = pm.directions;
+        /* speeds         */ var spds  = pm.speeds;
+        /* damages        */ var dmgs  = pm.damages;
+        /* count          */ var count = poss.Count;
+        /* hit radius */ var hradius = pm.HitRadius;
 
-        /* delta time           */ var dt     = Game.Instance.DeltaTime;
-        /* map                  */ var map    = Map.Instance;
-        /* units registry       */ var ur     = UnitsRegistry.Instance;
-        /* units' space grids   */ var grid   = ur.SpaceGrid;
-        /* grid's unit postions */ var uposs  = grid.unit_positions;
-        /* grid's units         */ var units  = grid.unit_refs;
-        /* bounding radius ^2   */ var bradius2 = map.BoundingRadius.sqr();
+        /* delta time            */ var dt     = Game.Instance.DeltaTime;
+        /* map                   */ var map    = Map.Instance;
+        /* map 2 world transform */ var m2w    = map.map_to_world;
+        /* units registry        */ var ur     = UnitsRegistry.Instance;
+        /* units' space grids    */ var grid   = ur.SpaceGrid;
+        /* grid's unit postions  */ var uposs  = grid.unit_positions;
+        /* grid's units          */ var units  = grid.unit_refs;
+        /* bounding radius ^2    */ var bradius2 = map.BoundingRadius.sqr();
+
+        var em = ExplosionsManager.Instance;
+        var eposs   = em.positions;
+        var ertimes = em.remaining_times;
+        var edur    = em.ExplosionDuration;
 
         for (int iproj = 0; iproj < count;)
         {
-            /* projectile's position    */ var pos  = poss[iproj];
-            /* projectile's direction   */ var dir  = dirs[iproj];
+            /* projectiles's shooter    */ var shooter = pshooters[iproj];
+            /* projectile's position    */ var ppos3d  = poss[iproj];
+            /* projectile's direction   */ var pdir3d  = dirs[iproj];
             /* projectile's frame speed */ var spd  = spds[iproj] * dt;
-            /* next projectile point    */ var npos = pos + dir * spd;
+            /* next projectile point    */ var npos = ppos3d + pdir3d * spd;
+            /* hit position             */ var hit_pos = npos.xy();
             
-            var hit = false;
-
-            // check collision with units
+            var hit = check_cell(ppos3d) || check_cell(npos);
+            
+            bool check_cell(Vector2 p)
             {
-                //TODO?: check more than one cell
-                /* cell's index       */ var cell_i  = grid.get_index_of(npos);
+                /* cell's index       */ var cell_i  = grid.get_index_of(p);
                 /* cell's positions   */ var cupos   = uposs[cell_i];
                 /* cell's units       */ var cunits  = units[cell_i];
                 /* cell's units count */ var cucount = cupos.Count;
                 for (var unit_i = 0; unit_i < cucount; unit_i++)
                 {
-                    /* unit's position 2d */ var upos2 = cupos[unit_i];
-                    /* unit's position 3d */ var upos3 = map.xyz(upos2);
+                    var unit = cunits[unit_i];
+                    if (ReferenceEquals(unit, shooter))
+                        continue;
 
-                    hit = rays.try_intersect_sphere(pos, dir, upos3, hradius, out var t) && t >= 0 && t < spd;
-                    if (hit)
+                    /* unit's position 2d */ var upos2 = cupos[unit_i];
+                    /* unit's position 3d */ var upos3 = upos2.xy(map.z(upos2) + hradius);
+
+                    if (rays.try_intersect_sphere(ppos3d, pdir3d, spd, upos3, hradius, out var t))
                     {
-                        cunits[unit_i].IncomingDamages.Add(dmgs[iproj]);
-                        break;
+                        unit.IncomingDamages.Add(dmgs[iproj]);
+                        hit_pos = ppos3d + pdir3d * t;
+                        return true;
                     }
                 }
+
+                return false;
             }
 
             // check collision with the terrain
             if (!hit)
             {
-                /* projectiles int position      */ var cpc = map.coord_of(pos.xy());
+                /* projectiles int position      */ var cpc = map.coord_of(ppos3d.xy());
                 /* projectiles next int position */ var npc = map.coord_of(npos.xy());
 
                 var x0 = cpc.x;
@@ -79,10 +94,19 @@ internal class update_projectiles : MassiveMechanic
                     {
                         first = false;
                     }
-                    else if (npos.z <= map.z(x1, y1)) //TODO?: calculate z by interpolation
+                    else 
                     {
-                        hit = true;
-                        break;
+                        if (npos.z <= map.z(x1, y1)) //TODO?: calculate z by interpolation
+                        {
+                            /* projectile's position 2d */ var ppos2d  = ppos3d.xy();
+                            /* projectile's position 2d */ var pdir2d  = pdir3d.xy();
+                            /* cell's center            */ var ccenter = m2w.apply_to_point(x1, y1);
+                            /* delta to cell's center   */ var delta   = ccenter - ppos2d;
+                            /* projection of delta onto direction */ var dproj = Vector2.Dot(pdir2d, delta);
+                            hit = true;
+                            hit_pos = ppos2d + pdir2d * dproj;
+                            break;
+                        }
                     }
 
                     if (x0 == x1 && y0 == y1) break;
@@ -108,7 +132,11 @@ internal class update_projectiles : MassiveMechanic
 
             if (hit)
             {
+                eposs.Add(hit_pos);
+                ertimes.Add(edur);
+
                 // remove projectile
+                pshooters.ReplaceWithLast(iproj);
                 poss .ReplaceWithLast(iproj);
                 pposs.ReplaceWithLast(iproj);
                 dirs .ReplaceWithLast(iproj);

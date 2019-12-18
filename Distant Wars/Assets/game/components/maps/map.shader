@@ -27,6 +27,7 @@
         _VisionSaturation        ("Vision Saturation", Range(0, 1)) = 0.1
         _VisionSharpness         ("Vision Sharpness", Range(0, 16)) = 8
     }
+
     SubShader
     {
         Tags { "RenderType"="Opaque" }
@@ -40,30 +41,13 @@
             #pragma vertex vert
             #pragma fragment frag
 
+            #pragma shader_feature HIDE_MAP_VISION
+            #pragma multi_compile __ SHOW_SPACE_GRID
+            #pragma multi_compile __ SHOW_MAP_GRID
+
             #include "UnityCG.cginc"
+            #include "Assets/Plugins/shader_common/shader_common.cginc"
 
-            struct appdata
-            {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
-            };
-
-            struct v2f
-            {
-                float4 vertex : SV_POSITION;
-                float2 uv : TEXCOORD0;
-                float2 screenPos : TEXCOORD1;
-            };
-
-            sampler2D _MapTex;
-            float4 _MapTex_ST;
-            float4 _MapTex_TexelSize;
-            sampler2D _VisionTex;
-            float4 _VisionTex_ST;
-            float4 _VisionTex_TexelSize;
-            sampler2D _DiscoveryTex;
-            float4 _DiscoveryTex_ST;
-            float4 _DiscoveryTex_TexelSize;
             float4 _TopLandColor;
             float4 _BottomLandColor;
             float4 _ShallowSeaColor;
@@ -88,11 +72,18 @@
             float _VisionBrightness;
             float _VisionSaturation;
             float _VisionSharpness;
-            
-            /* square value */                        float sqr(float v) { return v * v; }
-            /* smooth step within [min,max] */        float sstep(float min, float max, float width) { return smoothstep(min - width, min + width, max); }
-            /* remap value from [min,max] to [0,1] */ float remap01(float v, float min, float max) { return (v - min) / (max - min); }
-            /* saturate or clamp to [0,1] */          float sat(float v) { return saturate(v); }
+
+            sampler2D _MapTex;
+            float4 _MapTex_ST;
+            float4 _MapTex_TexelSize;
+            sampler2D _VisionTex;
+            float4 _VisionTex_ST;
+            float4 _VisionTex_TexelSize;
+            sampler2D _DiscoveryTex;
+            float4 _DiscoveryTex_ST;
+            float4 _DiscoveryTex_TexelSize;
+
+            float2 _GridCellSize;
             
             float border(float2 uv)
             {
@@ -248,15 +239,30 @@
                 
                 return /* shadow color */ 1 - si * sstep(hbr, htl, 0.001);
             }
+
+            #if SHOW_SPACE_GRID
+            float space_grid(/* world position */ float2 wp)
+            {
+                float2 gp =  wp / _GridCellSize;
+                float2 fr = frac(gp);
+                float  w  = 0.005;
+                //return sstep(w, fr.x, w / 2) * sstep(w, fr.y, w / 2);
+                return sstep(w, fr.x, w / 2) 
+                     * sstep(w, fr.y, w / 2)
+                     * sstep(fr.x, 1 - w, w / 2)
+                     * sstep(fr.y, 1 - w, w / 2)
+                ;
+            }
+            #endif
             
-            float grid(float2 uv)
+            #if SHOW_MAP_GRID
+            float map_grid(float2 uv)
             {
                 float2  ts = _MapTex_TexelSize.xy;
                 float   tx = ts.x;
                 float   ty = ts.y;
                 float    w = 0.05;
                 float2 suv = frac(uv / ts);
-                //float /* shadow's intensity */   si = _ShadowIntensity;
                 return /* grid color */ 
                 1 - 
                 (
@@ -266,6 +272,7 @@
                     * step(suv.y, 0.5 + w)
                 );
             }
+            #endif
 
             float3 vision(float /* discovery */ d, float /* vision */ v, float3 /* map color */ mc)
             {
@@ -280,34 +287,55 @@
                 return lerp(bgd, lerp(fgc,  mc, pow(v, shrp)), pow(max(d, v), shrp));
             }
 
+            struct appdata
+            {
+                float4 vertex : POSITION;
+                float2 uv : TEXCOORD0;
+            };
+
+            struct v2f
+            {
+                float4 vertex : SV_POSITION;
+                float2 uv : TEXCOORD0; // texture coordinates
+                float2 wp : TEXCOORD1; // world position
+            };
+
             v2f vert (appdata v)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MapTex);
-                o.screenPos = ComputeScreenPos(o.vertex);
+                o.wp = mul(unity_ObjectToWorld, v.vertex).xy;
                 return o;
             }
 
             float4 frag (v2f i) : SV_Target
             {
                 float2 uv = i.uv;
-                /* vision    */ float v = filtered_vision_texture_fetch(uv).x;
-                /* discovery */ float d = filtered_discovery_texture_fetch(uv).x;
                 
-                if (d == 0.0) discard;
-
                 float3 /* map color */ mc = 1
                     * border(uv)
                     * topo_line(uv)
                     * terrain(uv)
                     * shadow(uv)
-                    //* grid(uv)
+                    #if SHOW_SPACE_GRID
+                    * space_grid(i.wp)
+                    #endif
+                    #if SHOW_MAP_GRID
+                    * map_grid(uv)
+                    #endif
                 ;
 
-                float3 fc = vision(d, v, mc);
+                #if !HIDE_MAP_VISION
+                    /* vision    */ float v = filtered_vision_texture_fetch(uv).x;
+                    /* discovery */ float d = filtered_discovery_texture_fetch(uv).x;
+                    
+                    if (d == 0.0) discard;
+                    
+                    mc = vision(d, v, mc);
+                #endif
                 
-                return float4(fc, 1);
+                return float4(mc, 1);
             }
             ENDCG
         }

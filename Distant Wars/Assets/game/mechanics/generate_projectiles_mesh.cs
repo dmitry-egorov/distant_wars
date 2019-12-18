@@ -15,15 +15,17 @@ public class generate_projectiles_mesh : MassiveMechanic
         /* units' registry */ var pm = ProjectilesManager.Instance;
 
         var time_ratio = Game.Instance.PresentationToSimulationFrameTimeRatio;
+        var cam = StrategicCamera.Instance;
+        /* sprite size multiplier*/ var ssizem = cam.SpriteSizeMultiplier;
 
         // generate sprites
         var sm = pm.SpritesMesh;
         var sv = sprite_vertices;
         var st = sprite_triangles;
 
-        /* positions     */ var ps  = pm.positions;
-        /* positions     */ var pps = pm.prev_positions;
-        /* sprites count */ var sc  = ps.Count;
+        /* positions      */ var ps  = pm.positions;
+        /* prev positions */ var pps = pm.prev_positions;
+        /* sprites count  */ var sc  = ps.Count;
 
         sv.Clear();
         st.Clear();
@@ -50,12 +52,11 @@ public class generate_projectiles_mesh : MassiveMechanic
         sm.SetVertices(sv);
         sm.SetTriangles(st, 0, false);
 
-        Shader.SetGlobalFloat(bullets_size_id, pm.SpriteSize * (Screen.height / 1080));
+        Shader.SetGlobalFloat(bullets_size_id, pm.SpriteSize * ssizem);
     }
     
     private List<Vector3> sprite_vertices;
     private List<int> sprite_triangles;
 
     static readonly int bullets_size_id = Shader.PropertyToID("_BulletsSize");
-
 }

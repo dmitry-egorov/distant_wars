@@ -17,8 +17,7 @@
             #pragma fragment frag
             
             #include "UnityCG.cginc"
-
-            float sstep(float min, float max, float width) { return smoothstep(min - width, min + width, max); }
+            #include "Assets/Plugins/shader_common/shader_common.cginc"
 
             struct appdata
             {
@@ -44,10 +43,9 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
-                float x = i.uv.x;
-                float y = i.uv.y;
-                float w = fwidth(x) * 2;
-                float v = sstep(x*x + y*y, 0.5*0.5, w);
+                float2 uv = i.uv;
+                float w = fwidth(uv.x) * 2;
+                float v = sstep(dot(uv, uv), 0.5*0.5, w);
                 if (v == 0) discard;
                 return float4(v,v,v,1);
             }

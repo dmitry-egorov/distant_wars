@@ -38,12 +38,15 @@ internal class show_debug_text : MassiveMechanic
 
         sb.Append("\ntotal units: ");       sb.Append(ur.Units.Count);
         sb.Append("\ntotal projectiles: "); sb.Append(ProjectilesManager.Instance.positions.Count);
+        sb.Append("\ntotal explosions: ");  sb.Append(ExplosionsManager.Instance.positions.Count);
 
-        sb.Append("\nvision:");
+        sb.Append("\nsprites:");
         sb.Append("\n\tvision circles: ");    sb.Append(g.VisionCirclesCount);
         sb.Append("\n\tvision quads: ");      sb.Append(g.VisionQuadsCount);
         sb.Append("\n\tdiscovery circles: "); sb.Append(g.DiscoveryCirclesCount);
         sb.Append("\n\tdiscovery quads: ");   sb.Append(g.DiscoveryQuadsCount);
+        sb.Append("\n\tunits: ");             sb.Append(g.UnitSpritesCount);
+        sb.Append("\n\thp bars: ");           sb.Append(g.HPBarsCount);
 
         set_text("stats", sb.ToString());
     }

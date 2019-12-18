@@ -15,6 +15,7 @@
             #pragma fragment frag
             
             #include "UnityCG.cginc"
+            #include "Assets/Plugins/shader_common/shader_common.cginc"
 
             struct appdata
             {

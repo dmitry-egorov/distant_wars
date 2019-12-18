@@ -7,7 +7,6 @@
     {
         Tags { "RenderType"="Opaque" }
         ZTest Off
-        Cull Off
 
         Pass
         {
@@ -16,6 +15,7 @@
             #pragma fragment frag
             
             #include "UnityCG.cginc"
+            #include "Assets/Plugins/shader_common/shader_common.cginc"
 
             struct appdata
             {
@@ -35,7 +35,7 @@
                 v2f o;
 
                 float  i = v.vertex.z;
-                float2 p = v.vertex.xy + _GridCellSize * float2(4 * frac(i / 2) - 1.0, -2 * floor(i / 2) + 1.0);
+                float2 p = v.vertex.xy + _GridCellSize * float2(2 * frac(i / 2) - 0.5, -floor(i / 2) + 0.5);
                 o.vertex = UnityObjectToClipPos(float3(p, 0));
                 return o;
             }

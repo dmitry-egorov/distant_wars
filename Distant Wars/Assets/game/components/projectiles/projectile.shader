@@ -18,8 +18,7 @@
             #pragma fragment frag
             
             #include "UnityCG.cginc"
-            
-            float sstep(float min, float max, float width) { return smoothstep(min - width, min + width, max); }
+            #include "Assets/Plugins/shader_common/shader_common.cginc"
 
             struct appdata
             {

@@ -31,12 +31,14 @@ internal class init_space_grid : MassiveMechanic
             var gccount = sz.x * sz.y + 1;
             var guposs  = grid.unit_positions      = new LeakyList<Vector2>[gccount];
             var gupposs = grid.unit_prev_positions = new LeakyList<Vector2>[gccount];
-            var guviss  = grid.unit_visibilities   = new LeakyList<byte>[gccount];
+            var gudets  = grid.unit_detections     = new LeakyList<byte>[gccount];
+            var gudiss  = grid.unit_discoveries    = new LeakyList<byte>[gccount];
             var guteams = grid.unit_team_masks     = new LeakyList<byte>[gccount];
             var gunits  = grid.unit_refs           = new List<Unit>[gccount];
 
             var cc = grid.cell_centers = new Vector2[gccount];
             grid.cell_full_visibilities = new byte[gccount];
+            grid.cell_full_detections = new byte[gccount];
             grid.cell_full_discoveries_by_local_player = new bool[gccount];
             var vqvrts = grid.vision_quads_vertices = new Vector3[4 * (gccount - 1)];
 
@@ -55,7 +57,8 @@ internal class init_space_grid : MassiveMechanic
 
                 guposs [cell_i] = new LeakyList<Vector2>();
                 gupposs[cell_i] = new LeakyList<Vector2>();
-                guviss [cell_i] = new LeakyList<byte>();
+                gudets [cell_i] = new LeakyList<byte>();
+                gudiss [cell_i] = new LeakyList<byte>();
                 guteams[cell_i] = new LeakyList<byte>();
                 gunits [cell_i] = new List<Unit>();
             }
@@ -76,10 +79,9 @@ internal class init_space_grid : MassiveMechanic
                 guposs [ui].Add(pos);
                 gupposs[ui].Add(pos);
                 guteams[ui].Add(uteam);
-                guviss [ui].Add(uteam);
+                gudets [ui].Add(uteam);
+                gudiss [ui].Add(uteam);
             }
-
-            Debug.Log("Space grid resized");
         }
     }
 }

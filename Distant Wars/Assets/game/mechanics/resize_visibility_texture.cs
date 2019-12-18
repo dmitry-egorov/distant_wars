@@ -21,8 +21,8 @@ internal class init_vision_texture : MassiveMechanic
             Shader.SetGlobalTexture(_visionTex, t);
             map.VisionTexture = t;
             map.VisionCamera.targetTexture = t;
-            
-            Debug.Log("Vision texture resized");
+
+            map.VisionCamera.enabled = true;
         }
     }
 

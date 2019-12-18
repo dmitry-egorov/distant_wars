@@ -14,7 +14,8 @@ public class cleanup_units : MassiveMechanic
         /* grid prev positions */ var gupposs = sg.unit_prev_positions;
         /* grid team ids       */ var guteams = sg.unit_team_masks;
         /* grid units          */ var gunits  = sg.unit_refs;
-        /* grid visiblities    */ var guviss  = sg.unit_visibilities;
+        /* grid visiblities    */ var guviss  = sg.unit_detections;
+        /* grid visiblities    */ var gudiss  = sg.unit_discoveries;
 
         for (int i = 0; i < us.Count; i++)
         {
@@ -33,6 +34,7 @@ public class cleanup_units : MassiveMechanic
                     gupposs[icell].ReplaceWithLast(icunit);
                     guteams[icell].ReplaceWithLast(icunit);
                     guviss [icell].ReplaceWithLast(icunit);
+                    gudiss [icell].ReplaceWithLast(icunit);
 
                     // fix the id of the replacing unit
                     if (icunit < cunits.Count) cunits[icunit].SpaceGridIndex.index = icunit;

@@ -11,6 +11,7 @@ namespace Plugins.Lanski.Space
         }
 
         public Vector2 apply_to_point(Vector2 v) => v * multiplier + offset;
+        public Vector2 apply_to_point(float x, float y) => apply_to_point(MathEx.v2(x, y));
         public Vector2 apply_to_direction(Vector2 v) => v * multiplier;
         public SpaceTransform2 inverse() => new SpaceTransform2(multiplier.mul_invers(), -offset / multiplier);
 

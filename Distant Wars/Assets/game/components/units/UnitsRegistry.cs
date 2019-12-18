@@ -13,8 +13,16 @@ public class UnitsRegistry: MassiveRegistry<UnitsRegistry, Unit>
     public float DamageBlinkHideTime  = 0.1f;
     public float DamageBlinkShowTime  = 0.3f;
 
+    public float HPBarMaxCamZoomLevel = 0.2f;
+    public float HPBarWidthPx;
+    public float HPBarHeightPx;
+    public float HPBarOffsetPx;
+
+    public bool PredictTargetPosition;
+
     [Header("Dependencies")]
     public MeshRenderer SpritesRenderer;
+    public MeshRenderer HPSpritesRenderer;
     public MeshRenderer VisionCirclesRenderer;
     public MeshRenderer VisionQuadsRenderer;
     public MeshRenderer DiscoveryCirclesRenderer;
@@ -29,4 +37,7 @@ public class UnitsRegistry: MassiveRegistry<UnitsRegistry, Unit>
     public Mesh VisionQuadsMesh;
     public Mesh DiscoveryCirclesMesh;
     public Mesh DiscoveryQuadsMesh;
+    public Mesh HPSpritesMesh;
+
+    public float AdjustedSpriteSize;
 }

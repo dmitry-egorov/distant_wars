@@ -13,8 +13,6 @@ namespace Plugins.Lanski
 
         public int Count => count;
 
-        
-
         public ref T this[int i] => ref data[i];
 
         public void Add(T item)

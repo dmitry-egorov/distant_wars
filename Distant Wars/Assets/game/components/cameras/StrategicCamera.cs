@@ -22,6 +22,7 @@ public partial class StrategicCamera : RequiredSingleton<StrategicCamera>
     public UniformSpaceTransform2 WorldToScreenTransform;
     public UniformSpaceTransform2 ScreenToWorldTransform;
     public Vector2Int ScreenResolution;
+    public int SpriteSizeMultiplier;
     public FRect WorldScreen;
 
     public float SizeProportion => Size / MaxOrthographicSize;
