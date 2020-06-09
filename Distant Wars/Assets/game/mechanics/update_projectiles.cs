@@ -6,45 +6,46 @@ internal class update_projectiles : IMassiveMechanic
     public void _()
     {
         var pm  = ProjectilesManager.Instance;
-        /* shooters */ var pshooters = pm.shooters;
-        /* positions      */ var poss  = pm.positions;
-        /* prev positions */ var pposs = pm.prev_positions;
-        /* directions     */ var dirs  = pm.directions;
-        /* speeds         */ var speeds  = pm.speeds;
-        /* damages        */ var dmgs  = pm.damages;
-        /* count          */ var count = poss.Count;
-        /* hit radius */ var hradius = pm.HitRadius;
+        /* shooters       */ var proj_shooters = pm.shooters;
+        /* positions      */ var proj_poss = pm.positions;
+        /* prev positions */ var proj_prev_poss = pm.prev_positions;
+        /* directions     */ var proj_dirs = pm.directions;
+        /* speeds         */ var proj_speeds = pm.speeds;
+        /* damages        */ var proj_damages = pm.damages;
+        
+        /* count          */ var proj_count = proj_poss.Count;
+        /* hit radius     */ var hit_radius = pm.HitRadius;
 
         /* delta time            */ var dt = Game.Instance.DeltaTime;
         /* map                   */ var map = Map.Instance;
         /* map 2 world transform */ var m2w = map.map_to_world;
         /* units registry        */ var ur = UnitsRegistry.Instance;
         /* units' space grids    */ var grid = ur.all_units_grid;
-        /* grid's unit positions */ var uposs  = grid.unit_positions;
-        /* grid's units          */ var units  = grid.unit_refs;
-        /* bounding radius ^2    */ var bradius_sqr = map.BoundingRadius.sqr();
+        /* grid's unit positions */ var unit_poss = grid.unit_positions;
+        /* grid's units          */ var unit_refs = grid.unit_refs;
+        /* bounding radius ^2    */ var bound_radius_sqr = map.BoundingRadius.sqr();
 
         var em = ExplosionsManager.Instance;
         var expl_poss = em.positions;
         var expl_rem_times = em.remaining_times;
         var expl_duration    = em.ExplosionDuration;
 
-        for (var proj_i = 0; proj_i < count;)
+        for (var proj_i = 0; proj_i < proj_count;)
         {
-            /* projectiles's shooter    */ var shooter = pshooters[proj_i];
-            /* projectile's position    */ var proj_pos_3d = poss[proj_i];
-            /* projectile's direction   */ var proj_dir_3d = dirs[proj_i];
-            /* projectile's frame speed */ var proj_speed = speeds[proj_i] * dt;
-            /* next projectile point    */ var npos = proj_pos_3d + proj_dir_3d * proj_speed;
-            /* hit position             */ var hit_pos = npos.xy();
+            /* projectiles's shooter    */ var shooter = proj_shooters[proj_i];
+            /* projectile's position    */ var proj_pos_3d = proj_poss[proj_i];
+            /* projectile's direction   */ var proj_dir_3d = proj_dirs[proj_i];
+            /* projectile's frame speed */ var proj_speed = proj_speeds[proj_i] * dt;
+            /* next projectile point    */ var proj_next_pos = proj_pos_3d + proj_dir_3d * proj_speed;
+            /* hit position             */ var hit_pos = proj_next_pos.xy();
             
-            var hit = check_cell(proj_pos_3d) || check_cell(npos);
+            var hit = check_cell(proj_pos_3d) || check_cell(proj_next_pos);
             
             bool check_cell(Vector2 p)
             {
                 /* cell's index       */ var cell_i  = grid.get_index_of(p);
-                /* cell's positions   */ var cupos   = uposs[cell_i];
-                /* cell's units       */ var cunits  = units[cell_i];
+                /* cell's positions   */ var cupos = unit_poss[cell_i];
+                /* cell's units       */ var cunits= unit_refs[cell_i];
                 /* cell's units count */ var cucount = cupos.Count;
                 for (var unit_i = 0; unit_i < cucount; unit_i++)
                 {
@@ -53,11 +54,11 @@ internal class update_projectiles : IMassiveMechanic
                         continue;
 
                     /* unit's position 2d */ var upos2 = cupos[unit_i];
-                    /* unit's position 3d */ var upos3 = upos2.xy(map.z(upos2) + hradius);
+                    /* unit's position 3d */ var upos3 = upos2.xy(map.z(upos2) + hit_radius);
 
-                    if (rays.try_intersect_sphere(proj_pos_3d, proj_dir_3d, proj_speed, upos3, hradius, out var t))
+                    if (rays.try_intersect_sphere(proj_pos_3d, proj_dir_3d, proj_speed, upos3, hit_radius, out var t))
                     {
-                        unit.incoming_damages.Add(dmgs[proj_i]);
+                        unit.incoming_damages.Add(proj_damages[proj_i]);
                         hit_pos = proj_pos_3d + proj_dir_3d * t;
                         return true;
                     }
@@ -70,7 +71,7 @@ internal class update_projectiles : IMassiveMechanic
             if (!hit)
             {
                 /* projectiles int position      */ var cpc = map.coord_of(proj_pos_3d.xy());
-                /* projectiles next int position */ var npc = map.coord_of(npos.xy());
+                /* projectiles next int position */ var npc = map.coord_of(proj_next_pos.xy());
 
                 var x0 = cpc.x;
                 var y0 = cpc.y;
@@ -96,7 +97,7 @@ internal class update_projectiles : IMassiveMechanic
                     }
                     else 
                     {
-                        if (npos.z <= map.z(x1, y1)) //TODO?: calculate z by interpolation
+                        if (proj_next_pos.z <= map.z(x1, y1)) //TODO?: calculate z by interpolation
                         {
                             /* projectile's position 2d */ var proj_pos_2d  = proj_pos_3d.xy();
                             /* projectile's position 2d */ var proj_dir_2d  = proj_dir_3d.xy();
@@ -125,7 +126,7 @@ internal class update_projectiles : IMassiveMechanic
                 }
             }
 
-            if (!hit && npos.xy().sqrMagnitude > bradius_sqr)
+            if (!hit && proj_next_pos.xy().sqrMagnitude > bound_radius_sqr)
             {
                 hit = true;
             }
@@ -136,19 +137,19 @@ internal class update_projectiles : IMassiveMechanic
                 expl_rem_times.Add(expl_duration);
 
                 // remove projectile
-                pshooters.ReplaceWithLast(proj_i);
-                poss.ReplaceWithLast(proj_i);
-                pposs.ReplaceWithLast(proj_i);
-                dirs.ReplaceWithLast(proj_i);
-                dmgs.ReplaceWithLast(proj_i);
-                speeds.ReplaceWithLast(proj_i);
-                count--;
+                proj_shooters.ReplaceWithLast(proj_i);
+                proj_poss.ReplaceWithLast(proj_i);
+                proj_prev_poss.ReplaceWithLast(proj_i);
+                proj_dirs.ReplaceWithLast(proj_i);
+                proj_damages.ReplaceWithLast(proj_i);
+                proj_speeds.ReplaceWithLast(proj_i);
+                proj_count--;
             }
             else
             {
                 // update position
-                pposs[proj_i] = poss[proj_i].xy();
-                poss [proj_i] = npos;
+                proj_prev_poss[proj_i] = proj_poss[proj_i].xy();
+                proj_poss [proj_i] = proj_next_pos;
                 proj_i++;
             }
         }

@@ -1,18 +1,20 @@
-- move command visual feedback
-- different types of units (visually)
-- render undiscovered units as gray
 - buildings
-  - factory
-  - builder
-  - hauler
-  - metal gatherer
-  - energy gatherer
+- factory
+- building units
+- builder
+- hauler
+- metal mine
+- energy farm
+- different types of units (visually)
+- move command visual feedback
+- render undiscovered units as gray
 - unit info
 - ballistics
 - decals and procedural texture for flat surfaces
 - hide projectiles outside radar range
 - show radar range
 - unit stop and pause
+- interpolate map height
 
 - store unit's interpolated positions?
 - unity math, jobs, arrays?
