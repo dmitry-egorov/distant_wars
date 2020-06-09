@@ -1,6 +1,6 @@
 using UnityEngine;
 
-internal class prepare_mouse_clicking : MassiveMechanic
+internal class prepare_mouse_clicking : IMassiveMechanic
 {
     public void _()
     {

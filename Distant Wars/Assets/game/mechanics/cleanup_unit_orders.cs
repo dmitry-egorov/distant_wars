@@ -1,9 +1,9 @@
-internal class cleanup_unit_orders : MassiveMechanic
+internal class cleanup_unit_orders : IMassiveMechanic
 {
     public void _()
     {
         /* units' registry */ var ur = UnitsRegistry.Instance;
-        /* units           */ var us = ur.Units;
+        /* units           */ var us = ur.all_units;
         
         // clean up orders with destroyed targets
         foreach(var u in us)

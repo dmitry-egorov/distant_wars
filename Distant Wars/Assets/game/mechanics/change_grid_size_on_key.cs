@@ -1,6 +1,6 @@
 using UnityEngine;
 
-internal class change_grid_size_on_key : MassiveMechanic
+internal class change_grid_size_on_key : IMassiveMechanic
 {
     public void _()
     {

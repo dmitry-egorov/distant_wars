@@ -2,7 +2,7 @@
 using Plugins.Lanski;
 using UnityEngine;
 
-public class generate_vision_circles : MassiveMechanic
+public class generate_vision_circles : IMassiveMechanic
 {
     public generate_vision_circles()
     {
@@ -25,18 +25,18 @@ public class generate_vision_circles : MassiveMechanic
         var time_ratio = game.PresentationToSimulationFrameTimeRatio;
 
         /* units' registry  */ var ur  = UnitsRegistry.Instance;
-        /* vision circles mesh    */ var vcm = ur.VisionCirclesMesh;
-        /* discovery circles mesh */ var dcm = ur.DiscoveryCirclesMesh;
+        /* vision circles mesh    */ var vcm = ur.vision_circles_mesh;
+        /* discovery circles mesh */ var dcm = ur.discovery_circles_mesh;
         
-        /* units            */ var ounits = ur.OwnTeamUnits;
+        /* units            */ var ounits = ur.local_team_units;
         /* own unit's count */ var oucount = ounits.Count;
 
         /* local player        */ var lp = LocalPlayer.Instance;
         /* local player's team */ var lpteam_mask = lp.Faction.Team.Mask;
 
-        /* units grid          */ var grid = ur.SpaceGrid;
+        /* units grid          */ var grid = ur.all_units_grid;
         /* grid cell centers   */ var ccenters = grid.cell_centers;
-        /* fully visible cells */ var cfviss   = grid.cell_full_visibilities;
+        /* fully visible cells */ var cfviss   = grid.cell_full_visibilities_by_team;
         /* cell's radius       */ var cell_radius = grid.cell_radius;
 
         /* strategic camera */ var sc = StrategicCamera.Instance;

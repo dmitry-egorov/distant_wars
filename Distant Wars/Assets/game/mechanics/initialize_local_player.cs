@@ -1,6 +1,6 @@
 using Plugins.Lanski;
 
-internal class init_local_player : MassiveMechanic
+internal class init_local_player : IMassiveMechanic
 {
     public void _()
     {

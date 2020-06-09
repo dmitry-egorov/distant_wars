@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-internal class pause_on_key : MassiveMechanic
+internal class pause_on_key : IMassiveMechanic
 {
     public void _()
     {

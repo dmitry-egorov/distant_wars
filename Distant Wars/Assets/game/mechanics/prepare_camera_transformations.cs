@@ -1,7 +1,7 @@
 using Plugins.Lanski.Space;
 using UnityEngine;
 
-internal class prepare_camera_transformations: MassiveMechanic
+internal class prepare_camera_transformations: IMassiveMechanic
 {
     public void _()
     {

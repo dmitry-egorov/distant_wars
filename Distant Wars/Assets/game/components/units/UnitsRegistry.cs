@@ -8,6 +8,12 @@ public class UnitsRegistry: MassiveRegistry<UnitsRegistry, Unit>
     public float ScreenSelectionDistance = 1f;
     public int   SpaceGridWidth  = 100;
     public int   SpaceGridHeight = 100;
+    
+    public float GuardApproachDistance = 2.0f;
+    public float AttackApproachDistanceMargin = 5.0f;
+    public float MovementEasingDistance = 2f;
+    public float MovementStoppingDistance = 0.5f;
+    public float SlopeSlowdown = 0.5f;
 
     public int   DamageBlinkCount = 3;
     public float DamageBlinkHideTime  = 0.1f;
@@ -29,15 +35,15 @@ public class UnitsRegistry: MassiveRegistry<UnitsRegistry, Unit>
     public MeshRenderer DiscoveryQuadsRenderer;
 
     [Header("State")]
-    public List<Unit> Units;
-    public List<Unit> OwnTeamUnits;
-    public UnitsSpaceGrid2 SpaceGrid;
-    public Mesh SpritesMesh;
-    public Mesh VisionCirclesMesh;
-    public Mesh VisionQuadsMesh;
-    public Mesh DiscoveryCirclesMesh;
-    public Mesh DiscoveryQuadsMesh;
-    public Mesh HPSpritesMesh;
+    public List<Unit> all_units;
+    public List<Unit> local_team_units;
+    public UnitsSpaceGrid2 all_units_grid;
+    public Mesh sprites_mesh;
+    public Mesh vision_circles_mesh;
+    public Mesh vision_quads_mesh;
+    public Mesh discovery_circles_mesh;
+    public Mesh discovery_quads_mesh;
+    public Mesh hp_sprites_mesh;
 
-    public float AdjustedSpriteSize;
+    public float adjusted_sprite_size;
 }

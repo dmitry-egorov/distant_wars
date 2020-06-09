@@ -1,53 +1,52 @@
+using System.Collections.Generic;
 using Plugins.Lanski;
 using UnityEngine;
 
-public class cleanup_dead_units : MassiveMechanic
+public class cleanup_dead_units : IMassiveMechanic
 {
     public void _() 
     {
         var ur = UnitsRegistry.Instance;
-        var us = ur.Units;
-        var ous = ur.OwnTeamUnits;
+        var us = ur.all_units;
+        var own_units = ur.local_team_units;
 
-        /* space grid */ var sg  = ur.SpaceGrid;
-        /* grid positions      */ var guposs  = sg.unit_positions;
-        /* grid prev positions */ var gupposs = sg.unit_prev_positions;
-        /* grid team ids       */ var guteams = sg.unit_teams;
-        /* grid units          */ var gunits  = sg.unit_refs;
-        /* grid visiblities    */ var guviss  = sg.unit_detections_by_team;
-        /* grid visiblities    */ var gudiss  = sg.unit_indentifications_by_team;
+        /* space grid */ var grid  = ur.all_units_grid;
+        var grid_unit_poss  = grid.unit_positions;
+        var grid_unit_prev_poss = grid.unit_prev_positions;
+        var grid_unit_teams = grid.unit_teams;
+        var grid_unit_refs  = grid.unit_refs;
+        var grid_unit_detects  = grid.unit_detections_by_team;
+        var grid_unit_idents  = grid.unit_identifications_by_team;
 
         for (var i = 0; i < us.Count; i++)
         {
             var u = us[i];
-            if (u.hit_points > 0) 
+            if (u.hit_points > 0)
                 continue;
             
             // remove from units
             us.ReplaceWithLast(i);
 
-            // delete from space grid
-            {
-                var (icell, icunit) = u.space_grid_index;
-                var cunits = gunits[icell];
-                cunits.ReplaceWithLast(icunit);
-                guposs [icell].ReplaceWithLast(icunit);
-                gupposs[icell].ReplaceWithLast(icunit);
-                guteams[icell].ReplaceWithLast(icunit);
-                guviss [icell].ReplaceWithLast(icunit);
-                gudiss [icell].ReplaceWithLast(icunit);
+            var (cell_i, unit_i) = u.space_grid_index;
 
-                // fix the id of the replacing unit
-                if (icunit < cunits.Count) cunits[icunit].space_grid_index.index = icunit;
-            }
-                
+            UnitsSpaceGrid2.remove_unit_from_cell
+            (
+                unit_i
+                , grid_unit_refs[cell_i]
+                ,grid_unit_poss[cell_i]
+                , grid_unit_prev_poss[cell_i]
+                , grid_unit_teams[cell_i]
+                , grid_unit_detects[cell_i]
+                , grid_unit_idents[cell_i]
+            );
+
             // remove from own units
             {
-                var otuindex = u.own_units_index;
-                if (otuindex != -1)
+                var own_units_i = u.own_units_index;
+                if (own_units_i != -1)
                 {
-                    ous.ReplaceWithLast(otuindex);
-                    if (otuindex < ous.Count) ous[otuindex].own_units_index = otuindex;
+                    own_units.ReplaceWithLast(own_units_i);
+                    if (own_units_i < own_units.Count) own_units[own_units_i].own_units_index = own_units_i;
                 }
             }
                 

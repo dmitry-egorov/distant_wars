@@ -1,6 +1,6 @@
 using UnityEngine;
 
-internal class init_vision_texture : MassiveMechanic
+internal class init_vision_texture : IMassiveMechanic
 {
     public void _()
     {

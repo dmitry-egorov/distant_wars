@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class generate_vision_quads : MassiveMechanic
+public class generate_vision_quads : IMassiveMechanic
 {
     public generate_vision_quads()
     {
@@ -19,16 +19,16 @@ public class generate_vision_quads : MassiveMechanic
         }
 
         /* units' registry  */ var ur  = UnitsRegistry.Instance;
-        /* vision quads mesh      */ var vqm = ur.VisionQuadsMesh;
-        /* discovery circles mesh */ var dqm = ur.DiscoveryQuadsMesh;
+        /* vision quads mesh      */ var vqm = ur.vision_quads_mesh;
+        /* discovery circles mesh */ var dqm = ur.discovery_quads_mesh;
 
         /* local player        */ var lp = LocalPlayer.Instance;
         /* local player's team */ var lpteam_mask = lp.Faction.Team.Mask;
 
-        /* units grid          */ var grid = ur.SpaceGrid;
+        /* units grid          */ var grid = ur.all_units_grid;
         /* grid cell centers   */ var ccenters = grid.cell_centers;
-        /* fully visible cells */ var cfviss   = grid.cell_full_visibilities;
-        /* fully visible cells */ var cfrviss  = grid.cell_full_detections;
+        /* fully visible cells */ var cfviss   = grid.cell_full_visibilities_by_team;
+        /* fully visible cells */ var cfrviss  = grid.cell_full_detections_by_team;
         /* gird cell count     */ var ccount   = cfviss.Length;
         /* cell's radius       */ var cell_radius = grid.cell_radius;
 

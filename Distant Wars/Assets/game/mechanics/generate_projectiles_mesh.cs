@@ -2,7 +2,7 @@
 using Plugins.Lanski;
 using UnityEngine;
 
-public class generate_projectiles_mesh : MassiveMechanic
+public class generate_projectiles_mesh : IMassiveMechanic
 {
     public generate_projectiles_mesh()
     {

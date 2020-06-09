@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class init_faction_colors : MassiveMechanic
+public class init_faction_colors : IMassiveMechanic
 {
     public init_faction_colors()
     {

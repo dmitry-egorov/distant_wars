@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Plugins.Lanski;
 using UnityEngine;
 
-public class generate_units_mesh: MassiveMechanic
+public class generate_units_mesh: IMassiveMechanic
 {
     public generate_units_mesh()
     {
@@ -23,7 +23,7 @@ public class generate_units_mesh: MassiveMechanic
         /* units' registry */ var ur  = UnitsRegistry.Instance;
         /* camera          */ var cam = StrategicCamera.Instance;
         /* sprite size multiplier */ var ssizem = cam.SpriteSizeMultiplier;
-        /* adjasted sprite size   */ var ssize = ur.AdjustedSpriteSize;
+        /* adjasted sprite size   */ var ssize = ur.adjusted_sprite_size;
         
         var sv = sprite_vertices;
         var st = sprite_triangles;
@@ -35,7 +35,7 @@ public class generate_units_mesh: MassiveMechanic
         hpv.Clear();
         hpt.Clear();
 
-        /* units space grid    */ var grid    = ur.SpaceGrid;
+        /* units space grid    */ var grid    = ur.all_units_grid;
         /* grid positions      */ var gposs   = grid.unit_positions;
         /* grid prev positions */ var gpposs  = grid.unit_prev_positions;
         /* grid units          */ var gunits  = grid.unit_refs;
@@ -115,12 +115,12 @@ public class generate_units_mesh: MassiveMechanic
             }
         }
 
-        /* sprites mesh */ var smesh  = ur.SpritesMesh;
+        /* sprites mesh */ var smesh  = ur.sprites_mesh;
         smesh.Clear();
         smesh.SetVertices(sv);
         smesh.SetTriangles(st, 0, false);
 
-        var hpmesh = ur.HPSpritesMesh;
+        var hpmesh = ur.hp_sprites_mesh;
         hpmesh.Clear();
         hpmesh.SetVertices(hpv);
         hpmesh.SetTriangles(hpt, 0, false);

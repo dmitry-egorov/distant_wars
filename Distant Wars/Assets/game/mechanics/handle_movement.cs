@@ -1,74 +1,75 @@
+using Plugins.Lanski;
 using UnityEngine;
 
-internal class handle_movement : MassiveMechanic
+internal class handle_movement : IMassiveMechanic
 {
-    private const float GuardApproachDistance = 2.0f;
-    private const float AttackApproachDistanceMargin = 5.0f;
-    private const float EasingDistance = 2f;
-    private const float StoppingDistance = 0.5f;
+    
 
     public void _()
     {
-        /* easing distance         */ var ed   = EasingDistance;
-        /* stopping distance       */ var stop_dist   = StoppingDistance;
-        /* guard approach distance */ var gad  = GuardApproachDistance;
-        /* attack approach distance margin */ var aadm = AttackApproachDistanceMargin;
 
-        /* units' registry */ var ur  = UnitsRegistry.Instance;
-        /* units           */ var us  = ur.Units;
+        /* units' registry */ var ur = UnitsRegistry.Instance;
+        
+        /* easing distance         */ var ed   = ur.MovementEasingDistance;
+        /* stopping distance       */ var stop_dist   = ur.MovementStoppingDistance;
+        /* guard approach distance */ var gad  = ur.GuardApproachDistance;
+        /* attack approach distance margin */ var aadm = ur.AttackApproachDistanceMargin;
+        var slope_slowdown = ur.SlopeSlowdown;
+
+        /* units           */ var us = ur.all_units;
         /* map             */ var map = Map.Instance;
         /* delta time      */ var dt  = Game.Instance.DeltaTime;
 
-        foreach (var u in us)
+        foreach (var unit in us)
         {
-            /* unit's position 2d   */ var upos = u.position;
-            /* has move target      */ var has_target = false;
+            /* unit's position 2d   */ var unit_pos = unit.position;
+            /* has move target      */ bool has_target;
 
-            u.prev_position = upos;
+            unit.prev_position = unit_pos;
 
-            var is_move_order = has_target = u.issued_order.is_move(out var target);
+            var is_move_order = has_target = unit.issued_order.is_move(out var target_pos);
 
             if (!is_move_order)
             {
-                var ot = default(Unit);
-                var igo = u.issued_order.is_guard(out ot);
-                var iao = !igo ? u.issued_order.is_attack(out ot) : false;
+                var igo = unit.issued_order.is_guard(out var target_unit);
+                var iao = !igo ? unit.issued_order.is_attack(out target_unit) : false;
 
                 if (igo || iao)
                 {
-                    /* approach distance  */ var ad = igo ? gad : u.AttackRange - aadm;
-                    /* target's position  */ var tp = ot.position;
-                    /* target's offset    */ var to = tp - upos;
+                    /* approach distance  */ var ad = igo ? gad : unit.AttackRange - aadm;
+                    /* target's position  */ var tp = target_unit.position;
+                    /* target's offset    */ var to = tp - unit_pos;
                     /* distance to target */ var td = to.magnitude;
                     /* distance remaining */ var dr = td - ad;
 
                     if (dr > 0)
                     {
-                        /* direction towards target */ var tdir = to / td;
-                        /* approach point           */ var ap = upos + dr * tdir;
+                        /* direction towards target */ var dir = to / td;
+                        /* approach point           */ var ap = unit_pos + dr * dir;
                         has_target = true;
-                        target = ap;
+                        target_pos = ap;
                     }
                 }
             }
 
             if (has_target)
             {
-                /* movement delta     */ var dpos = (target - upos);
+                /* movement delta     */ var dpos = (target_pos - unit_pos);
                 /* distance to target */ var dist = dpos.magnitude;
                 if (dist > stop_dist)
                 {
-                    /* speed     */ var sp = u.BaseSpeed;
-                    /* direction */ var dir = dpos / dist;
-                    /* slope     */ var sl = -0.5f * Mathf.Max(map.slope2(upos, dir), 0.0f);
-                    /* terrain speed  */ var ts = sp * Mathf.Exp(sl);
+                    var speed = unit.BaseSpeed;
+                    var direction = dpos / dist;
+                    var height_dif = map.slope_2d(unit_pos, direction);
+                    var slope = -slope_slowdown * Mathf.Max(height_dif, 0.0f);
+                    /* terrain speed  */ var ts = speed / (slope.sqr() + 1f);//Mathf.Exp(sl);
                     /* smoothed speed */ var ss = ts * Mathf.Clamp01(dist / ed);
                     
-                    u.position = Vector2.MoveTowards(upos, target, ss * dt);
+                    unit.position = Vector2.MoveTowards(unit_pos, target_pos, ss * dt);
                 }
                 else if (is_move_order)
                 {
-                    u.issued_order = Unit.Order.idle();
+                    unit.issued_order = Unit.Order.idle();
                 }
             }
         }

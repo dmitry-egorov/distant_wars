@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
 
-internal class editor_setup_map_rendering : MassiveMechanic
+internal class editor_setup_map_rendering : IMassiveMechanic
 {
     public void _()
     {

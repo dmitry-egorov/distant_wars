@@ -1,9 +1,9 @@
-﻿internal class handle_incoming_damage : MassiveMechanic
+﻿internal class handle_incoming_damage : IMassiveMechanic
 {
     public void _()
     {
         var ur = UnitsRegistry.Instance;
-        var us = ur.Units;
+        var us = ur.all_units;
 
         foreach (var u in us)
         {

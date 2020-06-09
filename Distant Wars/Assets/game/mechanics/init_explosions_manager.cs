@@ -2,7 +2,7 @@ using Plugins.Lanski;
 using Plugins.Lanski.Behaviours;
 using UnityEngine;
 
-internal class init_explosions_manager : MassiveMechanic
+internal class init_explosions_manager : IMassiveMechanic
 {
     public void _()
     {

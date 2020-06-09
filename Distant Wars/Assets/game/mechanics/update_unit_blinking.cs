@@ -1,6 +1,6 @@
 using Plugins.Lanski;
 
-public class update_unit_blinking : MassiveMechanic
+public class update_unit_blinking : IMassiveMechanic
 {
     public void _()
     {
@@ -10,7 +10,7 @@ public class update_unit_blinking : MassiveMechanic
         /* blinking show time */ var bst = ur.DamageBlinkShowTime;
         /* blinking period    */ var bp  = bht + bst;
             
-        var units = ur.Units;
+        var units = ur.all_units;
         var ucount = units.Count;
         /* damage blink time */ var blink_time = ur.DamageBlinkCount * (ur.DamageBlinkShowTime + ur.DamageBlinkHideTime);
         /* camera            */ var cam = StrategicCamera.Instance;

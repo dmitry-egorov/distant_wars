@@ -1,4 +1,4 @@
-﻿public class update_units_style : MassiveMechanic
+﻿public class update_units_style : IMassiveMechanic
 {
     public void _()
     {

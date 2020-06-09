@@ -2,7 +2,7 @@
 using Plugins.Lanski;
 using UnityEngine;
 
-internal class update_unit_visibility : MassiveMechanic
+internal class update_unit_visibility : IMassiveMechanic
 {
     public void _()
     {
@@ -11,20 +11,20 @@ internal class update_unit_visibility : MassiveMechanic
 
         var ur = UnitsRegistry.Instance;
 
-        /* units' grids            */ var grid   = ur.SpaceGrid;
+        /* units' grids            */ var grid   = ur.all_units_grid;
         /* grid unit positions     */ var guposs = grid.unit_positions;
         /* grid unit detections    */ var gudets = grid.unit_detections_by_team;
-        /* grid unit discoveries   */ var gudiss = grid.unit_indentifications_by_team;
+        /* grid unit discoveries   */ var gudiss = grid.unit_identifications_by_team;
 
-        /* grid's fully radar visible cells */ var gcfdets = grid.cell_full_detections;
+        /* grid's fully radar visible cells */ var gcfdets = grid.cell_full_detections_by_team;
         Array.Clear(gcfdets, 0, gcfdets.Length);
-        /* grid's fully visible cells */ var gcfvis = grid.cell_full_visibilities;
+        /* grid's fully visible cells */ var gcfvis = grid.cell_full_visibilities_by_team;
         Array.Clear(gcfvis, 0, gcfvis.Length);
 
         /* cell's radius  */ var cell_radius = grid.cell_radius;
         /* cell's centers */ var ccenters = grid.cell_centers;
 
-        /* all units      */ var units  = ur.Units;
+        /* all units      */ var units  = ur.all_units;
         /* all unit count */ var ucount = units.Count;
 
         //var total_cells = 0;

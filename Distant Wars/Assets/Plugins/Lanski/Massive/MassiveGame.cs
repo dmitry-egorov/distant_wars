@@ -20,8 +20,7 @@ public class MassiveGame<TGame>: RequiredSingleton<TGame> where TGame: MassiveGa
     public double PresentationTotalTime;
     public double SteadySimulationTotalTime;
 
-    public void _<TMechanic>()   where TMechanic : class, MassiveMechanic, new() => run<TMechanic>();
-    public void run<TMechanic>() where TMechanic : class, MassiveMechanic, new()
+    public void run<TMechanic>() where TMechanic : class, IMassiveMechanic, new()
     {
         mechanics_sw.Restart();
         var name = Registry<TMechanic>.Name;
@@ -54,7 +53,7 @@ public class MassiveGame<TGame>: RequiredSingleton<TGame> where TGame: MassiveGa
         }
     }
 
-    public void game_loop(Action init, Action update_input, Action update_simulation, Action<bool> present)
+    public void game_loop(Action init, Action handle_input, Action simulate, Action<bool> render)
     {
         // initialisation
         if (!initialized)
@@ -77,7 +76,7 @@ public class MassiveGame<TGame>: RequiredSingleton<TGame> where TGame: MassiveGa
             DeltaTime = Time.deltaTime;
             PresentationTotalTime += DeltaTime;
 
-            update_input();
+            handle_input();
         }
 
         var had_at_least_one_steady_update = false;
@@ -86,7 +85,7 @@ public class MassiveGame<TGame>: RequiredSingleton<TGame> where TGame: MassiveGa
             DeltaTime = steady_delta_time;
             while (SteadySimulationTotalTime < PresentationTotalTime)
             {
-                update_simulation();
+                simulate();
 
                 SteadySimulationTotalTime += DeltaTime;
                 had_at_least_one_steady_update = true;
@@ -98,7 +97,7 @@ public class MassiveGame<TGame>: RequiredSingleton<TGame> where TGame: MassiveGa
             DeltaTime = Time.deltaTime;
             PresentationToSimulationFrameTimeRatio = (float)((PresentationTotalTime - (SteadySimulationTotalTime - steady_delta_time)) / steady_delta_time);
 
-            present(had_at_least_one_steady_update);
+            render(had_at_least_one_steady_update);
         }
 
         // measuring update time

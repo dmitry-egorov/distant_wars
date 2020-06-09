@@ -1,7 +1,7 @@
 using Plugins.Lanski;
 using Plugins.Lanski.Space;
 
-public class prepare_mouse_dragging : MassiveMechanic
+public class prepare_mouse_dragging : IMassiveMechanic
 {
     public void _()
     {

@@ -1,5 +1,5 @@
 
-internal class update_explosions : MassiveMechanic
+internal class update_explosions : IMassiveMechanic
 {
     public void _()
     {

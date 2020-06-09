@@ -1,7 +1,7 @@
 ﻿using Plugins.Lanski;
 using UnityEngine;
 
-internal class update_projectiles : MassiveMechanic
+internal class update_projectiles : IMassiveMechanic
 {
     public void _()
     {
@@ -19,7 +19,7 @@ internal class update_projectiles : MassiveMechanic
         /* map                   */ var map    = Map.Instance;
         /* map 2 world transform */ var m2w    = map.map_to_world;
         /* units registry        */ var ur     = UnitsRegistry.Instance;
-        /* units' space grids    */ var grid   = ur.SpaceGrid;
+        /* units' space grids    */ var grid   = ur.all_units_grid;
         /* grid's unit postions  */ var uposs  = grid.unit_positions;
         /* grid's units          */ var units  = grid.unit_refs;
         /* bounding radius ^2    */ var bradius2 = map.BoundingRadius.sqr();

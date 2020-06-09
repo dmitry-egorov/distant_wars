@@ -1,4 +1,4 @@
-public class update_selection_box : MassiveMechanic
+public class update_selection_box : IMassiveMechanic
 {
     public void _()
     {

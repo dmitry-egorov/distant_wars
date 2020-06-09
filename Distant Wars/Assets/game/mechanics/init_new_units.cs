@@ -2,24 +2,24 @@
 using UnityEngine;
 using UnityEngine.Assertions;
 
-internal class init_new_units : MassiveMechanic
+internal class init_new_units : IMassiveMechanic
 {
     public void _()
     {
         /* units registry */ var ur = UnitsRegistry.Instance;
         /* new units      */ var nu = ur.NewObjects;
-        /* own team units */ var otunits = ur.OwnTeamUnits;
+        /* own team units */ var otunits = ur.local_team_units;
 
         /* local player   */ var lp = LocalPlayer.Instance;
         /* local player's team mask */ var lp_team_mask = lp.Faction.Team.Mask;
 
-        /* space grid */ var sg = ur.SpaceGrid;
+        /* space grid */ var sg = ur.all_units_grid;
         /* grid positions      */ var guposs  = sg?.unit_positions;
         /* grid prev positions */ var gupposs = sg?.unit_prev_positions;
         /* grid team ids       */ var guteams = sg?.unit_teams;
         /* grid units          */ var gunits  = sg?.unit_refs;
         /* grid visiblities    */ var guviss  = sg?.unit_detections_by_team;
-        /* grid visiblities    */ var gudiss  = sg?.unit_indentifications_by_team;
+        /* grid visiblities    */ var gudiss  = sg?.unit_identifications_by_team;
         /* grid cell count     */ var ccount  = guposs?.Length;
 
         foreach (var u in nu)
@@ -27,7 +27,7 @@ internal class init_new_units : MassiveMechanic
             if (u == null)
                 continue;
 
-            ur.Units.Add(u);
+            ur.all_units.Add(u);
 
             var utmask = u.Faction.Team.Mask;
 

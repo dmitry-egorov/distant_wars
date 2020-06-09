@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Plugins.Lanski.Behaviours;
 using UnityEngine;
 
-internal class init_units_registry : MassiveMechanic
+internal class init_units_registry : IMassiveMechanic
 {
     public void _()
     {
@@ -11,15 +11,15 @@ internal class init_units_registry : MassiveMechanic
 
         var bounds = new Bounds(Vector3.zero, new Vector3(3.0f * map.Scale, 3.0f * map.Scale, 1));
 
-        ur.SpritesMesh          = init_renderer(ur.SpritesRenderer,          "unit sprites");
-        ur.HPSpritesMesh        = init_renderer(ur.HPSpritesRenderer,        "hp sprites");
-        ur.VisionCirclesMesh    = init_renderer(ur.VisionCirclesRenderer,    "vision circles");
-        ur.VisionQuadsMesh      = init_renderer(ur.VisionQuadsRenderer,      "vision quads");
-        ur.DiscoveryCirclesMesh = init_renderer(ur.DiscoveryCirclesRenderer, "discovery circles");;
-        ur.DiscoveryQuadsMesh   = init_renderer(ur.DiscoveryQuadsRenderer,   "discovery quads");;;
+        ur.sprites_mesh           = init_renderer(ur.SpritesRenderer,          "unit sprites");
+        ur.hp_sprites_mesh        = init_renderer(ur.HPSpritesRenderer,        "hp sprites");
+        ur.vision_circles_mesh    = init_renderer(ur.VisionCirclesRenderer,    "vision circles");
+        ur.vision_quads_mesh      = init_renderer(ur.VisionQuadsRenderer,      "vision quads");
+        ur.discovery_circles_mesh = init_renderer(ur.DiscoveryCirclesRenderer, "discovery circles");;
+        ur.discovery_quads_mesh   = init_renderer(ur.DiscoveryQuadsRenderer,   "discovery quads");;;
 
-        ur.Units = new List<Unit>();
-        ur.OwnTeamUnits = new List<Unit>();
+        ur.all_units = new List<Unit>();
+        ur.local_team_units = new List<Unit>();
 
         Mesh init_renderer(MeshRenderer mr, string name)
         {

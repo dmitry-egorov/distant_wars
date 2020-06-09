@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Plugins.Lanski;
 using UnityEngine;
 
-internal class generate_explosions_mesh : MassiveMechanic
+internal class generate_explosions_mesh : IMassiveMechanic
 {
     public generate_explosions_mesh()
     {

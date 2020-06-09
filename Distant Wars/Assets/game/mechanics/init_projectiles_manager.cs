@@ -3,7 +3,7 @@ using Plugins.Lanski;
 using Plugins.Lanski.Behaviours;
 using UnityEngine;
 
-internal class init_projectiles_manager : MassiveMechanic
+internal class init_projectiles_manager : IMassiveMechanic
 {
     public void _()
     {

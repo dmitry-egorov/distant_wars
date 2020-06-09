@@ -1,4 +1,4 @@
-internal class set_cursor_is_a_box : MassiveMechanic
+internal class set_cursor_is_a_box : IMassiveMechanic
 {
     public void _()
     {

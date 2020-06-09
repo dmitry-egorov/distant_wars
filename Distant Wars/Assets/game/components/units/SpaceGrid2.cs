@@ -15,16 +15,14 @@ public class UnitsSpaceGrid2
     public LeakyList<Vector2>[] unit_positions;
     public LeakyList<Vector2>[] unit_prev_positions;
     public LeakyList<byte>[] unit_detections_by_team; // whether the unit is detected by radar or vision
-    public LeakyList<byte>[] unit_indentifications_by_team; // whether the unit is discovered, i.e. was in the vision range once
+    public LeakyList<byte>[] unit_identifications_by_team; // whether the unit is discovered, i.e. was in the vision range once
     public LeakyList<byte>[] unit_teams;
     public List<Unit>[] unit_refs;
 
     // Cell dynamic
-    public byte[] cell_full_visibilities;
-    public byte[] cell_full_detections;
+    public byte[] cell_full_visibilities_by_team;
+    public byte[] cell_full_detections_by_team;
     public bool[] cell_full_discoveries_by_local_player;
-
-    public Vector3[] vision_quads_vertices;
 
     // Cell static
     public Vector2[] cell_centers;
@@ -107,7 +105,7 @@ public class UnitsSpaceGrid2
     {
         public Iterator(
             int end_i, 
-            int ci_offset, 
+            int cell_i_offset, 
             int area_width, 
             int grid_width, 
             bool external
@@ -115,7 +113,7 @@ public class UnitsSpaceGrid2
         {
             this.i = 0;
             this.end_i = end_i;
-            this.ci_offset = ci_offset;
+            this.cell_i_offset = cell_i_offset;
             this.area_width = area_width;
             this.grid_width = grid_width;
             this.external = external;
@@ -125,7 +123,7 @@ public class UnitsSpaceGrid2
         {
             if (i < end_i)
             {
-                cell_index = ci_offset + i % area_width + (i / area_width) * grid_width;
+                cell_index = cell_i_offset + i % area_width + (i / area_width) * grid_width;
                 i++;
                 return true;
             }
@@ -145,9 +143,31 @@ public class UnitsSpaceGrid2
 
         int i;
         int end_i;
-        int ci_offset;
+        int cell_i_offset;
         int area_width;
         int grid_width;
         bool external;
+    }
+
+    public static void remove_unit_from_cell
+    (
+        int unit_i
+        , List<Unit> cell_unit_refs
+        , LeakyList<Vector2> cell_unit_poss
+        , LeakyList<Vector2> cell_unit_prev_poss
+        , LeakyList<byte> cell_unit_teams
+        , LeakyList<byte> cell_unit_detects
+        , LeakyList<byte> cell_unit_idents
+    )
+    {
+        cell_unit_refs.ReplaceWithLast(unit_i);
+        cell_unit_poss.ReplaceWithLast(unit_i);
+        cell_unit_prev_poss.ReplaceWithLast(unit_i);
+        cell_unit_teams.ReplaceWithLast(unit_i);
+        cell_unit_detects.ReplaceWithLast(unit_i);
+        cell_unit_idents.ReplaceWithLast(unit_i);
+
+        // fix the id of the replacing unit
+        if (unit_i < cell_unit_refs.Count) cell_unit_refs[unit_i].space_grid_index.index = unit_i;
     }
 }

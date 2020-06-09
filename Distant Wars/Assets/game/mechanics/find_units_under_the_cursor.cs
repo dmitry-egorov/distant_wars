@@ -2,7 +2,7 @@ using Plugins.Lanski;
 using Plugins.Lanski.Space;
 using UnityEngine;
 
-public class find_units_under_the_cursor : MassiveMechanic
+public class find_units_under_the_cursor : IMassiveMechanic
 {
     public void _()
     {
@@ -10,7 +10,7 @@ public class find_units_under_the_cursor : MassiveMechanic
 
         /* units' repository   */ var ur = UnitsRegistry.Instance;
 
-        /* space grid */ var sg = ur.SpaceGrid;
+        /* space grid */ var sg = ur.all_units_grid;
         /* cells unit postions      */ var poss  = sg.unit_positions;
         /* cells unit prev postions */ var pposs = sg.unit_prev_positions;
         /* cells unit visibilities  */ var viss  = sg.unit_detections_by_team;

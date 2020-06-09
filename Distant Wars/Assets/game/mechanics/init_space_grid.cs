@@ -3,7 +3,7 @@ using Plugins.Lanski;
 using Plugins.Lanski.Space;
 using UnityEngine;
 
-internal class init_space_grid : MassiveMechanic
+internal class init_space_grid : IMassiveMechanic
 {
     public void _()
     {
@@ -12,14 +12,14 @@ internal class init_space_grid : MassiveMechanic
 
         var h  = ur.SpaceGridHeight;
         var w  = ur.SpaceGridWidth;
-        var grid = ur.SpaceGrid;
+        var grid = ur.all_units_grid;
 
         if (grid == null || grid.size.x != w || grid.size.y != h)
         {
             /* half scale */ var hs   = map.Scale * 0.5f;
             /* map area   */ var spc = new FRect(-hs.xy(), hs.xy());
             var sz = new Vector2Int(w, h);
-            grid = ur.SpaceGrid = new UnitsSpaceGrid2();
+            grid = ur.all_units_grid = new UnitsSpaceGrid2();
 
             grid.size = sz;
             grid.cell_size = (spc.max - spc.min) / sz;
@@ -32,15 +32,15 @@ internal class init_space_grid : MassiveMechanic
             var guposs  = grid.unit_positions      = new LeakyList<Vector2>[gccount];
             var gupposs = grid.unit_prev_positions = new LeakyList<Vector2>[gccount];
             var gudets  = grid.unit_detections_by_team     = new LeakyList<byte>[gccount];
-            var gudiss  = grid.unit_indentifications_by_team    = new LeakyList<byte>[gccount];
+            var gudiss  = grid.unit_identifications_by_team    = new LeakyList<byte>[gccount];
             var guteams = grid.unit_teams     = new LeakyList<byte>[gccount];
             var gunits  = grid.unit_refs           = new List<Unit>[gccount];
 
             var cc = grid.cell_centers = new Vector2[gccount];
-            grid.cell_full_visibilities = new byte[gccount];
-            grid.cell_full_detections = new byte[gccount];
+            grid.cell_full_visibilities_by_team = new byte[gccount];
+            grid.cell_full_detections_by_team = new byte[gccount];
             grid.cell_full_discoveries_by_local_player = new bool[gccount];
-            var vqvrts = grid.vision_quads_vertices = new Vector3[4 * (gccount - 1)];
+            var vqvrts = new Vector3[4 * (gccount - 1)];
 
             // intialize unit data arrays
             for (var cell_i = 0; cell_i < gccount; cell_i++)
@@ -63,11 +63,11 @@ internal class init_space_grid : MassiveMechanic
                 gunits [cell_i] = new List<Unit>();
             }
 
-            ur.VisionQuadsMesh   .vertices = vqvrts;
-            ur.DiscoveryQuadsMesh.vertices = vqvrts;
+            ur.vision_quads_mesh   .vertices = vqvrts;
+            ur.discovery_quads_mesh.vertices = vqvrts;
 
             // fill unit data arrays
-            foreach(var unit in ur.Units)
+            foreach(var unit in ur.all_units)
             {
                 /* unit's position */ var pos = unit.position;
                 var uteam = unit.Faction.Team.Mask;

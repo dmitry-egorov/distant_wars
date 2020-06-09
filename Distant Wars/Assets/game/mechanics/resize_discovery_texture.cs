@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-internal class init_discovery_texture : MassiveMechanic
+internal class init_discovery_texture : IMassiveMechanic
 {
     public void _()
     {
@@ -26,7 +26,7 @@ internal class init_discovery_texture : MassiveMechanic
 
             // reset discovery flags
             // should instead copy discovery data from the old texture
-            var grid = UnitsRegistry.Instance.SpaceGrid;
+            var grid = UnitsRegistry.Instance.all_units_grid;
             var ds = grid.cell_full_discoveries_by_local_player;
             Array.Clear(ds, 0, ds.Length);
 

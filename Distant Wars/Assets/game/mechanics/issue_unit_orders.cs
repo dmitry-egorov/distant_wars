@@ -1,4 +1,4 @@
-﻿public class issue_unit_orders : MassiveMechanic
+﻿public class issue_unit_orders : IMassiveMechanic
 {
 
     public void _()

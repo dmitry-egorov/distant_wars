@@ -1,7 +1,7 @@
 using Plugins.Lanski.Behaviours;
 using UnityEngine;
 
-internal class init_order_point : MassiveMechanic
+internal class init_order_point : IMassiveMechanic
 {
     public void _()
     {

@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 using static UnityEngine.Vector2;
 using static UnityEngine.Mathf;
 
-public class handle_camera_movement: MassiveMechanic
+public class handle_camera_movement: IMassiveMechanic
 {
     public void _()
     {

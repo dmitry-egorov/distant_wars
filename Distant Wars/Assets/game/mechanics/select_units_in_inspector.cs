@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-internal class select_units_in_inspector : MassiveMechanic
+internal class select_units_in_inspector : IMassiveMechanic
 {
     public void _()
     {

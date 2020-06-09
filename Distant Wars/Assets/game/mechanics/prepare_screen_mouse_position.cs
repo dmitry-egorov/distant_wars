@@ -1,6 +1,6 @@
 using UnityEngine;
 
-internal class prepare_screen_mouse_position : MassiveMechanic
+internal class prepare_screen_mouse_position : IMassiveMechanic
 {
     public void _()
     {

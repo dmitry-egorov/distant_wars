@@ -1,6 +1,6 @@
 using UnityEngine;
 
-internal class hide_vision_on_key : MassiveMechanic
+internal class hide_vision_on_key : IMassiveMechanic
 {
     public void _()
     {

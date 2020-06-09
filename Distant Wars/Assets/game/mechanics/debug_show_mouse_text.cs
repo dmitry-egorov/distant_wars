@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Text;
 using static DebugText;
 
-internal class show_debug_text : MassiveMechanic
+internal class show_debug_text : IMassiveMechanic
 {
     public void _() 
     {
@@ -24,7 +24,7 @@ internal class show_debug_text : MassiveMechanic
 
         sb.Append("\nmouse:");
         sb.Append("\n\tworld position: "); sb.Append(mwp);
-        sb.Append("\n\tspace grid: ");    sb.Append(ur.SpaceGrid.get_coord_of(mwp));
+        sb.Append("\n\tspace grid: ");    sb.Append(ur.all_units_grid.get_coord_of(mwp));
         sb.Append("\n\tcoord: ");         sb.Append(map.coord_of(mwp));
         sb.Append("\n\theight: ");        sb.Append(map.z(mwp));
 
@@ -36,7 +36,7 @@ internal class show_debug_text : MassiveMechanic
             sb.AppendFormat("\n\t{0}: {1}ms, {2}ms", t.name, to_ms(t.avg), to_ms(t.cur));
         }
 
-        sb.Append("\ntotal units: ");       sb.Append(ur.Units.Count);
+        sb.Append("\ntotal units: ");       sb.Append(ur.all_units.Count);
         sb.Append("\ntotal projectiles: "); sb.Append(ProjectilesManager.Instance.positions.Count);
         sb.Append("\ntotal explosions: ");  sb.Append(ExplosionsManager.Instance.positions.Count);
 

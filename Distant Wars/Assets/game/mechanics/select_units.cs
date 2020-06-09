@@ -1,7 +1,7 @@
 using Plugins.Lanski;
 using UnityEngine;
 
-public class select_units : MassiveMechanic
+public class select_units : IMassiveMechanic
 {
     public void _()
     {

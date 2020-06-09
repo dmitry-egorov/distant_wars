@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class editor_generate_units_mesh : MassiveMechanic
+public class editor_generate_units_mesh : IMassiveMechanic
 {
     public editor_generate_units_mesh()
     {
@@ -12,7 +12,7 @@ public class editor_generate_units_mesh : MassiveMechanic
     public void _()
     {
         var ur = UnitsRegistry.Instance;
-        var units = ur.Units;
+        var units = ur.all_units;
 
         var sv = sprite_vertices;
         var st = sprite_triangles;
@@ -22,7 +22,7 @@ public class editor_generate_units_mesh : MassiveMechanic
 
         for (int i = 0; i < units.Count; i++)
         {
-            var unit = ur.Units[i];
+            var unit = ur.all_units[i];
             /* unit is selected    */ var uih = unit.is_highlighted;
             /* unit is selected    */ var uis = unit.is_selected;
             /* faction color index */ var fci = unit.Faction.Index;
@@ -39,7 +39,7 @@ public class editor_generate_units_mesh : MassiveMechanic
             RenderHelper.add_quad(st, i);
         }
 
-        /* sprites mesh */ var sm  = ur.SpritesMesh;
+        /* sprites mesh */ var sm  = ur.sprites_mesh;
 
         sm.Clear();
         sm.SetVertices(sv);

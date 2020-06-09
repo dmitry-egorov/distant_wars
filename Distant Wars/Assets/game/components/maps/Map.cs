@@ -55,15 +55,13 @@ public class Map : RequiredSingleton<Map>
         Shader.SetGlobalFloat(map_scale_id, Scale);
     }
 
-    public float slope(Vector2 position, Vector2 direction) => slope2(position, direction.normalized);
-
-    public float slope2(Vector2 position, Vector2 normalized_direction)
+    public float slope_2d(Vector2 position, Vector2 normalized_direction)
     {
         var p = position;
         var nd = normalized_direction;
 
         var coord = coord_of(p);
-        var offset = Vector2Int.FloorToInt(nd);
+        var offset = Vector2Int.RoundToInt(nd);
         var ocoord = coord + offset;
         var h  = z(coord);
         var ho = z(ocoord);

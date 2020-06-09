@@ -1,7 +1,7 @@
 ﻿using Plugins.Lanski;
 using Plugins.Lanski.Space;
 
-internal class init_map : MassiveMechanic
+internal class init_map : IMassiveMechanic
 {
     public void _()
     {

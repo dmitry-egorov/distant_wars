@@ -1,12 +1,12 @@
 ﻿using Plugins.Lanski;
 using UnityEngine;
 
-public class find_and_attack_target : MassiveMechanic
+public class find_and_attack_target : IMassiveMechanic
 {
     public void _()
     {
         /* units' registry  */ var ur  = UnitsRegistry.Instance;
-        /* units            */ var us  = ur.Units;
+        /* units            */ var us  = ur.all_units;
         /* map              */ var map = Map.Instance;
 
         /* projectiles manager       */ var pm = ProjectilesManager.Instance;
@@ -22,11 +22,11 @@ public class find_and_attack_target : MassiveMechanic
 
         /* delta time */ var dt  = Game.Instance.DeltaTime;
 
-        /* unit's space grid */ var grid = ur.SpaceGrid;
+        /* unit's space grid */ var grid = ur.all_units_grid;
         /* cells unit postions        */ var grid_unit_poss = grid.unit_positions;
         /* cells unit teams           */ var grid_unit_teams = grid.unit_teams;
         /* cells unit detections      */ var grid_unit_detects = grid.unit_detections_by_team;
-        /* cells unit identifications */ var grid_unit_idents = grid.unit_indentifications_by_team;
+        /* cells unit identifications */ var grid_unit_idents = grid.unit_identifications_by_team;
         /* cells units                */ var grid_unit_refs = grid.unit_refs;
                     
         foreach (var unit in us)

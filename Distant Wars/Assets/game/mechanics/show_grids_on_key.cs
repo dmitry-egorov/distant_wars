@@ -1,6 +1,6 @@
 using UnityEngine;
 
-internal class show_grids_on_key : MassiveMechanic
+internal class show_grids_on_key : IMassiveMechanic
 {
     public void _()
     {

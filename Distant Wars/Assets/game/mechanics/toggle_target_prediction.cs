@@ -1,6 +1,6 @@
 using UnityEngine;
 
-internal class toggle_target_prediction : MassiveMechanic
+internal class toggle_target_prediction : IMassiveMechanic
 {
     public void _()
     {
