@@ -69,10 +69,10 @@ public class generate_vision_circles : MassiveMechanic
             var upp   = u.PrevPosition;
             var uipos = Vector2.Lerp(upp, upos, time_ratio);
             
-            /* at least one cell of the circle is partially visible (not fully) */ 
-            var partially_visible = false;
+            /* all of the cells of the circle are fully visible */ 
+            var fully_visible = true;
 
-            /* vision + cell radius ^2 */ var uvis_p_crad2 = (vrange + cell_radius).sqr();
+            /* vision + cell radius ^2 */ var uvis_p_crad_2 = (vrange + cell_radius).sqr();
             var it = grid.get_iterator_of_circle(uipos, vrange);
             while (it.next(out var cell_i))
             {
@@ -85,23 +85,24 @@ public class generate_vision_circles : MassiveMechanic
 
                     /* cell's center */ var ccenter = ccenters[cell_i];
                     /* delta from unit to cell's center       */ var ucdelta = ccenter - upos;
-                    /* distance ^2 from unit to cell's center */ var ucdist2 = ucdelta.sqrMagnitude;
+                    /* distance ^2 from unit to cell's center */ var ucdist_2 = ucdelta.sqrMagnitude;
 
                     // cell is outside the vision circle
-                    if (ucdist2 > uvis_p_crad2)
+                    if (ucdist_2 > uvis_p_crad_2)
                         continue;
                 }
 
-                partially_visible = true;
+                fully_visible = false;
                 break;
             }
 
-            if (!partially_visible)
+            if (fully_visible)
                 continue;
 
             var qmin = new Vector2(uipos.x - vrange, uipos.y - vrange);
             var qmax = new Vector2(uipos.x + vrange, uipos.y + vrange);
 
+            // generate vision circles
             // is within the screen rect
             if (ws.intersects(qmin, qmax))
             {
@@ -115,10 +116,11 @@ public class generate_vision_circles : MassiveMechanic
                 vcvrts.Add(bl);
                 vcvrts.Add(br);
 
-                RenderHelper.add_quad(vctris, vcircle_i);
+                vctris.add_quad(vcircle_i);
                 vcircle_i++;
             }
 
+            // generate discovery circles
             {
                 //PERF: don't draw circles fully covered by radar quads (right now only the ones covered by vision are eliminated)
                 var tl = new Vector3(uipos.x - rrange, uipos.y + rrange, 0);
@@ -131,7 +133,7 @@ public class generate_vision_circles : MassiveMechanic
                 dcvrts.Add(bl);
                 dcvrts.Add(br);
 
-                RenderHelper.add_quad(dctris, dcircle_i);
+                dctris.add_quad(dcircle_i);
                 dcircle_i++;
             }
         }

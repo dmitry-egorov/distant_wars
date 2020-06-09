@@ -21,6 +21,9 @@
 - very slow land units
 - some weapons produce their own ammunition
 - ecscavation expedition to acquire an artefact, requires resources and time
+- can dig deep to find resources
+- resources blow ala dune
+- player roles: economist, strategist, several tacticians, etc
 
 - session multiplayer
 - players arrive at the sight early, acid fog covers the map (planning phase)

@@ -21,5 +21,5 @@ Material:
     m_TexEnvs: []
     m_Floats: []
     m_Colors:
-    - _EmptyColor: {r: 0, g: 0, b: 0, a: 1}
+    - _EmptyColor: {r: 0, g: 0, b: 0, a: 0.2784314}
     - _FullColor: {r: 0.061807394, g: 1, b: 0, a: 1}

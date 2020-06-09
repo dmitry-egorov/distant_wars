@@ -26,20 +26,20 @@ internal class update_space_grid : MassiveMechanic
             /* cell's units dicovery      */ var cdiss  = gudiss [ci];
             /* unit count                 */ var ucount = cposs.Count;
 
-            for (int ui = 0; ui < ucount;)
+            for (var ui = 0; ui < ucount;)
             {
                 /* unit's team mask */ var tid  = cteams[ui];
 
                 /* the unit */ var unit = cunits[ui];
-                /* unit's new position   */ var npos = unit.Position;
-                /* unit's prev position  */ var ppos = unit.PrevPosition;
-                /* unit's new cell index */ var new_ci = sg.get_index_of(npos);
+                /* unit's new position   */ var new_pos  = unit.Position;
+                /* unit's prev position  */ var prev_pos = unit.PrevPosition;
+                /* unit's new cell index */ var new_ci = sg.get_index_of(new_pos);
 
                 if (new_ci == ci)
                 // is in the old cell
                 {
-                    cpposs[ui] = ppos;
-                    cposs [ui] = npos;
+                    cpposs[ui] = prev_pos;
+                    cposs [ui] = new_pos;
                     cviss [ui] = tid; // reset visibility to the unit's own team only
                     ui++;
 
@@ -53,8 +53,8 @@ internal class update_space_grid : MassiveMechanic
                     unit.SpaceGridIndex = (new_ci, ncunits.Count);
                     ncunits.Add(unit);
 
-                    guposs [new_ci].Add(npos);
-                    gupposs[new_ci].Add(ppos);
+                    guposs [new_ci].Add(new_pos);
+                    gupposs[new_ci].Add(prev_pos);
                     guteams[new_ci].Add(tid);
                     guviss [new_ci].Add(tid); // reset visibility to the unit's own team only
                     gudiss [new_ci].Add(cdiss[ui]);

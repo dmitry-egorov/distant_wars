@@ -61,7 +61,7 @@ public class generate_vision_quads : MassiveMechanic
                 if (within_screen)
                 // cell is visible on the screen
                 {
-                    RenderHelper.add_quad(vqtris, cell_i - 1);
+                    vqtris.add_quad(cell_i - 1);
                     vquad_i++;
                 }
 
@@ -73,7 +73,7 @@ public class generate_vision_quads : MassiveMechanic
                 if (!discovered)
                 // cell was not fully discovered before
                 {
-                    RenderHelper.add_quad(dqtris, cell_i - 1);
+                    dqtris.add_quad(cell_i - 1);
                     dquad_i++;
 
                     cdiscs_lp[cell_i] = true;

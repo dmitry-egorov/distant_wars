@@ -2,7 +2,7 @@
 {
     Properties
     {
-        _FullColor ("Full Color", Color) = (1, 0, 0, 1)
+        _FullColor  ( "Full Color", Color) = (1, 0, 0, 1)
         _EmptyColor ("Empty Color", Color) = (1, 0, 0, 1)
     }
     SubShader
@@ -32,7 +32,6 @@
                 float full_or_empty: TEXCOORD0;
             };
 
-
             float _HPBarWidthPx;
             float _HPBarHeightPx;
             float _HPBarOffsetPx;
@@ -46,26 +45,26 @@
 
                 float z = v.vertex.z;
                 float j = floor(z); // index 0 - 8
-                float p = frac(z);  // proportion
+                float p = frac (z);  // proportion
 
                 float xi = 2 * frac(j / 2);
                 float yi = 2 * frac(floor(j / 2) / 2);
-                /* full or empty */ float foe  = floor(j / 4);
+                /* full or empty */ float foe = floor(j / 4);
 
                 float hpbw = _HPBarWidthPx;
                 float hpbh = _HPBarHeightPx;
 
-                float fullx = p * xi;
-                float emptyx = p * (1 - xi) + xi;
-                float x = fullx * (1 - foe) + emptyx * foe - 0.5;
+                float fullx  = lerp(0, p, xi);
+                float emptyx = lerp(p, 1, xi);
+                float x = lerp(fullx, emptyx, foe) - 0.5;
                 float y = yi - 0.5;
 
                 float4 spos = UnityObjectToClipPos(float3(v.vertex.xy, 0));
 
                 float sx = _ScreenParams.x;
                 float sy = _ScreenParams.y;
-                spos.x = (floor(spos.x * sx) + hpbw * x) / sx;
-                spos.y = (floor(spos.y * sy) + hpbh * y - _HPBarOffsetPx) / sy;
+                spos.x = (floor(spos.x * sx) + 2 * hpbw * x) / sx;
+                spos.y = (floor(spos.y * sy) + 2 * hpbh * y - _HPBarOffsetPx) / sy;
 
                 o.vertex = spos;
                 o.full_or_empty = foe;

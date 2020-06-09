@@ -83,7 +83,7 @@ public class Game: MassiveGame<Game>
                     _<update_projectiles>();
                     _<handle_incoming_damage>();
 
-                    _<cleanup_units>();
+                    _<cleanup_dead_units>();
                     _<cleanup_unit_orders>();
 
                     _<update_unit_visibility>();
