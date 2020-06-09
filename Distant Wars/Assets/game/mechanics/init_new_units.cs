@@ -16,10 +16,10 @@ internal class init_new_units : MassiveMechanic
         /* space grid */ var sg = ur.SpaceGrid;
         /* grid positions      */ var guposs  = sg?.unit_positions;
         /* grid prev positions */ var gupposs = sg?.unit_prev_positions;
-        /* grid team ids       */ var guteams = sg?.unit_team_masks;
+        /* grid team ids       */ var guteams = sg?.unit_teams;
         /* grid units          */ var gunits  = sg?.unit_refs;
-        /* grid visiblities    */ var guviss  = sg?.unit_detections;
-        /* grid visiblities    */ var gudiss  = sg?.unit_discoveries;
+        /* grid visiblities    */ var guviss  = sg?.unit_detections_by_team;
+        /* grid visiblities    */ var gudiss  = sg?.unit_indentifications_by_team;
         /* grid cell count     */ var ccount  = guposs?.Length;
 
         foreach (var u in nu)
@@ -33,12 +33,12 @@ internal class init_new_units : MassiveMechanic
 
             if (utmask == lp_team_mask)
             {
-                u.OwnUnitsIndex = otunits.Count;
+                u.own_units_index = otunits.Count;
                 otunits.Add(u);
             }
             else
             {
-                u.OwnUnitsIndex = -1;
+                u.own_units_index = -1;
             }
 
             #if UNITY_EDITOR
@@ -52,17 +52,17 @@ internal class init_new_units : MassiveMechanic
 
                 // apply transform to position
                 {
-                    u.PrevPosition = u.Position = u.transform.position.xy();
+                    u.prev_position = u.position = u.transform.position.xy();
                 }
 
-                u.IncomingDamages = new LeakyList<int>(4);
-                u.HitPoints = u.MaxHitPoints;
+                u.incoming_damages = new LeakyList<int>(4);
+                u.hit_points = u.MaxHitPoints;
 
-                /* unit's position */ var upos = u.Position;
+                /* unit's position */ var upos = u.position;
                 var icell = sg.get_index_of(upos);
 
                 var cunits = gunits[icell];
-                u.SpaceGridIndex = (icell, cunits.Count);
+                u.space_grid_index = (icell, cunits.Count);
                 cunits.Add(u);
                 guposs [icell].Add(upos);
                 gupposs[icell].Add(upos);

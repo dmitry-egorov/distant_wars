@@ -12,15 +12,15 @@ public class cleanup_dead_units : MassiveMechanic
         /* space grid */ var sg  = ur.SpaceGrid;
         /* grid positions      */ var guposs  = sg.unit_positions;
         /* grid prev positions */ var gupposs = sg.unit_prev_positions;
-        /* grid team ids       */ var guteams = sg.unit_team_masks;
+        /* grid team ids       */ var guteams = sg.unit_teams;
         /* grid units          */ var gunits  = sg.unit_refs;
-        /* grid visiblities    */ var guviss  = sg.unit_detections;
-        /* grid visiblities    */ var gudiss  = sg.unit_discoveries;
+        /* grid visiblities    */ var guviss  = sg.unit_detections_by_team;
+        /* grid visiblities    */ var gudiss  = sg.unit_indentifications_by_team;
 
         for (var i = 0; i < us.Count; i++)
         {
             var u = us[i];
-            if (u.HitPoints > 0) 
+            if (u.hit_points > 0) 
                 continue;
             
             // remove from units
@@ -28,7 +28,7 @@ public class cleanup_dead_units : MassiveMechanic
 
             // delete from space grid
             {
-                var (icell, icunit) = u.SpaceGridIndex;
+                var (icell, icunit) = u.space_grid_index;
                 var cunits = gunits[icell];
                 cunits.ReplaceWithLast(icunit);
                 guposs [icell].ReplaceWithLast(icunit);
@@ -38,17 +38,16 @@ public class cleanup_dead_units : MassiveMechanic
                 gudiss [icell].ReplaceWithLast(icunit);
 
                 // fix the id of the replacing unit
-                if (icunit < cunits.Count) cunits[icunit].SpaceGridIndex.index = icunit;
+                if (icunit < cunits.Count) cunits[icunit].space_grid_index.index = icunit;
             }
-
                 
             // remove from own units
             {
-                var otuindex = u.OwnUnitsIndex;
+                var otuindex = u.own_units_index;
                 if (otuindex != -1)
                 {
                     ous.ReplaceWithLast(otuindex);
-                    if (otuindex < ous.Count) ous[otuindex].OwnUnitsIndex = otuindex;
+                    if (otuindex < ous.Count) ous[otuindex].own_units_index = otuindex;
                 }
             }
                 

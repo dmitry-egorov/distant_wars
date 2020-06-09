@@ -13,8 +13,8 @@ internal class update_unit_visibility : MassiveMechanic
 
         /* units' grids            */ var grid   = ur.SpaceGrid;
         /* grid unit positions     */ var guposs = grid.unit_positions;
-        /* grid unit detections    */ var gudets = grid.unit_detections;
-        /* grid unit discoveries   */ var gudiss = grid.unit_discoveries;
+        /* grid unit detections    */ var gudets = grid.unit_detections_by_team;
+        /* grid unit discoveries   */ var gudiss = grid.unit_indentifications_by_team;
 
         /* grid's fully radar visible cells */ var gcfdets = grid.cell_full_detections;
         Array.Clear(gcfdets, 0, gcfdets.Length);
@@ -36,12 +36,12 @@ internal class update_unit_visibility : MassiveMechanic
         for (int unit_i = 0; unit_i < ucount; unit_i++)
         {
             /* the unit         */ var unit = units[unit_i];
-            /* unit's position  */ var upos = unit.Position;
+            /* unit's position  */ var upos = unit.position;
             /* unit's team mask */ var uteam_mask = unit.Faction.Team.Mask;
 
             /* unit's vision range     */ var uvis  = unit.VisionRange;
             /* unit's vision range ^2  */ var uvis2 = uvis.sqr();
-            /* own radar range         */ var uradar  = uvis + unit.RadarRange;
+            /* own radar range         */ var uradar  = uvis + unit.RadarRangeExtension;
             /* own radar range ^2      */ var uradar2 = uradar.sqr();
             /* radar + cell radius ^2  */ var uradar_p_crad2 = (uradar + cell_radius).sqr();
             /* radar - cell radius     */ var uradar_m_crad  = uradar - cell_radius;

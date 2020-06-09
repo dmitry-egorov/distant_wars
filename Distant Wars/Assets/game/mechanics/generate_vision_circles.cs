@@ -64,9 +64,9 @@ public class generate_vision_circles : MassiveMechanic
         {
             /* unit          */ var u  = ounits[i];
             /* vision radius */ var vrange = u.VisionRange;
-            /* vision radius */ var rrange = vrange + u.RadarRange;
-            var upos  = u.Position;
-            var upp   = u.PrevPosition;
+            /* vision radius */ var rrange = vrange + u.RadarRangeExtension;
+            var upos  = u.position;
+            var upp   = u.prev_position;
             var uipos = Vector2.Lerp(upp, upos, time_ratio);
             
             /* all of the cells of the circle are fully visible */ 

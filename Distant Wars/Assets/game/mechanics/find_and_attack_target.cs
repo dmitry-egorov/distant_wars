@@ -9,54 +9,53 @@ public class find_and_attack_target : MassiveMechanic
         /* units            */ var us  = ur.Units;
         /* map              */ var map = Map.Instance;
 
-        /* projectiles manager */ var pm = ProjectilesManager.Instance;
-        /* projectile shooter        */ var pshooter = pm.shooters;
-        /* projectile positions      */ var pposs    = pm.positions;
-        /* prev projectile positions */ var ppposs   = pm.prev_positions;
-        /* projectile directions     */ var pdirs    = pm.directions;
-        /* projectile speeds         */ var pspds    = pm.speeds;    
-        /* projectile damages        */ var pdmgs    = pm.damages;
-        /* hit radius                */ var hradius  = pm.HitRadius;
-        /* predict target's position */ var predict  = ur.PredictTargetPosition;
+        /* projectiles manager       */ var pm = ProjectilesManager.Instance;
+        /* projectile shooter        */ var proj_shooters = pm.shooters;
+        /* projectile positions      */ var proj_poss = pm.positions;
+        /* prev projectile positions */ var proj_prev_poss = pm.prev_positions;
+        /* projectile directions     */ var proj_dirs = pm.directions;
+        /* projectile speeds         */ var proj_speeds = pm.speeds;    
+        /* projectile damages        */ var proj_damages = pm.damages;
+        
+        /* hit radius                */ var hit_radius  = pm.HitRadius;
+        /* predict target's position */ var predict_target_pos  = ur.PredictTargetPosition;
 
         /* delta time */ var dt  = Game.Instance.DeltaTime;
 
-        /* unit's space grid   */ var grid = ur.SpaceGrid;
-        /* cells unit postions     */ var guposs  = grid.unit_positions;
-        /* cells unit teams        */ var guteams = grid.unit_team_masks;
-        /* cells unit visibilities */ var guviss  = grid.unit_detections;
-        /* cells unit visibilities */ var gudiss  = grid.unit_discoveries;
-        /* cells units             */ var gunits  = grid.unit_refs;
+        /* unit's space grid */ var grid = ur.SpaceGrid;
+        /* cells unit postions        */ var grid_unit_poss = grid.unit_positions;
+        /* cells unit teams           */ var grid_unit_teams = grid.unit_teams;
+        /* cells unit detections      */ var grid_unit_detects = grid.unit_detections_by_team;
+        /* cells unit identifications */ var grid_unit_idents = grid.unit_indentifications_by_team;
+        /* cells units                */ var grid_unit_refs = grid.unit_refs;
                     
         foreach (var unit in us)
         {
-            /* attack cooldown     */ var ocd = unit.AttackCountdown;
-            /* new attack cooldown */ var ncd = unit.AttackCountdown = ocd > 0 ? ocd - dt : 0;
+            /* attack cooldown     */ var old_attack_cd = unit.attack_remaining_cooldown;
+            /* new attack cooldown */ var new_attack_cd = old_attack_cd > 0 ? old_attack_cd - dt : 0;
+            unit.attack_remaining_cooldown = new_attack_cd;
 
-            if (ncd > 0)
+            if (new_attack_cd > 0)
                 // attack is on cooldown
                 continue;
 
-            /* unit's position 2d   */ var upos2d  = unit.Position;
-            /* attack range         */ var range   = unit.AttackRange;
+            /* unit's position 2d   */ var unit_pos_2d  = unit.position;
+            /* unit's attack range  */ var u_range   = unit.AttackRange;
             /* target is found      */ var target_found = false;
 
             /* possible target unit */ 
             // check attack order target and last attack target
-            if (unit.IssuedOrder.is_attack(/* attack order target */ out var ptarget)
-             || unit.LastAttackTarget.try_get(/* last attack target */ out ptarget))
+            if (unit.issued_order.is_attack(/* attack order target */ out var target)
+             || unit.last_attack_target.try_get(/* last attack target */ out target))
             {
-                /* target's position 2d */
-                var tp2 = ptarget.Position;
-                /* target's offset      */
-                var to = tp2 - upos2d;
-                /* distance to target   */
-                var td = to.sqrMagnitude;
+                /* target's position 2d */ var tp2 = target.position;
+                /* target's offset      */ var to = tp2 - unit_pos_2d;
+                /* distance to target   */ var td = to.sqrMagnitude;
 
                 // target is within range
-                if (td <= range.sqr())
+                if (td <= u_range.sqr())
                 {
-                    unit.LastAttackTarget = ptarget;
+                    unit.last_attack_target = target;
                     target_found = true;
                 }
             }
@@ -64,116 +63,113 @@ public class find_and_attack_target : MassiveMechanic
             if (!target_found)
             // find first enemy in range
             {
-                var uteam_mask = unit.Faction.Team.Mask;
+                var unit_team = unit.Faction.Team.Mask;
 
                 //PERF: can probably be done faster by walking outwards from the center
-                /* attack range ^2        */ var range2 = range.sqr();
-                /* min distance ^2 so far */ var mindst2 = float.MaxValue;
-                /* grid attack area       */ var it = grid.get_iterator_of_circle(upos2d, range);
+                /* attack range ^2        */ var range_sq = u_range.sqr();
+                /* min distance ^2 so far */ var min_dst_sq = float.MaxValue;
+                /* grid attack area       */ var it = grid.get_iterator_of_circle(unit_pos_2d, u_range);
 
                 while (it.next(out var cell_i))
                 {
-                    /* cell unit positions   */ var cuposs  = guposs [cell_i];
-                    /* cell unit teams       */ var cuteams = guteams[cell_i];
-                    /* cell unit visbilities */ var cuviss  = guviss [cell_i];
-                    /* cell unit visbilities */ var cudiss  = gudiss [cell_i];
-                    /* cell units refs       */ var curefs  = gunits [cell_i];
-                    /* cell units count      */ var cucount = cuposs.Count;
+                    /* cell unit positions       */ var cell_unit_poss = grid_unit_poss[cell_i];
+                    /* cell unit teams           */ var cell_unit_teams = grid_unit_teams[cell_i];
+                    /* cell unit detections      */ var cell_unit_detects = grid_unit_detects[cell_i];
+                    /* cell unit identifications */ var cell_unit_idents = grid_unit_idents[cell_i];
+                    /* cell units refs           */ var cell_unit_refs = grid_unit_refs[cell_i];
+                    /* cell units count          */ var cell_unit_count = cell_unit_poss.Count;
 
-                    for (/* target unit index */ int tunit_i = 0; tunit_i < cucount; tunit_i++)
+                    for (var target_i = 0; target_i < cell_unit_count; target_i++)
                     {
-                        /* target's team */ var tteam = cuteams[tunit_i];
-                        if (tteam == uteam_mask) 
+                        if (cell_unit_teams[target_i] == unit_team) 
                             // target is on the same team
                             continue;
 
-                        /* target's visibility */ var tvis = cuviss[tunit_i];
-                        if ((tvis & uteam_mask) == 0) 
-                            // target is not visible
+                        if ((cell_unit_detects[target_i] & unit_team) == 0) 
+                            // target is not detected
                             continue;
 
-                        /* target's discovery */ var tdis = cudiss[tunit_i];
-                        if ((tdis & uteam_mask) == 0) 
-                            // target is not discovered
+                        if ((cell_unit_idents[target_i] & unit_team) == 0) 
+                            // target is not identified
                             continue;
                         
-                        /* target's position 2d  */ var tpos2 = cuposs[tunit_i];
-                        /* target's offset       */ var toff  = tpos2 - upos2d;
-                        /* distance to target ^2 */ var tdist2 = toff.sqrMagnitude;
-                        if (tdist2 < mindst2 && tdist2 < range2)
+                        /* target's position 2d  */ var target_pos_2d = cell_unit_poss[target_i];
+                        /* target's offset       */ var target_off  = target_pos_2d - unit_pos_2d;
+                        /* distance to target ^2 */ var target_dist_sq = target_off.sqrMagnitude;
+                        if (target_dist_sq < min_dst_sq && target_dist_sq < range_sq)
                         {
-                            mindst2 = tdist2;
-                            ptarget = curefs[tunit_i];
+                            min_dst_sq = target_dist_sq;
+                            target = cell_unit_refs[target_i];
                             target_found = true;
                         }
                     }
                 }
             }
 
-            if (!target_found)
-                // target not found
-                continue;
-
-            // calculate shot direction
-            /* target's position 2d   */ var tpos2d  = ptarget.Position;
-            /* target's prev position */ var tppos2d = ptarget.PrevPosition;
-            /* projectiles speed      */ var pspeed  = unit.ProjectileSpeed;
-
-            if (predict && tpos2d != tppos2d)
-            // fire at predicted position
+            if (target_found)
+            // fire at the target 
             {
-                /* target's velocity  */ var tvel2d = (tpos2d - tppos2d) / dt;
-                /* delta to target 2d */ var tdelta2d = tpos2d - upos2d;
+                // calculate shot direction
+                /* target's position 2d   */ var target_pos_2d  = target.position;
+                /* target's prev position */ var target_prev_pos_2d = target.prev_position;
+                /* projectiles speed      */ var proj_speed  = unit.ProjectileSpeed;
 
-                // solution for:
-                // |tvel2d * t + tdelta2d| = pspeed * t
-                // (tvel2d^2 - pspeed^2) * t^2 + 2 * dot(tvel2d, tdelta2d) * t + tdelta2d^2 = 0
-
-                var tvel2d2 = tvel2d.sqrMagnitude;
-                var pspeed2 = pspeed.sqr();
-                var tdelta2d2 = tdelta2d.sqrMagnitude;
-
-                var a  = tvel2d2 - pspeed2;
-                var hb = Vector2.Dot(tvel2d, tdelta2d); // half b
-                var c  = tdelta2d2;
-
-                /* half determinant ^2 */ var hd2 = hb.sqr() - a * c;
-                if (hd2 >= 0)
+                if (predict_target_pos && target_pos_2d != target_prev_pos_2d)
+                // predict target position
                 {
-                    var hd = Mathf.Sqrt(hd2);
-                    var t1 = (-hb - hd) / a;
-                    var t2 = (-hb + hd) / a;
-                    if (t1 >= 0 || t2 >= 0)
-                    {
-                        var t = t2 < 0 ? t1
-                              : t1 < 0 ? t2
-                              : Mathf.Min(t1, t2)
-                        ;
+                    /* target's velocity  */ var target_vel_2d = (target_pos_2d - target_prev_pos_2d) / dt;
+                    /* delta to target 2d */ var target_delta_2d = target_pos_2d - unit_pos_2d;
 
-                        // assuming the same height offset
-                        tpos2d += tvel2d * t;
+                    // solution for:
+                    // |tvel2d * t + tdelta2d| = pspeed * t
+                    // (tvel2d^2 - pspeed^2) * t^2 + 2 * dot(tvel2d, tdelta2d) * t + tdelta2d^2 = 0
+
+                    var target_vel_2d_sq = target_vel_2d.sqrMagnitude;
+                    var proj_speed_sq = proj_speed.sqr();
+                    var target_dist_2d = target_delta_2d.sqrMagnitude;
+
+                    var a  = target_vel_2d_sq - proj_speed_sq;
+                    var hb = Vector2.Dot(target_vel_2d, target_delta_2d); // half b
+                    var c  = target_dist_2d;
+
+                    /* half determinant ^2 */ var hd2 = hb.sqr() - a * c;
+                    if (hd2 >= 0)
+                    {
+                        var hd = Mathf.Sqrt(hd2);
+                        var t1 = (-hb - hd) / a;
+                        var t2 = (-hb + hd) / a;
+                        if (t1 >= 0 || t2 >= 0)
+                        {
+                            var t = t2 < 0 ? t1
+                                  : t1 < 0 ? t2
+                                  : Mathf.Min(t1, t2)
+                            ;
+
+                            // assuming the same height offset
+                            target_pos_2d += target_vel_2d * t;
+                        }
                     }
                 }
+
+                // create projectile
+                /* unit's turret position */ var unit_pos_3d     = unit_pos_2d.xy(map.z(unit_pos_2d) + hit_radius);
+                /* target's position   3d */ var target_pos_3d   = target_pos_2d.xy(map.z(target_pos_2d) + hit_radius);
+                /* delta to target     3d */ var target_delta_3d = target_pos_3d - unit_pos_3d;
+                /* direction to target 3d */ var target_dir_3d   = target_delta_3d.normalized;
+
+                /* projectile damage   */ var proj_dmg = unit.ProjectileDamage;
+
+                proj_shooters .Add(unit);
+                proj_poss     .Add(unit_pos_3d);
+                proj_prev_poss.Add(unit_pos_3d.xy());
+                proj_dirs     .Add(target_dir_3d);
+                proj_speeds   .Add(proj_speed);
+                proj_damages  .Add(proj_dmg);
+
+                // reset attack cooldown
+                /* cooldown time */ var cd = unit.AttackCooldownTime;
+                unit.attack_remaining_cooldown = new_attack_cd + cd;
             }
-
-            // create projectile
-            /* unit's turret position */ var upos3d   = upos2d.xy(map.z(upos2d) + hradius);
-            /* target's position   3d */ var tpos3d   = tpos2d.xy(map.z(tpos2d) + hradius);
-            /* delta to target     3d */ var tdelta3d = tpos3d - upos3d;
-            /* direction to target 3d */ var tdir3dn   = tdelta3d.normalized;
-
-            /* projectile damage   */ var pdmg = unit.ProjectileDamage;
-
-            pshooter.Add(unit);
-            pposs .Add(upos3d);
-            ppposs.Add(upos3d.xy());
-            pdirs .Add(tdir3dn);
-            pspds .Add(pspeed);
-            pdmgs .Add(pdmg);
-
-            // reset attack cooldown
-            /* cooldown time */ var cdtime = unit.AttackCooldownTime;
-            unit.AttackCountdown = ncd + cdtime;
         }
     }
 }

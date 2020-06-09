@@ -22,11 +22,11 @@
             //FEAT: friend/foe/neutral distinction
             if (tu.Faction != lp.Faction)
             {
-                foreach (var u in su) u.IssuedOrder = Unit.Order.attack(tu);
+                foreach (var u in su) u.issued_order = Unit.Order.attack(tu);
             }
             else
             {
-                foreach (var u in su) u.IssuedOrder = Unit.Order.guard(tu);
+                foreach (var u in su) u.issued_order = Unit.Order.guard(tu);
             }
             
             return;
@@ -36,7 +36,7 @@
         {
             var /* target position */ tp = lp.WorldMousePosition;
 
-            foreach (var u in su) u.IssuedOrder = Unit.Order.move(tp);
+            foreach (var u in su) u.issued_order = Unit.Order.move(tp);
         }
     }
 }

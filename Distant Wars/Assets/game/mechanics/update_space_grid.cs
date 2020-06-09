@@ -10,10 +10,10 @@ internal class update_space_grid : MassiveMechanic
         /* space grid */ var sg  = ur.SpaceGrid;
         /* grid positions      */ var guposs  = sg.unit_positions;
         /* grid prev positions */ var gupposs = sg.unit_prev_positions;
-        /* grid team ids       */ var guteams = sg.unit_team_masks;
+        /* grid team ids       */ var guteams = sg.unit_teams;
         /* grid units          */ var gunits  = sg.unit_refs;
-        /* grid visiblities    */ var guviss  = sg.unit_detections;
-        /* grid visiblities    */ var gudiss  = sg.unit_discoveries;
+        /* grid visiblities    */ var guviss  = sg.unit_detections_by_team;
+        /* grid visiblities    */ var gudiss  = sg.unit_indentifications_by_team;
         /* grid cell count     */ var ccount  = guposs.Length;
 
         for (var ci = 0; ci < ccount; ci++)
@@ -31,8 +31,8 @@ internal class update_space_grid : MassiveMechanic
                 /* unit's team mask */ var tid  = cteams[ui];
 
                 /* the unit */ var unit = cunits[ui];
-                /* unit's new position   */ var new_pos  = unit.Position;
-                /* unit's prev position  */ var prev_pos = unit.PrevPosition;
+                /* unit's new position   */ var new_pos  = unit.position;
+                /* unit's prev position  */ var prev_pos = unit.prev_position;
                 /* unit's new cell index */ var new_ci = sg.get_index_of(new_pos);
 
                 if (new_ci == ci)
@@ -50,7 +50,7 @@ internal class update_space_grid : MassiveMechanic
                 // add to the new cell
                 {
                     /* new cell's units */ var ncunits = gunits[new_ci];
-                    unit.SpaceGridIndex = (new_ci, ncunits.Count);
+                    unit.space_grid_index = (new_ci, ncunits.Count);
                     ncunits.Add(unit);
 
                     guposs [new_ci].Add(new_pos);
@@ -70,7 +70,7 @@ internal class update_space_grid : MassiveMechanic
                     cdiss .ReplaceWithLast(ui);
 
                     // fix the id of the replacing unit
-                    if (ui < cunits.Count) cunits[ui].SpaceGridIndex.index = ui;
+                    if (ui < cunits.Count) cunits[ui].space_grid_index.index = ui;
                 }
 
                 ucount--;

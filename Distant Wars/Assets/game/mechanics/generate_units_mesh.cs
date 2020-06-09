@@ -39,7 +39,7 @@ public class generate_units_mesh: MassiveMechanic
         /* grid positions      */ var gposs   = grid.unit_positions;
         /* grid prev positions */ var gpposs  = grid.unit_prev_positions;
         /* grid units          */ var gunits  = grid.unit_refs;
-        /* grid visiblities    */ var gdets   = grid.unit_detections;
+        /* grid visiblities    */ var gdets   = grid.unit_detections_by_team;
 
         var max_cprop = ur.HPBarMaxCamZoomLevel;
         var cprop = cam.SizeProportion;
@@ -76,7 +76,7 @@ public class generate_units_mesh: MassiveMechanic
                 // render hp
                 if (render_hp)
                 {
-                    var hp_prop = unit.HitPoints / (float)unit.MaxHitPoints;
+                    var hp_prop = unit.hit_points / (float)unit.MaxHitPoints;
                     if (hp_prop < 1)
                     {
                         hp_prop = hp_prop < 0 ? 0 : hp_prop;
@@ -92,13 +92,13 @@ public class generate_units_mesh: MassiveMechanic
                     }
                 }
                 
-                if (unit.IsBlinking)
+                if (unit.is_blinking)
                     continue;
 
                 //TODO: display gray icon when not discovered
 
-                /* unit is highlighted */ var uih = unit.IsHighlighted;
-                /* unit is selected    */ var uis = unit.IsSelected;
+                /* unit is highlighted */ var uih = unit.is_highlighted;
+                /* unit is selected    */ var uis = unit.is_selected;
                 /* faction color index */ var fci = unit.Faction.Index;
                 /* highlight flags     */ var hf  = (uih ? 1 : 0) | (uis ? 2 : 0) | (fci << 4);
                 

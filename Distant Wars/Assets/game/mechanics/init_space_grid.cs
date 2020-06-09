@@ -31,9 +31,9 @@ internal class init_space_grid : MassiveMechanic
             var gccount = sz.x * sz.y + 1;
             var guposs  = grid.unit_positions      = new LeakyList<Vector2>[gccount];
             var gupposs = grid.unit_prev_positions = new LeakyList<Vector2>[gccount];
-            var gudets  = grid.unit_detections     = new LeakyList<byte>[gccount];
-            var gudiss  = grid.unit_discoveries    = new LeakyList<byte>[gccount];
-            var guteams = grid.unit_team_masks     = new LeakyList<byte>[gccount];
+            var gudets  = grid.unit_detections_by_team     = new LeakyList<byte>[gccount];
+            var gudiss  = grid.unit_indentifications_by_team    = new LeakyList<byte>[gccount];
+            var guteams = grid.unit_teams     = new LeakyList<byte>[gccount];
             var gunits  = grid.unit_refs           = new List<Unit>[gccount];
 
             var cc = grid.cell_centers = new Vector2[gccount];
@@ -69,12 +69,12 @@ internal class init_space_grid : MassiveMechanic
             // fill unit data arrays
             foreach(var unit in ur.Units)
             {
-                /* unit's position */ var pos = unit.Position;
+                /* unit's position */ var pos = unit.position;
                 var uteam = unit.Faction.Team.Mask;
                 var ui = grid.get_index_of(pos);
 
                 var cunits = gunits[ui];
-                unit.SpaceGridIndex = (ui, cunits.Count);
+                unit.space_grid_index = (ui, cunits.Count);
                 cunits.Add(unit);
                 guposs [ui].Add(pos);
                 gupposs[ui].Add(pos);

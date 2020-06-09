@@ -5,15 +5,15 @@
         var /* local player */ lp = LocalPlayer.Instance;
 
         foreach (var /* unit */ u in lp.PreviousUnitsInTheCursorBox)
-            u.IsHighlighted = false;
+            u.is_highlighted = false;
 
         foreach (var /* unit */ u in lp.UnitsInTheCursorBox)
-            u.IsHighlighted = true;
+            u.is_highlighted = true;
 
         foreach (var u in lp.PreviouslySelectedUnits)
-            u.IsSelected = false;
+            u.is_selected = false;
 
         foreach (var /* unit */ u in lp.SelectedUnits) 
-            u.IsSelected = true;
+            u.is_selected = true;
     }
 }

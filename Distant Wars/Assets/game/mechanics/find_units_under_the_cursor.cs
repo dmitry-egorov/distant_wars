@@ -13,7 +13,7 @@ public class find_units_under_the_cursor : MassiveMechanic
         /* space grid */ var sg = ur.SpaceGrid;
         /* cells unit postions      */ var poss  = sg.unit_positions;
         /* cells unit prev postions */ var pposs = sg.unit_prev_positions;
-        /* cells unit visibilities  */ var viss  = sg.unit_detections;
+        /* cells unit visibilities  */ var viss  = sg.unit_detections_by_team;
         /* cells units              */ var units = sg.unit_refs;
 
         /* local player      */ var lp = LocalPlayer.Instance;

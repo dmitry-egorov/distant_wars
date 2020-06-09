@@ -12,47 +12,48 @@ public class update_unit_blinking : MassiveMechanic
             
         var units = ur.Units;
         var ucount = units.Count;
-        /* damage blink time */ var bt = ur.DamageBlinkCount * (ur.DamageBlinkShowTime + ur.DamageBlinkHideTime);
+        /* damage blink time */ var blink_time = ur.DamageBlinkCount * (ur.DamageBlinkShowTime + ur.DamageBlinkHideTime);
         /* camera            */ var cam = StrategicCamera.Instance;
-        /* screen rectangle  */ var rscreen = cam.WorldScreen;
-        /* adjasted sprite size */ var ssize = (float)(ur.SpriteSize * (cam.ScreenResolution.y / 1080));
-        /* screen rect offset to accomodate unit's size */ var offset = ssize * MathEx.Root2;
-        /* adjusted screen rectangle */ var arscreen = rscreen.wider_by(offset);
+        /* screen rectangle  */ var screen_rect = cam.WorldScreen;
+        /* adjasted sprite size */ var adj_sprite_size = (float)(ur.SpriteSize * (cam.ScreenResolution.y / 1080));
+        /* screen rect offset to accomodate unit's size */ var offset = adj_sprite_size * MathEx.Root2;
+        /* adjusted screen rectangle */ var adj_screen_rect = screen_rect.wider_by(offset);
 
-        for (var iunit = 0; iunit < ucount; iunit++)
+        for (var i_unit = 0; i_unit < ucount; i_unit++)
         {
-            var u = units[iunit];
-
-            if (arscreen.contains(u.Position))
+            var u = units[i_unit];
+            var u_pos = u.position;
+            
+            if (adj_screen_rect.contains(u_pos))
             {
-                var obt = u.BlinkTimeRemaining;
-                if (u.ReceivedDamageSinceLastPresentation)
+                /* old blinking time */ var old_bt = u.blink_time_remaining;
+                if (u.has_received_damage_since_last_presentation)
                 {
-                    obt = u.BlinkTimeRemaining = bt;
-                    u.ReceivedDamageSinceLastPresentation = false;
+                    old_bt = u.blink_time_remaining = blink_time;
+                    u.has_received_damage_since_last_presentation = false;
                 }
 
-                /* new blinking time */ var nbt = obt - dt;
+                /* new blinking time */ var new_bt = old_bt - dt;
                 // hide, when blinking and in hiding period
-                if (nbt > 0)
+                if (new_bt > 0)
                 {
-                    u.BlinkTimeRemaining = nbt;
-                    u.IsBlinking = (nbt % bp) > bst;
+                    u.blink_time_remaining = new_bt;
+                    u.is_blinking = (new_bt % bp) > bst;
                 }
                 else 
                 {
-                    u.IsBlinking = false;
-                    if (obt != 0)
+                    u.is_blinking = false;
+                    if (old_bt != 0)
                     {
-                        u.BlinkTimeRemaining = 0;
+                        u.blink_time_remaining = 0;
                     }
                 }
             }
             else
             {
-                u.ReceivedDamageSinceLastPresentation = false;
-                u.BlinkTimeRemaining = 0;
-                u.IsBlinking = false;
+                u.has_received_damage_since_last_presentation = false;
+                u.blink_time_remaining = 0;
+                u.is_blinking = false;
             }
         }
     }

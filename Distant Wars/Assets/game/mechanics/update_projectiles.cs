@@ -57,7 +57,7 @@ internal class update_projectiles : MassiveMechanic
 
                     if (rays.try_intersect_sphere(ppos3d, pdir3d, spd, upos3, hradius, out var t))
                     {
-                        unit.IncomingDamages.Add(dmgs[iproj]);
+                        unit.incoming_damages.Add(dmgs[iproj]);
                         hit_pos = ppos3d + pdir3d * t;
                         return true;
                     }

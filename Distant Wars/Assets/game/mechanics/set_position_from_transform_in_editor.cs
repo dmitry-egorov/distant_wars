@@ -7,7 +7,7 @@ internal class editor_set_position_from_transform : MassiveMechanic
         var us = ur.Units;
         
         foreach (var u in us)
-            u.PrevPosition = u.Position = u.transform.position.xy();
+            u.prev_position = u.position = u.transform.position.xy();
     }
 }
 #endif

@@ -8,24 +8,24 @@ internal class cleanup_unit_orders : MassiveMechanic
         // clean up orders with destroyed targets
         foreach(var u in us)
         {
-            if (u.IssuedOrder.is_attack(out var at))
+            if (u.issued_order.is_attack(out var at))
             {
                 if (at == null)
                 {
-                    u.IssuedOrder = Unit.Order.idle();
+                    u.issued_order = Unit.Order.idle();
                 }
             }
-            else if (u.IssuedOrder.is_guard(out var gt))
+            else if (u.issued_order.is_guard(out var gt))
             {
                 if (gt == null)
                 {
-                    u.IssuedOrder = Unit.Order.idle();
+                    u.issued_order = Unit.Order.idle();
                 }
             }
 
-            if (u.LastAttackTarget == null)
+            if (u.last_attack_target == null)
             {
-                u.LastAttackTarget = null;
+                u.last_attack_target = null;
             }
         }
     }

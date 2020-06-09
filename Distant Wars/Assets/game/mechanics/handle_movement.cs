@@ -21,23 +21,23 @@ internal class handle_movement : MassiveMechanic
 
         foreach (var u in us)
         {
-            /* unit's position 2d   */ var upos = u.Position;
+            /* unit's position 2d   */ var upos = u.position;
             /* has move target      */ var has_target = false;
 
-            u.PrevPosition = upos;
+            u.prev_position = upos;
 
-            var is_move_order = has_target = u.IssuedOrder.is_move(out var target);
+            var is_move_order = has_target = u.issued_order.is_move(out var target);
 
             if (!is_move_order)
             {
                 var ot = default(Unit);
-                var igo = u.IssuedOrder.is_guard(out ot);
-                var iao = !igo ? u.IssuedOrder.is_attack(out ot) : false;
+                var igo = u.issued_order.is_guard(out ot);
+                var iao = !igo ? u.issued_order.is_attack(out ot) : false;
 
                 if (igo || iao)
                 {
                     /* approach distance  */ var ad = igo ? gad : u.AttackRange - aadm;
-                    /* target's position  */ var tp = ot.Position;
+                    /* target's position  */ var tp = ot.position;
                     /* target's offset    */ var to = tp - upos;
                     /* distance to target */ var td = to.magnitude;
                     /* distance remaining */ var dr = td - ad;
@@ -64,11 +64,11 @@ internal class handle_movement : MassiveMechanic
                     /* terrain speed  */ var ts = sp * Mathf.Exp(sl);
                     /* smoothed speed */ var ss = ts * Mathf.Clamp01(dist / ed);
                     
-                    u.Position = Vector2.MoveTowards(upos, target, ss * dt);
+                    u.position = Vector2.MoveTowards(upos, target, ss * dt);
                 }
                 else if (is_move_order)
                 {
-                    u.IssuedOrder = Unit.Order.idle();
+                    u.issued_order = Unit.Order.idle();
                 }
             }
         }

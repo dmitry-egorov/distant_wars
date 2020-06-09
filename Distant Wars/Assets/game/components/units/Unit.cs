@@ -1,12 +1,13 @@
 ﻿using Plugins.Lanski;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
 {
     [Header("Settings")]
     public float BaseSpeed;
     public float VisionRange;
-    public float RadarRange; // outside the vision range
+    [FormerlySerializedAs("RadarRange")] public float RadarRangeExtension; // outside the vision range
     public float AttackRange;
     public float AttackCooldownTime;
     public float ProjectileSpeed;
@@ -15,33 +16,33 @@ public class Unit : MassiveBehaviour<UnitsRegistry, Unit>
     public int MaxHitPoints;
 
     [Header("State")]
-    public Vector2 Position;
-    public Vector2 PrevPosition;
+    public Vector2 position;
+    public Vector2 prev_position;
 
-    public (int cell, int index) SpaceGridIndex;
-    public int OwnUnitsIndex;
+    public (int cell, int index) space_grid_index;
+    public int own_units_index;
     
-    public Order IssuedOrder;
-    public Unit LastAttackTarget;
+    public Order issued_order;
+    public Unit last_attack_target;
  
-    public float AttackCountdown;
+    public float attack_remaining_cooldown;
 
-    public LeakyList<int> IncomingDamages;
-    public int HitPoints;
+    public LeakyList<int> incoming_damages;
+    public int hit_points;
 
     [Header("Visual State")]
-    public bool IsHighlighted;
-    public bool IsSelected;
+    public bool is_highlighted;
+    public bool is_selected;
     
-    public bool  ReceivedDamageSinceLastPresentation;
-    public float BlinkTimeRemaining;
-    public bool  IsBlinking;
+    public bool  has_received_damage_since_last_presentation;
+    public float blink_time_remaining;
+    public bool  is_blinking;
 
     public void OnDrawGizmos()
     {
         Gizmos.color = Color.blue;
         
-        Gizmos.DrawIcon(Position,"U", false);
+        Gizmos.DrawIcon(position,"U", false);
     }
 
     public struct Order

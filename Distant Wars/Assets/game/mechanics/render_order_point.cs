@@ -19,7 +19,7 @@ public class update_order_point : MassiveMechanic
         (
             !lp.CursorIsABox 
             && bu.TryGetFirstItem(out var /* unit */ u) 
-            && u.IssuedOrder.is_move(out var /* move order */ tp)
+            && u.issued_order.is_move(out var /* move order */ tp)
         )
         {
             /* strategic camera  */ var sc  = StrategicCamera.Instance;
@@ -39,7 +39,7 @@ public class update_order_point : MassiveMechanic
             {
                 var /* line width */ w = s2w.apply_to_scalar(op.LineWidth);
 
-                olr.SetPosition(0, u.Position.xy(z));
+                olr.SetPosition(0, u.position.xy(z));
                 olr.SetPosition(1, tp.xy(z));
 
                 olr.startWidth = w;
