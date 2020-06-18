@@ -1,4 +1,6 @@
-- buildings
+- buildings menu
+- buildings blueprint
+- admiral builds
 - factory
 - building units
 - builder

@@ -1,3 +1,10 @@
+- robotic farm to defend
+- ftl like roguelike: 10 maps with random mission, secrets, loot
+- ftl like: give access to random tech throughout the game
+- story: find a spaceship and launch it
+- story: pursued by zerglike, later revealed overlords
+- final mission repairing the spacecraft, integrating people and the admiral into it, fighting off the final boss
+- reputation with factions
 - auto squads: select part of a squad and give it a command to create a new squad
 - right-click on a squad to merge selected units with it
 - squads auto resupply
